@@ -16,15 +16,23 @@
   </a>
 </p>
 
-# Laravue
-[Laravue](https://laravue.dev) (pronounced /ˈlarəvjuː/) is a beautiful dashboard combination of [Laravel](https://laravel.com/), [Vue.js](https://github.com/vuejs/vue) and the UI Toolkit [Element](https://github.com/ElemeFE/element). The work is inspired by  [vue-element-admin](http://panjiachen.github.io/vue-element-admin) with our love on top of that. With the powerful Laravel framework as the backend, Vue.js as the high performance on the frontend,  Laravue appears to be a full-stack solution for an enterprise application level.
+# Audiolegs 1.0
 
-Documentation: [https://doc.laravue.dev](https://doc.laravue.dev)
+## Configurar tradução
+/resources/js/lang/index.js = configurar e importar uma nova tradução
+/resources/js/lang/pt_BR = Arquivo  de tradução pt-br
 
-## Screenshot
-<p align="center">
-  <img width="900" src="https://cdn.laravue.dev/screenshot.png">
-</p>
+
+
+
+
+
+
+
+
+
+
+
 
 ## Getting started
 

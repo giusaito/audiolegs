@@ -119,6 +119,16 @@ export const constantRoutes = [
     ],
   },
   {
+    path: '/importar-usuario',
+    component: Layout,
+    children: [{
+      path: 'index',
+      component: () => import('@/views/users/ImportUser'),
+      name: 'Importar Usuários',
+      meta: { title: 'Importar Usuários', icon: 'icon' },
+    }],
+  },
+  {
     path: '/guide',
     component: Layout,
     redirect: '/guide/index',
@@ -216,18 +226,7 @@ export const asyncRoutes = [
         meta: { title: 'i18n', icon: 'international' },
       },
     ],
-  },
-  {
-    path: '/external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://github.com/tuandm/laravue',
-        meta: { title: 'externalLink', icon: 'link' },
-      },
-    ],
-  },
-  { path: '*', redirect: '/404', hidden: true },
+  }, { path: '*', redirect: '/404', hidden: true },
 ];
 
 const createRouter = () => new Router({

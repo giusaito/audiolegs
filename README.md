@@ -19,8 +19,8 @@
 # Audiolegs 1.0
 
 ## Configurar tradução
-/resources/js/lang/index.js = configurar e importar uma nova tradução
-/resources/js/lang/pt_BR = Arquivo  de tradução pt-br
+* /resources/js/lang/index.js = configurar e importar uma nova tradução
+* /resources/js/lang/pt_BR = Arquivo  de tradução pt-br
 
 
 

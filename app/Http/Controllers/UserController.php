@@ -230,4 +230,20 @@ class UserController extends Controller
             ],
         ];
     }
+
+
+    public function userImport(Request $request){ 
+
+        foreach($request->all() as $inserUser){
+            $user = User::create([
+                'name' => $inserUser['nome'],
+                'email' => $inserUser['email'],
+                'password' => Hash::make('12345678'),
+            ]);
+        }
+
+        return 'ok';
+
+    }
+
 }

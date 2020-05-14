@@ -8,11 +8,13 @@
 </template>
 
 <script>
+import request from '@/utils/request';
 import UploadExcelComponent from '@/components/UploadExcel/import-user.vue';
-
+import waves from '@/directive/waves'; // Waves directive
 export default {
   name: 'UploadExcel',
   components: { UploadExcelComponent },
+  directives: { waves },
   data() {
     return {
       tableData: [],
@@ -36,6 +38,23 @@ export default {
     handleSuccess({ results, header }) {
       this.tableData = results;
       this.tableHeader = header;
+      request({
+        url: '/usuario/importar-usuario',
+        method: 'post',
+        data: results,
+      })
+        .then(function(response) {
+        // this.$message({
+        //         message: 'add',
+        //         type: 'success',
+        //         duration: 5 * 1000,
+        //       });
+          alert('Usuários importados com sucesso');
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     },
   },
 };

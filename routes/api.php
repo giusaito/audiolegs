@@ -30,6 +30,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::apiResource('permissions', 'PermissionController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
     Route::post('/usuario/importar-usuario', 'UserController@userImport');
+
+    Route::get('atividades', 'Backend\ActivitieController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 });
 
 

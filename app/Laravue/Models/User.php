@@ -6,7 +6,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
-
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * Class User
  *
@@ -20,7 +21,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
-    use Notifiable, HasRoles, HasApiTokens;
+    use Notifiable, HasRoles, HasApiTokens, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +32,7 @@ class User extends Authenticatable
         'name', 'email', 'password'
     ];
 
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -39,6 +41,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
 
     /**
      * The attributes that should be cast to native types.
@@ -54,6 +57,11 @@ class User extends Authenticatable
      * @var string
      */
     protected $guard_name = 'api';
+
+    protected static $logFillable = true;
+    protected static $logName = 'Usuário';
+
+
 
     /**
      * @inheritdoc
@@ -98,5 +106,17 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+     public function getDescriptionForEvent(string $eventName): string
+    {
+        if($eventName == 'created'){
+            $eventName = 'Adicionado';
+        } elseif($eventName == 'updated') {
+            $eventName = 'Atualizado';
+        }elseif($eventName == 'deleted') {
+            $eventName = 'Removido';
+        }
+        return $eventName;
     }
 }

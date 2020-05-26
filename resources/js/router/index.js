@@ -129,6 +129,16 @@ export const constantRoutes = [
     }],
   },
   {
+    path: '/atividades/logs',
+    component: Layout,
+    children: [{
+      path: 'index',
+      component: () => import('@/views/activities/logs'),
+      name: 'Logs de usuários',
+      meta: { title: 'Logs de usuários', icon: 'icon' },
+    }],
+  },
+  {
     path: '/guide',
     component: Layout,
     redirect: '/guide/index',

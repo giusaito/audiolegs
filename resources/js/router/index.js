@@ -131,12 +131,26 @@ export const constantRoutes = [
   {
     path: '/atividades/logs',
     component: Layout,
-    children: [{
-      path: 'index',
-      component: () => import('@/views/activities/logs'),
-      name: 'Logs de usuários',
-      meta: { title: 'Logs de usuários', icon: 'icon' },
-    }],
+    meta: {
+      title: 'Logs de acesso',
+      icon: 'documentation',
+      permissions: ['view logs permission'],
+    },
+    children: [
+      {
+        path: 'usuarios',
+        component: () => import('@/views/activities/logs'),
+        name: 'Logs de acesso ao sistema',
+        meta: { title: 'Logs de acesso', icon: 'admin' },
+      },
+      {
+        path: 'utilizacao',
+        component: () => import('@/views/activities/logs'),
+        name: 'Logs de utilização',
+        meta: { title: 'Logs de utilização', icon: 'documentation' },
+      },
+
+    ],
   },
   {
     path: '/guide',

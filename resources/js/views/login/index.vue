@@ -1,10 +1,7 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-      <h3 class="title">
-        {{ $t('login.title') }}
-      </h3>
-      <lang-select class="set-language" />
+      <img src="logo.png" width="300" class="bw-login-logo">
       <el-form-item prop="email">
         <span class="svg-container">
           <svg-icon icon-class="user" />
@@ -19,7 +16,7 @@
           v-model="loginForm.password"
           :type="pwdType"
           name="password"
-          auto-complete="on"
+          auto-complete="off"
           placeholder="password"
           @keyup.enter.native="handleLogin"
         />
@@ -28,36 +25,30 @@
         </span>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
-          Sign in
+        <el-button :loading="loading" type="bw-login-btn" style="width:100%;" @click.native.prevent="handleLogin">
+          Entrar
         </el-button>
       </el-form-item>
-      <div class="tips">
-        <span style="margin-right:20px;">Email: admin@laravue.dev</span>
-        <span>Password: laravue</span>
-      </div>
     </el-form>
   </div>
 </template>
 
 <script>
-import LangSelect from '@/components/LangSelect';
 import { validEmail } from '@/utils/validate';
 
 export default {
   name: 'Login',
-  components: { LangSelect },
   data() {
     const validateEmail = (rule, value, callback) => {
       if (!validEmail(value)) {
-        callback(new Error('Please enter the correct email'));
+        callback(new Error('Por favor, digite um e-mail válido'));
       } else {
         callback();
       }
     };
     const validatePass = (rule, value, callback) => {
       if (value.length < 4) {
-        callback(new Error('Password cannot be less than 4 digits'));
+        callback(new Error('Digite uma senha com mais de quatro dígitos'));
       } else {
         callback();
       }
@@ -200,11 +191,17 @@ $light_gray:#eee;
     cursor: pointer;
     user-select: none;
   }
-  .set-language {
+
+  .bw-login-logo {
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 30px;
+  }
+
+  .el-button--bw-login-btn{
+    background: #dbb200;
+    border-color: #dbb200;
     color: #fff;
-    position: absolute;
-    top: 40px;
-    right: 35px;
   }
 }
 </style>

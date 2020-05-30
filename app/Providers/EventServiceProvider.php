@@ -18,6 +18,19 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        'Illuminate\Auth\Events\Login' => ['App\Listeners\LogSuccessFulLogin'],
+
+        'Illuminate\Auth\Events\Registered' => ['App\Listeners\LogRegisteredUser'],
+
+        'Illuminate\Auth\Events\Failed' => ['App\Listeners\LogFailedLogin'],
+
+        'Illuminate\Auth\Events\Logout' => [
+            'App\Listeners\LogSuccessfulLogout',
+        ],
+        'Illuminate\Auth\Events\PasswordReset' => [
+            'App\Listeners\LogPasswordReset',
+        ],
     ];
 
     /**

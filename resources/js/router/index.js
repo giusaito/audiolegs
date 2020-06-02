@@ -22,6 +22,7 @@ import nestedRoutes from './modules/nested';
 import errorRoutes from './modules/error';
 import excelRoutes from './modules/excel';
 import permissionRoutes from './modules/permission';
+import plansRoutes from './modules/plans';
 
 /**
  * Sub-menu only appear when children.length>=1
@@ -128,6 +129,7 @@ export const constantRoutes = [
       meta: { title: 'Importar Usuários', icon: 'icon' },
     }],
   },
+  plansRoutes,
   {
     path: '/atividades/logs',
     component: Layout,

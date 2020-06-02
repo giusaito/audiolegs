@@ -3,13 +3,14 @@ import request from '@/utils/request';
 /**
  * Simple RESTful resource class
  */
+
 class Resource {
   constructor(uri) {
     this.uri = uri;
   }
   list(query) {
     return request({
-      url: '/' + this.uri,
+      url: '/v1/bw/' + this.uri,
       method: 'get',
       params: query,
     });
@@ -22,21 +23,21 @@ class Resource {
   }
   store(resource) {
     return request({
-      url: '/' + this.uri,
+      url: '/v1/bw/' + this.uri,
       method: 'post',
       data: resource,
     });
   }
   update(id, resource) {
     return request({
-      url: '/' + this.uri + '/' + id,
+      url: '/v1/bw/' + this.uri + '/' + id,
       method: 'put',
       data: resource,
     });
   }
   destroy(id) {
     return request({
-      url: '/' + this.uri + '/' + id,
+      url: '/v1/bw/' + this.uri + '/' + id,
       method: 'delete',
     });
   }

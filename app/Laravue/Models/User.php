@@ -108,7 +108,7 @@ class User extends Authenticatable
         return false;
     }
 
-     public function getDescriptionForEvent(string $eventName): string
+    public function getDescriptionForEvent(string $eventName): string
     {
         if($eventName == 'created'){
             $eventName = 'Adicionado';

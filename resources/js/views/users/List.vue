@@ -350,7 +350,7 @@ export default {
               this.handleFilter();
             })
             .catch(error => {
-              console.log(error);
+              console.log('ops' + error);
             })
             .finally(() => {
               this.userCreating = false;

@@ -17,7 +17,7 @@ use \App\Laravue\JsonResponse;
 
 Route::post('auth/login', 'AuthController@login');
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('auth/user', 'AuthController@user');
+        Route::get('auth/user', 'AuthController@user');
     Route::post('auth/logout', 'AuthController@logout');
     Route::get('users', 'UserController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::get('users/{user}', 'UserController@show')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
@@ -29,9 +29,17 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('permissions', 'PermissionController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
+
+    Route::group(['prefix' => 'v1/bw', 'namespace' => 'Backend'], function()
+    {
+    // Rota de planos backend
+    Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    // Fim rota de planos backend
+
     Route::post('/usuario/importar-usuario', 'UserController@userImport');
 
-    Route::get('atividades', 'Backend\ActivitieController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::get('atividades', 'ActivitieController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    });
 });
 
 

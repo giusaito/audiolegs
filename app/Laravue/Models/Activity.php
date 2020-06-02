@@ -3,9 +3,14 @@
 namespace App\Laravue\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 
 class Activity extends Model
 {
+    use Notifiable, HasRoles, HasApiTokens;
+
 	protected $table = 'bw_activity_log';
    	protected $fillable = ['*'];
 

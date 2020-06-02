@@ -83,6 +83,7 @@ export default {
     async getActivities() {
       this.listLoading = true;
       const { data } = await fetchActivities(this.listQuery);
+      console.log(data);
       this.total = data.total;
       this.list = data.data;
       this.jsonParse = JSON.parse(this.list[0].properties);

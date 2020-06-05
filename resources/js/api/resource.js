@@ -17,7 +17,7 @@ class Resource {
   }
   get(id) {
     return request({
-      url: '/' + this.uri + '/' + id,
+      url: '/v1/bw/' + this.uri + '/' + id,
       method: 'get',
     });
   }

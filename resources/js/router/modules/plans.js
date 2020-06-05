@@ -3,7 +3,6 @@ import Layout from '@/layout';
 const plansRoutes = {
   path: '/planos',
   component: Layout,
-  redirect: '/planos/lista',
   name: 'Planos de assinatura',
   meta: {
     title: 'Planos',
@@ -11,10 +10,10 @@ const plansRoutes = {
   },
   children: [
     {
-      path: 'criar',
-      component: () => import('@/views/plans/Create'),
+      path: 'lista',
+      component: () => import('@/views/plans/Index'),
       name: 'Planos',
-      meta: { title: 'Planos', icon: 'edit' },
+      meta: { title: 'plans', icon: 'edit' },
     },
   ],
 };

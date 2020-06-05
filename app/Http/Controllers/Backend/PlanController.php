@@ -7,6 +7,7 @@ use App\Laravue\Models\Plan;
 use App\Http\Resources\PlanResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PlanController extends Controller
 {
@@ -79,6 +80,7 @@ class PlanController extends Controller
        $plan = Plan::firstOrCreate([
                 'name' => $request->name,
                 'description' => $request->description,
+                'slug' => Str::slug($request->name),
                 'price' => $request->price,
                 'quantity_days' => $request->days,
                 'user_id' => Auth::user()->id,
@@ -126,6 +128,7 @@ class PlanController extends Controller
         $plan = Plan::findOrFail($id);
         $plan->name = $request->name;
         $plan->description = $request->description;
+        $plan->slug = Str::slug($request->name);
         $plan->price = $request->price;
         $plan->quantity_days = $request->days;
         $plan->status = $request->status;

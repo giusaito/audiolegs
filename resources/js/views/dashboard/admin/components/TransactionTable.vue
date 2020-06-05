@@ -4,21 +4,24 @@
     :data="list"
     style="width: 100%;padding-top: 15px;"
   >
-    <el-table-column label="Order #" min-width="200">
+    <el-table-column label="Id do pedido #" min-width="200">
       <template slot-scope="scope">
         {{ scope.row && scope.row.order_no | orderNoFilter }}
       </template>
     </el-table-column>
-    <el-table-column label="Price" width="195" align="center">
+    <el-table-column label="Nome" width="195" align="center">
       <template slot-scope="scope">
-        ¥{{ scope.row && scope.row.price | toThousandFilter }}
+        {{ scope.row && scope.row.name }}
       </template>
     </el-table-column>
-    <el-table-column label="Status" width="100" align="center">
+    <el-table-column label="Valor" width="195" align="center">
       <template slot-scope="scope">
-        <el-tag :type="scope.row && scope.row.status | statusFilter">
-          {{ scope.row && scope.row.status }}
-        </el-tag>
+        R$ {{ scope.row && scope.row.price | toThousandFilter }}
+      </template>
+    </el-table-column>
+    <el-table-column label="Data" width="195" align="center">
+      <template slot-scope="scope">
+        {{ scope.row && scope.row.date }}
       </template>
     </el-table-column>
   </el-table>

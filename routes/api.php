@@ -16,7 +16,7 @@ use \App\Laravue\JsonResponse;
 */
 
 Route::post('auth/login', 'AuthController@login');
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
         Route::get('auth/user', 'AuthController@user');
     Route::post('auth/logout', 'AuthController@logout');
     Route::get('users', 'UserController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
@@ -30,7 +30,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::apiResource('permissions', 'PermissionController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
 
-    Route::group(['prefix' => 'v1/bw', 'namespace' => 'Backend'], function()
+    Route::group(['namespace' => 'Backend'], function()
     {
     // Rota de planos backend
     Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
@@ -64,12 +64,14 @@ Route::get('/table/list', function () {
 });
 
 Route::get('/orders', function () {
-    $rowsNumber = 8;
+    $rowsNumber = 10;
     $data = [];
     for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
         $row = [
-            'order_no' => 'LARAVUE' . mt_rand(1000000, 9999999),
-            'price' => mt_rand(10000, 999999),
+            'order_no' => 'aud-' . mt_rand(1000000, 9999999),
+            'price' => mt_rand(30, 250),
+            'name' => Faker::randomString(mt_rand(5, 10)),
+            'date' => '09 de Mai 2020 às 03:59 ',
             'status' => Faker::randomInArray(['success', 'pending']),
         ];
 

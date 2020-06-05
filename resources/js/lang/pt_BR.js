@@ -4,6 +4,8 @@ export default {
     introduction: 'Introdução',
     documentation: 'Documentação	',
     guide: 'Guia',
+    plans: 'Planos',
+    log_util: 'Logs de utilização',
     permission: 'Permissões',
     pagePermission: 'Página de permissões',
     rolePermission: 'Papeis',

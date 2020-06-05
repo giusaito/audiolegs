@@ -10,14 +10,14 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/auth/user',
+    url: '/v1/bw/auth/user',
     method: 'get',
   });
 }
 
 export function logout() {
   return request({
-    url: '/auth/logout',
+    url: '/v1/bw/auth/logout',
     method: 'post',
   });
 }

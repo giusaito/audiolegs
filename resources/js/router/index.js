@@ -143,13 +143,13 @@ export const constantRoutes = [
         path: 'usuarios',
         component: () => import('@/views/activities/logs'),
         name: 'Logs de acesso ao sistema',
-        meta: { title: 'Logs de acesso', icon: 'admin' },
+        meta: { title: 'log_util', icon: 'admin' },
       },
       {
         path: 'utilizacao',
         component: () => import('@/views/activities/logs'),
         name: 'Logs de utilização',
-        meta: { title: 'Logs de utilização', icon: 'documentation' },
+        meta: { title: 'log_util', icon: 'documentation' },
       },
 
     ],

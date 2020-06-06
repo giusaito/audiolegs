@@ -1,37 +1,37 @@
 <template>
   <div class="app-container">
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="ID" width="80">
+    <el-table v-loading="listLoading" :data="list" style="width: 100%">
+      <el-table-column align="center" label="ID">
         <template slot-scope="{row}">
           <span> {{ row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="Tipo de ação">
+      <el-table-column label="Tipo de ação">
         <template slot-scope="{row}">
           <span>{{ row.log_name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="180px" align="center" label="Mensagem">
+      <el-table-column label="Mensagem">
         <template slot-scope="{row}">
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="290px" align="center" label="Url">
+      <el-table-column align="center" label="Url">
         <template>
           <span>{{ jsonParse.url }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="180px" align="center" label="ip">
+      <el-table-column align="center" label="ip">
         <template>
           <span>{{ jsonParse.ip }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="290px" align="center" label="Data e Hora">
+      <el-table-column align="center" label="Data e Hora">
         <template slot-scope="{row}">
           <span>{{ row.created_at | format_date }}</span>
         </template>

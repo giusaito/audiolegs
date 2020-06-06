@@ -6,38 +6,38 @@
       </el-button>
     </div>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
+    <el-table v-loading="listLoading" :data="list" style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
         <template slot-scope="{row}">
           <span> {{ row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="130px" align="center" label="Nome do plano">
+      <el-table-column align="center" label="Nome do plano">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="220px" align="center" label="Descrição">
+      <el-table-column align="center" label="Descrição">
         <template slot-scope="{row}">
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="80px" align="center" label="Dias">
+      <el-table-column align="center" label="Dias">
         <template slot-scope="{row}">
           <span>{{ row.quantity_days }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="100px" align="center" label="Valor">
+      <el-table-column align="center" label="Valor">
         <template slot-scope="{row}">
           <span>R$ {{ row.price }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="180px" align="center" label="Status">
+      <el-table-column align="center" label="Status">
         <template slot-scope="{row}">
           <span>{{ row.status | statusPlans }}</span>
         </template>
@@ -57,40 +57,38 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
     <el-dialog :title="formTitle " :visible.sync="dialogFormVisible">
       <div v-loading="planoEditing" class="form-container">
-        <el-form ref="userForm" label-position="left" label-width="150px" style="max-width: 500px;">
+        <el-form ref="currentPlan" :model="currentPlan" :rules="rules" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item label="Nome" prop="name">
             <el-input v-model="currentPlan.name" />
           </el-form-item>
-        </el-form>
-        <el-form ref="userForm" label-position="left" label-width="150px" style="max-width: 500px;">
+
           <el-form-item label="Descrição" prop="description">
             <el-input v-model="currentPlan.description" />
           </el-form-item>
-        </el-form>
-        <el-form ref="userForm" label-position="left" label-width="150px" style="max-width: 500px;">
+
           <el-form-item label="Valor" prop="price">
             <el-input v-model="currentPlan.price" />
           </el-form-item>
-        </el-form>
-        <el-form ref="userForm" label-position="left" label-width="150px" style="max-width: 500px;">
+
           <el-form-item label="Dias" prop="days">
             <el-input v-model="currentPlan.days" />
           </el-form-item>
+
+          <el-form-item label="Status" prop="status">
+            <el-switch
+              v-model="currentPlan.statusSwitch"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            />
+          </el-form-item>
         </el-form>
 
-        <!--  <el-form-item :label="$t('user.role')" prop="role">
-          <el-select v-model="currentPlan.status" class="filter-item" placeholder="Please select role">
-            <el-option :value="currentPlan.status" />
-            <el-option :value="currentPlan.status" />
-          </el-select>
-        </el-form-item> -->
-
         <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">
+          <el-button @click="resetForm('ruleForm')">
             Cancelar
           </el-button>
-          <el-button type="primary" @click="handleSubmit()">
-            Atualizar
+          <el-button type="primary" @click="handleSubmit('currentPlan')">
+            {{ btnInsertUpdate }}
           </el-button>
         </div>
       </div>
@@ -99,12 +97,9 @@
 </template>
 
 <script>
-// import { fetchPlans } from '@/api/plans';
 import Resource from '@/api/resource';
 import Pagination from '@/components/Pagination';
-
 const PlanResource = new Resource('planos');
-
 export default {
   name: 'Plans',
   components: { Pagination },
@@ -119,25 +114,41 @@ export default {
     },
     statusPlans(value){
       if (value === 'PUBLISHED'){
-        return 'PUBLICADO';
+        return 'Publicado';
       } else {
-        return 'RASCUNHO';
+        return 'Rascunho';
       }
     },
   },
   data() {
     return {
       list: [],
-      jsonParse: {},
       total: 0,
       formTitle: '',
       currentPlan: {},
       dialogFormVisible: false,
       listLoading: true,
+      btnInsertUpdate: '',
       planoEditing: false,
       listQuery: {
         page: 1,
         limit: 10,
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Por favor, preencha o nome do plano', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 50', trigger: 'change' },
+        ],
+        description: [
+          { required: true, message: 'Por favor, informe uma descrição curta', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 50', trigger: 'change' },
+        ],
+        price: [
+          { required: true, message: 'Por favor, informe o valor do plano', trigger: 'change' },
+        ],
+        days: [
+          { required: true, message: 'Por favor, informe por quantos dias a assinatura é válida', trigger: 'change' },
+        ],
       },
     };
   },
@@ -156,66 +167,78 @@ export default {
     handleCreateForm() {
       this.dialogFormVisible = true;
       this.formTitle = 'Adicionar novo plano';
+      this.btnInsertUpdate = 'Adicionar plano';
       this.currentPlan = {
         name: '',
         description: '',
         price: '',
         days: '',
-        status: '',
+        statusSwitch: true,
       };
     },
 
-    handleSubmit() {
-      if (this.currentPlan.id !== undefined) {
-        PlanResource.update(this.currentPlan.id, this.currentPlan).then(response => {
-          this.$message({
-            type: 'success',
-            message: 'O plano ' + this.currentPlan.name + ' atualizado com sucesso',
-            duration: 5 * 1000,
-          });
-          this.getList();
-        }).catch(() => {
-          this.$message({
-            type: 'error',
-            message: 'Ocorreu um erro ao tentar atualizar o plano ' + this.currentPlan.name + ' por favor, tente novamente mais tarde',
-            duration: 5 * 1000,
-          });
-        }).finally(() => {
-          console.log('fim');
-          this.dialogFormVisible = false;
-        });
-      } else {
-        PlanResource
-          .store(this.currentPlan)
-          .then(response => {
-            this.$message({
-              message: 'O plano ' + this.currentPlan.name + ' foi criado com sucesso.',
-              type: 'success',
-              duration: 5 * 1000,
+    handleSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.currentPlan.id !== undefined){
+            PlanResource.update(this.currentPlan.id, this.currentPlan).then(response => {
+              this.$message({
+                type: 'success',
+                message: 'O plano ' + this.currentPlan.name + ' atualizado com sucesso',
+                duration: 5 * 1000,
+              });
+              this.getList();
+            }).catch(() => {
+              this.$message({
+                type: 'error',
+                message: 'Ocorreu um erro ao tentar atualizar o plano ' + this.currentPlan.name + ' por favor, tente novamente mais tarde',
+                duration: 5 * 1000,
+              });
+            }).finally(() => {
+              console.log('fim');
+              this.dialogFormVisible = false;
             });
-            this.currentPlan = {
-              name: '',
-              description: '',
-              price: '',
-              days: '',
-              status: '',
-            };
-            this.planFormVisible = false;
-            this.getList();
-          })
-          .catch(err => {
-            console.log(err);
-          }).finally(() => {
-            console.log('fim');
-            this.dialogFormVisible = false;
-          });
-      }
+          } else {
+            PlanResource
+              .store(this.currentPlan)
+              .then(response => {
+                this.$message({
+                  message: 'O plano ' + this.currentPlan.name + ' foi criado com sucesso.',
+                  type: 'success',
+                  duration: 5 * 1000,
+                });
+                this.currentPlan = {
+                  name: '',
+                  description: '',
+                  price: '',
+                  days: '',
+                  status: '',
+                };
+                this.planFormVisible = false;
+                this.getList();
+              })
+              .catch(err => {
+                console.log(err);
+              }).finally(() => {
+                console.log('fim');
+                this.dialogFormVisible = false;
+              });
+          }
+        }
+      });
     },
 
     handleEdit(id, name, description, price, days, status){
       this.currentPlan = this.list.find(category => category.id === id);
       this.dialogFormVisible = true;
       this.formTitle = 'Editar plano ' + name;
+      this.btnInsertUpdate = 'Atualizar plano';
+      var statusSwitch = status;
+      if (statusSwitch === 'PUBLISHED') {
+        statusSwitch = true;
+      } else {
+        statusSwitch = false;
+      }
       this.currentPlan = {
         id: id,
         name: name,
@@ -223,6 +246,7 @@ export default {
         price: price,
         days: days,
         status: status,
+        statusSwitch: statusSwitch,
       };
     },
 
@@ -244,9 +268,14 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: 'Operação cancelada pelo usuário',
+          message: 'Operação cancelada!',
         });
       });
+    },
+
+    resetForm(formName) {
+      this.dialogFormVisible = false;
+      this.$refs[formName].resetFields();
     },
 
     handleFilter() {

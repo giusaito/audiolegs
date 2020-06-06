@@ -42,7 +42,7 @@ class PlanController extends Controller
     public function index()
     {
 
-        $plans = Plan::paginate(10);
+        $plans = Plan::orderBy('id', 'DESC')->paginate(10);
 
         $response = [
             'pagination' => [
@@ -77,6 +77,7 @@ class PlanController extends Controller
      */
     public function store(Request $request)
     {
+
        $plan = Plan::firstOrCreate([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -84,6 +85,7 @@ class PlanController extends Controller
                 'price' => $request->price,
                 'quantity_days' => $request->days,
                 'user_id' => Auth::user()->id,
+                'status' => $request->statusSwitch ? 'PUBLISHED' : 'DRAFT',
                 'user_ip_created' => $this->getUserIP()
             ]);
 
@@ -131,10 +133,14 @@ class PlanController extends Controller
         $plan->slug = Str::slug($request->name);
         $plan->price = $request->price;
         $plan->quantity_days = $request->days;
-        $plan->status = $request->status;
-        $plan->update();
+        $plan->status = $request->statusSwitch ? 'PUBLISHED' : 'DRAFT';
+        $plan->update();    
 
-        return 'ok';
+        if($plan){
+            echo 'ok';
+        } else {
+            echo 'error';
+        }
     }
 
     /**

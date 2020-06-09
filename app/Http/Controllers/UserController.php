@@ -98,6 +98,14 @@ class UserController extends Controller
      * @param  User $user
      * @return UserResource|\Illuminate\Http\JsonResponse
      */
+
+    public function edit(){
+       $id = Auth::user()->id;
+       $user = User::with(['userProfile'])->findOrFail($id);
+
+        return response()->json(['data' => $user]);
+    }
+    
     public function show(User $user)
     {
         return new UserResource($user);

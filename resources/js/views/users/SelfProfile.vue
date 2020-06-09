@@ -4,7 +4,7 @@
       <el-row :gutter="20">
         <el-col :span="6">
           <user-card :user="user" />
-          <user-bio />
+          <user-bio :user="user" />
         </el-col>
         <el-col :span="18">
           <user-activity :user="user" />
@@ -15,9 +15,12 @@
 </template>
 
 <script>
+import Resource from '@/api/resource';
 import UserBio from './components/UserBio';
 import UserCard from './components/UserCard';
 import UserActivity from './components/UserActivity';
+
+const UserResource = new Resource('user/profile/edit');
 
 export default {
   name: 'SelfProfile',
@@ -28,15 +31,17 @@ export default {
     };
   },
   watch: {
-    '$route': 'getUser',
+    '$route': 'getList',
   },
   created() {
-    this.getUser();
+    this.getList();
   },
   methods: {
-    async getUser() {
-      const data = await this.$store.dispatch('user/getInfo');
+    async getList() {
+      // const data = await this.$store.dispatch('user/getInfo');
+      const { data } = await UserResource.list({});
       this.user = data;
+      console.log(data.user_profile.path);
     },
   },
 };

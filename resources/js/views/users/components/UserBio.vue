@@ -1,40 +1,31 @@
 <template>
   <el-card class="box-card user-bio">
     <div slot="header" class="clearfix">
-      <span>About me</span>
+      <span>Sobre mim</span>
     </div>
     <div class="user-education user-bio-section">
-      <div class="user-bio-section-header">
-        <svg-icon icon-class="education" />
-        <span>Education</span>
-      </div>
       <div class="user-bio-section-body">
         <div class="text-muted">
-          B.S. in Computer Science from the University of Technology at Ho Chi Minh city
+          {{ user.user_profile.biography }}
         </div>
       </div>
     </div>
     <div class="user-skills user-bio-section">
       <div class="user-bio-section-header">
-        <svg-icon icon-class="skill" />
-        <span>Skills</span>
+        <span>Redes sociais</span>
       </div>
       <div class="user-bio-section-body">
-        <div class="progress-item">
-          <span>Laravel</span>
-          <el-progress :percentage="70" />
+        <div v-if="user.user_profile.linkedin" class="social">
+          <a :href="user.user_profile.linkedin" target="_blank"><span>Linkedin</span></a>
         </div>
-        <div class="progress-item">
-          <span>Vue</span>
-          <el-progress :percentage="18" />
+        <div v-if="user.user_profile.facebook" class="social">
+          <a :href="user.user_profile.facebook" target="_blank"><span>Facebook</span></a>
         </div>
-        <div class="progress-item">
-          <span>JavaScript</span>
-          <el-progress :percentage="12" />
+        <div v-if="user.user_profile.twitter" class="social">
+          <a :href="user.user_profile.twitter" target="_blank"><span>Twitter</span></a>
         </div>
-        <div class="progress-item">
-          <span>HTML &amp; CSS</span>
-          <el-progress :percentage="100" status="success" />
+        <div v-if="user.user_profile.youtube" class="social">
+          <a :href="user.user_profile.youtube" target="_blank"><span>Youtube</span></a>
         </div>
       </div>
     </div>
@@ -43,6 +34,18 @@
 
 <script>
 export default {
+  props: {
+    user: {
+      type: Object,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          roles: [],
+        };
+      },
+    },
+  },
 };
 </script>
 
@@ -62,6 +65,10 @@ export default {
       margin-bottom: 10px;
       font-weight: bold;
     }
+  }
+  .social {
+    line-height: 2;
+    font-size: 1.2em;
   }
 }
 </style>

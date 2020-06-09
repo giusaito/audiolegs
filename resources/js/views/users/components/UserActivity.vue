@@ -1,165 +1,145 @@
 <template>
-  <el-card v-if="user.name">
+  <el-card>
     <el-tabs v-model="activeActivity" @tab-click="handleClick">
-      <el-tab-pane label="Activity" name="first">
-        <div class="user-activity">
-          <div class="post">
-            <div class="user-block">
-              <img
-                class="img-circle"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDkaQO69Fro8SZLTVZQ75JH2R0T-sn5yIA_lKGwvvgQ0R0BoQtUQ"
-                alt="user image"
-              >
-              <span class="username text-muted">
-                <a href="#">Iron Man</a>
-                <a href="#" class="pull-right btn-box-tool">
-                  <i class="fa fa-times" />
-                </a>
-              </span>
-              <span class="description">Shared publicly - 7:30 PM today</span>
-            </div>
-            <p>
-              Lorem ipsum represents a long-held tradition for designers,
-              typographers and the like. Some people hate it and argue for
-              its demise, but others ignore the hate as they create awesome
-              tools to help create filler text for everyone from bacon lovers
-              to Charlie Sheen fans.
-            </p>
-            <ul class="list-inline">
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <i class="el-icon-share" /> Share
-                </a>
-              </li>
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="like" />Like
-                </a>
-              </li>
-              <li class="pull-right">
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="comment" />Comments
-                  (5)
-                </a>
-              </li>
-            </ul>
-            <el-input placeholder="Type a comment" />
-          </div>
-          <div class="post">
-            <div class="user-block">
-              <img
-                class="img-circle"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMMN-8f9CQQ3MKJpboBJIqaiJ2Wus2Tf4w_vx9STtalxrY3qGJ"
-                alt="user image"
-              >
-              <span class="username text-muted">
-                <a href="#">Captain American</a>
-                <a href="#" class="pull-right btn-box-tool">
-                  <i class="fa fa-times" />
-                </a>
-              </span>
-              <span class="description">Sent you a message - yesterday</span>
-            </div>
-            <p>
-              Lorem ipsum represents a long-held tradition for designers,
-              typographers and the like. Some people hate it and argue for
-              its demise, but others ignore the hate as they create awesome
-              tools to help create filler text for everyone from bacon lovers
-              to Charlie Sheen fans.
-            </p>
-            <el-input placeholder="Response">
-              <el-button slot="append">
-                Send
-              </el-button>
-            </el-input>
-          </div>
-          <div class="post">
-            <div class="user-block">
-              <img
-                class="img-circle img-bordered-sm"
-                src="https://cdn3.iconfinder.com/data/icons/movies-3/32/daredevil-superhero-marvel-comics-mutant-avatar-512.png"
-                alt="User Image"
-              >
-              <span class="username">
-                <a href="#">Daredevil</a>
-                <a href="#" class="pull-right btn-box-tool">
-                  <i class="fa fa-times" />
-                </a>
-              </span>
-              <span class="description">Posted 4 photos - 2 days ago</span>
-            </div>
-            <div class="user-images">
-              <el-carousel :interval="6000" type="card" height="200px">
-                <el-carousel-item v-for="item in carouselImages" :key="item">
-                  <img :src="item" class="image">
-                </el-carousel-item>
-              </el-carousel>
-            </div>
-            <ul class="list-inline">
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <i class="el-icon-share" /> Share
-                </a>
-              </li>
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="like" />Like
-                </a>
-              </li>
-              <li class="pull-right">
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="comment" />Comments
-                  (5)
-                </a>
-              </li>
-            </ul>
-            <el-input placeholder="Type a comment" />
-          </div>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="Timeline" name="second">
+      <el-tab-pane label="Timeline" name="first">
         <div class="block">
           <el-timeline>
-            <el-timeline-item timestamp="2019/4/17" placement="top">
+            <el-timeline-item timestamp="16/05/2020" placement="top">
               <el-card>
-                <h4>Update Github template</h4>
-                <p>tuandm committed 2019/4/17 20:46</p>
+                <h4>Renovação assinatura plano mensal</h4>
+                <p>16/05/2020 às 20:46</p>
               </el-card>
             </el-timeline-item>
-            <el-timeline-item timestamp="2019/4/18" placement="top">
+            <el-timeline-item timestamp="16/05/2020" placement="top">
               <el-card>
-                <h4>Update Github template</h4>
-                <p>tonynguyen committed 2019/4/18 20:46</p>
-              </el-card>
-              <el-card>
-                <h4>Update Github template</h4>
-                <p>tuandm committed 2019/4/19 21:16</p>
+                <h4>Assinatura plano mensal</h4>
+                <p>16/04/2020 às 20:46</p>
               </el-card>
             </el-timeline-item>
-            <el-timeline-item timestamp="2019/4/19" placement="top">
+            <el-timeline-item timestamp="06/04/2020" placement="top">
               <el-card>
-                <h4>
-                  Deploy
-                  <a href="https://laravue.dev" target="_blank">laravue.dev</a>
-                </h4>
-                <p>tuandm deployed 2019/4/19 10:23</p>
+                <h4>Cadastro</h4>
+                <p>Cadastro realizado no dia 06/04/2020 às 19:46</p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
         </div>
       </el-tab-pane>
-      <el-tab-pane v-loading="updating" label="Account" name="third">
-        <el-form-item label="Name">
-          <el-input v-model="user.name" :disabled="user.role === 'admin'" />
-        </el-form-item>
-        <el-form-item label="Email">
-          <el-input v-model="user.email" :disabled="user.role === 'admin'" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :disabled="user.role === 'admin'" @click="onSubmit">
-            Update
-          </el-button>
-        </el-form-item>
+      <el-tab-pane v-loading="updating" label="Minha conta" name="second">
+        <el-form ref="user" :model="user.user_profile" :rules="rules">
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="Nome" prop="name">
+                <el-input v-model="user.name" maxlength="191" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Email" prop="email">
+                <el-input v-model="user.email" maxlength="191" show-word-limit />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="Apelido">
+                <el-input v-model="user.user_profile.nickname" maxlength="50" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Senha">
+                <el-input maxlength="191" show-word-limit show-password />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="CPF" prop="cpf">
+                <el-input v-model="user.user_profile.cpf" maxlength="14" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="RG" prop="rg">
+                <el-input v-model="user.user_profile.rg" maxlength="20" show-word-limit />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="Estado">
+                <el-input v-model="user.user_profile.state_id" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Cidade">
+                <el-input v-model="user.user_profile.city_id" />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="6">
+              <el-form-item label="Cep" prop="cep">
+                <el-input v-model="user.user_profile.cep" maxlength="20" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Endereço" prop="address">
+                <el-input v-model="user.user_profile.address" maxlength="255" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="Número" prop="number_address">
+                <el-input v-model="user.user_profile.number_address" maxlength="10" show-word-limit />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="Telefone" prop="telephone">
+                <el-input v-model="user.user_profile.telephone" maxlength="30" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="WhatsApp">
+                <el-input v-model="user.user_profile.whatsapp" maxlength="30" show-word-limit />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="Linkedin">
+                <el-input v-model="user.user_profile.linkedin" maxlength="100" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Facebook">
+                <el-input v-model="user.user_profile.facebook" maxlength="100" show-word-limit />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item required>
+            <el-col :span="12">
+              <el-form-item label="Instagram">
+                <el-input v-model="user.user_profile.instagram" maxlength="100" show-word-limit />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Twitter">
+                <el-input v-model="user.user_profile.twitter" maxlength="100" show-word-limit />
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item label="Youtube">
+            <el-input v-model="user.user_profile.youtube" maxlength="100" show-word-limit />
+          </el-form-item>
+          <el-form-item label="Sobre mim">
+            <el-input v-model="user.user_profile.biography" type="textarea" maxlength="255" show-word-limit />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" :disabled="user.role === 'admin'" @click="onSubmit('user')">
+              Atualizar
+            </el-button>
+          </el-form-item>
+        </el-form>
       </el-tab-pane>
     </el-tabs>
   </el-card>
@@ -182,39 +162,65 @@ export default {
         };
       },
     },
+
   },
   data() {
     return {
       activeActivity: 'first',
-      carouselImages: [
-        'https://cdn.laravue.dev/photo1.png',
-        'https://cdn.laravue.dev/photo2.png',
-        'https://cdn.laravue.dev/photo3.jpg',
-        'https://cdn.laravue.dev/photo4.jpg',
-      ],
       updating: false,
+      rules: {
+        name: [
+          { required: true, message: 'Por favor, informe seu nome completo', trigger: 'change' },
+          { min: 3, message: 'Preencha no mínimo 3 caracteres', trigger: 'change' },
+        ],
+        email: [
+          { required: true, message: 'Por favor, informe um Email', trigger: 'change' },
+        ],
+        cpf: [
+          { required: true, message: 'Por favor, informe seu CPF', trigger: 'change' },
+        ],
+        rg: [
+          { required: true, message: 'Por favor, informe o RG', trigger: 'change' },
+        ],
+        cep: [
+          { required: true, message: 'Por favor, informe o Cep', trigger: 'change' },
+        ],
+        address: [
+          { required: true, message: 'Por favor, informe o Endereço', trigger: 'change' },
+        ],
+        number_address: [
+          { required: true, message: 'Por favor, informe o número da casa ou apartamento', trigger: 'change' },
+        ],
+        telephone: [
+          { required: true, message: 'Por favor, informe o número do telefone', trigger: 'change' },
+        ],
+      },
     };
   },
   methods: {
     handleClick(tab, event) {
       console.log('Switching tab ', tab, event);
     },
-    onSubmit() {
-      this.updating = true;
-      userResource
-        .update(this.user.id, this.user)
-        .then(response => {
-          this.updating = false;
-          this.$message({
-            message: 'User information has been updated successfully',
-            type: 'success',
-            duration: 5 * 1000,
-          });
-        })
-        .catch(error => {
-          console.log(error);
-          this.updating = false;
-        });
+    onSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.updating = true;
+          userResource
+            .update(this.user.id, this.user)
+            .then(response => {
+              this.updating = false;
+              this.$message({
+                message: 'User information has been updated successfully',
+                type: 'success',
+                duration: 5 * 1000,
+              });
+            })
+            .catch(error => {
+              console.log(error);
+              this.updating = false;
+            });
+        }
+      });
     },
   },
 };

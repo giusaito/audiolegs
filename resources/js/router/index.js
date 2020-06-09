@@ -107,12 +107,12 @@ export const constantRoutes = [
     ],
   },
   {
-    path: '/profile',
+    path: '/perfil',
     component: Layout,
-    redirect: '/profile/edit',
+    redirect: '/perfil/editar',
     children: [
       {
-        path: 'edit',
+        path: 'editar',
         component: () => import('@/views/users/SelfProfile'),
         name: 'SelfProfile',
         meta: { title: 'userProfile', icon: 'user', noCache: true },

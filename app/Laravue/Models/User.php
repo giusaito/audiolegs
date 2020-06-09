@@ -108,6 +108,10 @@ class User extends Authenticatable
         return false;
     }
 
+    public function userProfile(){
+        return $this->hasOne('App\Laravue\Models\userProfile');
+    }
+
     public function getDescriptionForEvent(string $eventName): string
     {
         if($eventName == 'created'){

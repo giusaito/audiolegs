@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="query.keyword" :placeholder="$t('table.keyword')" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="query.role" :placeholder="$t('table.role')" clearable style="width: 90px" class="filter-item" @change="handleFilter">
+      <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="query.role" placeholder="Papel" clearable style="width: 90px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        {{ $t('table.search') }}
+        Procurar
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
-        {{ $t('table.add') }}
+        Adicionar
       </el-button>
-      <el-button v-waves :loading="downloading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button v-waves :loading="downloading" class="filter-item" type="primary" icon="el-icon-download" @click= "handleDownload">
         {{ $t('table.export') }}
-      </el-button>
+      </el-button> -->
     </div>
 
     <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
@@ -23,7 +23,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Name">
+      <el-table-column align="center" label="Nome">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
@@ -35,24 +35,24 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Role" width="120">
+      <el-table-column align="center" label="Papel" width="120">
         <template slot-scope="scope">
           <span>{{ scope.row.roles.join(', ') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Actions" width="350">
+      <el-table-column align="center" label="Ações" width="350">
         <template slot-scope="scope">
           <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id">
             <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
-              Edit
+              Editar
             </el-button>
           </router-link>
           <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
-            Permissions
+            Papel
           </el-button>
           <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
-            Delete
+            Remover
           </el-button>
         </template>
       </el-table-column>
@@ -90,24 +90,24 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="'Create new user'" :visible.sync="dialogFormVisible">
+    <el-dialog :title="'Adicionar usuário'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
         <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
-          <el-form-item :label="$t('user.role')" prop="role">
+          <el-form-item label="Papel" prop="role">
             <el-select v-model="newUser.role" class="filter-item" placeholder="Please select role">
               <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" />
             </el-select>
           </el-form-item>
-          <el-form-item :label="$t('user.name')" prop="name">
+          <el-form-item label="Nome" prop="name">
             <el-input v-model="newUser.name" />
           </el-form-item>
-          <el-form-item :label="$t('user.email')" prop="email">
+          <el-form-item label="Email" prop="email">
             <el-input v-model="newUser.email" />
           </el-form-item>
-          <el-form-item :label="$t('user.password')" prop="password">
+          <el-form-item label="Senha" prop="password">
             <el-input v-model="newUser.password" show-password />
           </el-form-item>
-          <el-form-item :label="$t('user.confirmPassword')" prop="confirmPassword">
+          <el-form-item label="Confirmar senha" prop="confirmPassword">
             <el-input v-model="newUser.confirmPassword" show-password />
           </el-form-item>
         </el-form>
@@ -142,7 +142,7 @@ export default {
   data() {
     var validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.newUser.password) {
-        callback(new Error('Password is mismatched!'));
+        callback(new Error('As senhas não combinam'));
       } else {
         callback();
       }
@@ -172,13 +172,13 @@ export default {
         rolePermissions: [],
       },
       rules: {
-        role: [{ required: true, message: 'Role is required', trigger: 'change' }],
-        name: [{ required: true, message: 'Name is required', trigger: 'blur' }],
+        role: [{ required: true, message: 'Permissão obrigatória', trigger: 'change' }],
+        name: [{ required: true, message: 'Nome obrigatório', trigger: 'blur' }],
         email: [
-          { required: true, message: 'Email is required', trigger: 'blur' },
-          { type: 'email', message: 'Please input correct email address', trigger: ['blur', 'change'] },
+          { required: true, message: 'Email obrigatório', trigger: 'blur' },
+          { type: 'email', message: 'Insira um email válido', trigger: ['blur', 'change'] },
         ],
-        password: [{ required: true, message: 'Password is required', trigger: 'blur' }],
+        password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
         confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
       },
       permissionProps: {
@@ -294,15 +294,15 @@ export default {
       });
     },
     handleDelete(id, name) {
-      this.$confirm('This will permanently delete user ' + name + '. Continue?', 'Warning', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
+      this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
+        confirmButtonText: 'Remover',
+        cancelButtonText: 'Cancelar',
         type: 'warning',
       }).then(() => {
         userResource.destroy(id).then(response => {
           this.$message({
             type: 'success',
-            message: 'Delete completed',
+            message: 'Usuário removido com sucesso',
           });
           this.handleFilter();
         }).catch(error => {
@@ -311,7 +311,7 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'info',
-          message: 'Delete canceled',
+          message: 'Operação cancelada',
         });
       });
     },
@@ -341,7 +341,7 @@ export default {
             .store(this.newUser)
             .then(response => {
               this.$message({
-                message: 'New user ' + this.newUser.name + '(' + this.newUser.email + ') has been created successfully.',
+                message: 'Usuário ' + this.newUser.name + '(' + this.newUser.email + ') foi criado com sucesso',
                 type: 'success',
                 duration: 5 * 1000,
               });

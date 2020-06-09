@@ -52,6 +52,8 @@ class DatabaseSeeder extends Seeder
         $user->syncRoles($userRole);
         $visitor->syncRoles($visitorRole);
         factory(Plan::class, 5)->create();
+        $this->call(StateTableSeeder::class);
+        $this->call(CityTableSeeder::class);
         $this->call(UsersTableSeeder::class);
     }
 }

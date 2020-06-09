@@ -163,7 +163,6 @@ export default {
       this.list = data.data;
       this.listLoading = false;
     },
-
     handleCreateForm() {
       this.dialogFormVisible = true;
       this.formTitle = 'Adicionar novo plano';
@@ -176,7 +175,6 @@ export default {
         statusSwitch: true,
       };
     },
-
     handleSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -227,7 +225,6 @@ export default {
         }
       });
     },
-
     handleEdit(id, name, description, price, days, status){
       this.currentPlan = this.list.find(category => category.id === id);
       this.dialogFormVisible = true;
@@ -249,7 +246,6 @@ export default {
         statusSwitch: statusSwitch,
       };
     },
-
     handleDelete(id, name) {
       this.$confirm('Tem certeza que deseja remover permanentemente o plano ' + name + ' ?', 'ATENÇÃO', {
         confirmButtonText: 'Deletar',
@@ -272,12 +268,10 @@ export default {
         });
       });
     },
-
     resetForm(formName) {
       this.dialogFormVisible = false;
       this.$refs[formName].resetFields();
     },
-
     handleFilter() {
       this.listQuery.page = 1;
       this.getList();

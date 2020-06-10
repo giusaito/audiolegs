@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Laravue\Acl;
 use App\Laravue\Models\Role;
+use App\Laravue\Models\userProfile;
 
 class UsersTableSeeder extends Seeder
 {
@@ -82,6 +83,14 @@ class UsersTableSeeder extends Seeder
 
             $role = Role::findByName($roleName);
             $user->syncRoles($role);
+
+            $user->userProfile()->create([
+                'user_id' => $user->id,
+                 'state_id' => 18,
+                 'city_id' => 3994,
+                 'path' => 'https://picsum.photos/',
+                 'photo' => '200'
+            ]);
         }
     }
 }

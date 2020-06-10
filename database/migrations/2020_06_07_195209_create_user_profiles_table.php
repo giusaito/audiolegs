@@ -33,7 +33,7 @@ class CreateUserProfilesTable extends Migration
             $table->char('facebook', 100)->nullable();
             $table->char('instagram', 100)->nullable();
             $table->char('twitter', 100)->nullable();
-            $table->char('youtube', 100)->nullable();   
+            $table->char('youtube', 100)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')

@@ -4,6 +4,7 @@ use App\Laravue\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Laravue\Models\Role;
+use App\Laravue\Models\userProfile;
 use App\Laravue\Models\Plan;
 
 class DatabaseSeeder extends Seeder
@@ -51,9 +52,25 @@ class DatabaseSeeder extends Seeder
         $editor->syncRoles($editorRole);
         $user->syncRoles($userRole);
         $visitor->syncRoles($visitorRole);
-        factory(Plan::class, 5)->create();
+
         $this->call(StateTableSeeder::class);
         $this->call(CityTableSeeder::class);
+
+        $admin->userProfile()->create([
+            'user_id' => $admin->id,
+             'state_id' => 18,
+             'city_id' => 3994,
+             'path' => 'https://picsum.photos/',
+             'photo' => '200'
+        ]);
+        $editor->userProfile()->create([
+            'user_id' => $editor->id,
+             'state_id' => 18,
+             'city_id' => 3994,
+             'path' => 'https://picsum.photos/',
+             'photo' => '200'
+        ]);
+        factory(Plan::class, 5)->create();
         $this->call(UsersTableSeeder::class);
     }
 }

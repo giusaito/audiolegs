@@ -18,7 +18,8 @@ class CreatePlansTable extends Migration
             $table->text('name', 255);
             $table->text('description', 255)->nullable();
             $table->text('slug', 255);
-            $table->float('price', 8,2)->nullable();
+            // $table->float('price', 8,2)->nullable();
+            $table->char('price', 20)->nullable();
             $table->bigInteger('quantity_days')->nullable();
             $table->enum('status', ['PUBLISHED', 'DRAFT'])->default('PUBLISHED');
             $table->bigInteger('user_id');

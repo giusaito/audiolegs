@@ -15,6 +15,7 @@ use App\Laravue\JsonResponse;
 use App\Laravue\Models\Permission;
 use App\Laravue\Models\Role;
 use App\Laravue\Models\User;
+use App\Laravue\Models\userProfile;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Arr;
@@ -105,7 +106,7 @@ class UserController extends Controller
 
         return response()->json(['data' => $user]);
     }
-    
+
     public function show(User $user)
     {
         return new UserResource($user);
@@ -120,36 +121,69 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        if ($user === null) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-        if ($user->isAdmin()) {
-            return response()->json(['error' => 'Admin can not be modified'], 403);
-        }
 
-        $currentUser = Auth::user();
-        if (!$currentUser->isAdmin()
-            && $currentUser->id !== $user->id
-            && !$currentUser->hasPermission(\App\Laravue\Acl::PERMISSION_USER_MANAGE)
-        ) {
-            return response()->json(['error' => 'Permission denied'], 403);
-        }
+        // dd($request['user']);
+        $id = Auth::user()->id;
+        $user = User::with(['userProfile'])->findOrFail($id);
+        $user->update($request->all());
 
-        $validator = Validator::make($request->all(), $this->getValidationRules(false));
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 403);
-        } else {
-            $email = $request->get('email');
-            $found = User::where('email', $email)->first();
-            if ($found && $found->id !== $user->id) {
-                return response()->json(['error' => 'Email has been taken'], 403);
-            }
 
-            $user->name = $request->get('name');
-            $user->email = $email;
-            $user->save();
-            return new UserResource($user);
-        }
+        $user->userProfile()->update([
+            'nickname' => $request['user_profile']['nickname'],
+            // 'state_id' => $request['user_profile']['state_id'],
+            // 'state_id' => $request['user_profile']['state_id'],
+            'city_id' => 18,
+            'city_id' => 3994,
+            'cep' => $request['user_profile']['cep'],
+            'address' => $request['user_profile']['address'],
+            'number_address' => $request['user_profile']['number_address'],
+            'cpf' => $request['user_profile']['cpf'],
+            'rg' => $request['user_profile']['rg'],
+            'whatsapp' => $request['user_profile']['whatsapp'],
+            'telephone' => $request['user_profile']['telephone'],
+            'path' => $request['user_profile']['path'],
+            'photo' => $request['user_profile']['photo'],
+            'biography' => $request['user_profile']['biography'],
+            'linkedin' => $request['user_profile']['linkedin'],
+            'facebook' => $request['user_profile']['facebook'],
+            'instagram' => $request['user_profile']['instagram'],
+            'twitter' => $request['user_profile']['twitter'],
+            'youtube' => $request['user_profile']['youtube']
+            ]
+       );
+
+
+        // // dd($request->all());
+        // if ($user === null) {
+        //     return response()->json(['error' => 'User not found'], 404);
+        // }
+        // if ($user->isAdmin()) {
+        //     return response()->json(['error' => 'Admin can not be modified'], 403);
+        // }
+
+        // $currentUser = Auth::user();
+        // if (!$currentUser->isAdmin()
+        //     && $currentUser->id !== $user->id
+        //     && !$currentUser->hasPermission(\App\Laravue\Acl::PERMISSION_USER_MANAGE)
+        // ) {
+        //     return response()->json(['error' => 'Permission denied'], 403);
+        // }
+
+        // $validator = Validator::make($request->all(), $this->getValidationRules(false));
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => $validator->errors()], 403);
+        // } else {
+        //     $email = $request->get('email');
+        //     $found = User::where('email', $email)->first();
+        //     if ($found && $found->id !== $user->id) {
+        //         return response()->json(['error' => 'Email has been taken'], 403);
+        //     }
+
+        //     $user->name = $request->get('name');
+        //     $user->email = $email;
+        //     $user->save();
+        //     return new UserResource($user);
+        // }
     }
 
     /**
@@ -240,16 +274,18 @@ class UserController extends Controller
     }
 
 
-    public function userImport(Request $request){ 
-
-        foreach($request->all() as $inserUser){
+    public function userImport(Request $request){
+     foreach(json_decode($request->all()) as $inserUser){
             $user = User::create([
                 'name' => $inserUser['nome'],
                 'email' => $inserUser['email'],
                 'password' => Hash::make('12345678'),
             ]);
-        }
 
+            $user->userProfile()->create([
+                'user_id' => $user->id
+            ]);
+        }
         return 'ok';
 
     }

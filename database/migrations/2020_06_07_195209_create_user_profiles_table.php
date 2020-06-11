@@ -17,8 +17,8 @@ class CreateUserProfilesTable extends Migration
             $table->id();
             $table->bigInteger('user_id')->unsigned();
             $table->char('nickname', 50)->nullable();
-            $table->bigInteger('state_id')->unsigned();
-            $table->bigInteger('city_id')->unsigned();
+            $table->bigInteger('state_id')->nullable()->unsigned();
+            $table->bigInteger('city_id')->nullable()->unsigned();
             $table->char('cep', 20)->nullable();
             $table->string('address', 255)->nullable();
             $table->char('number_address', 50)->nullable();
@@ -33,7 +33,7 @@ class CreateUserProfilesTable extends Migration
             $table->char('facebook', 100)->nullable();
             $table->char('instagram', 100)->nullable();
             $table->char('twitter', 100)->nullable();
-            $table->char('youtube', 100)->nullable();   
+            $table->char('youtube', 100)->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')

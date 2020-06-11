@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Laravue\Models\Activity;
 use Illuminate\Http\Request;
 
+use App\Laravue\Models\User;
+
+use Illuminate\Support\Facades\Hash;
+
 class ActivitieController extends Controller
 {
     /**
@@ -32,20 +36,26 @@ class ActivitieController extends Controller
        return response()->json($response);
     }
     
-     public function userImport(Request $request){ 
+     public function userImport(Request $request){
 
-        dd($request->all());
-
-        foreach($request->all() as $inserUser){
-            $user = User::create([
-                'name' => $inserUser['nome'],
-                'email' => $inserUser['email'],
-                'password' => Hash::make('12345678'),
+        foreach($request->all() as $key => $value) {
+          // foreach ($value as $ket => $v) {
+             $user = user::firstOrCreate([
+              'name' => $value['data'][$key],
+              'email' => $value['data'][$key],
+              'password' => 12345,
             ]);
+          // }
+         
+            // $user = user::firstOrCreate([
+            //   'name' => $value['data'][$key],
+            //   'email' => $value['data'][$key],
+            //   'password' => 12345,
+            // ]);
         }
 
-        return 'ok';
 
+        return 'ok';
     }
 
 }

@@ -1,144 +1,100 @@
 <template>
-  <div>
-    <input ref="excel-upload-input" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
-    <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
-      Drop excel file here or
-      <el-button :loading="loading" style="margin-left:16px;" size="mini" type="primary" @click="handleUpload">
-        Browse
-      </el-button>
-    </div>
+  <div class="app-container">
+    <xls-csv-parser :columns="columns" :help="help" lang="nl" @on-validate="onValidate" />
+    <pre>{{ JSON.stringify(results, null, 2) }}</pre>
   </div>
 </template>
 
 <script>
-import XLSX from 'xlsx';
-
+import { XlsCsvParser } from 'vue-xls-csv-parser';
 export default {
-  props: {
-    beforeUpload: Function, // eslint-disable-line
-    onSuccess: Function, // eslint-disable-line
+  name: 'App',
+  components: {
+    XlsCsvParser,
   },
   data() {
     return {
-      loading: false,
-      excelData: {
-        header: null,
-        results: null,
-      },
+      columns: [
+        { name: 'Student login', value: 'login', isOptional: true },
+        { name: 'Student firstname', value: 'firstname', isOptional: true },
+        { name: 'Student lastname', value: 'lastname', isOptional: true },
+        { name: 'Other', value: 'other', isOptional: true },
+      ],
+      results: null,
+      help: 'Necessary columns are: login, firstname and lastname',
     };
   },
   methods: {
-    generateData({ header, results }) {
-      this.excelData.header = header;
-      this.excelData.results = results;
-      this.onSuccess && this.onSuccess(this.excelData);
-    },
-    handleDrop(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (this.loading) {
-        return;
-      }
-      const files = e.dataTransfer.files;
-      if (files.length !== 1) {
-        this.$message.error('Only support uploading one file!');
-        return;
-      }
-      const rawFile = files[0]; // only use files[0]
-
-      if (!this.isExcel(rawFile)) {
-        this.$message.error('Only supports upload .xlsx, .xls, .csv suffix files');
-        return false;
-      }
-      this.upload(rawFile);
-      e.stopPropagation();
-      e.preventDefault();
-    },
-    handleDragover(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'copy';
-    },
-    handleUpload() {
-      this.$refs['excel-upload-input'].click();
-    },
-    handleClick(e) {
-      const files = e.target.files;
-      const rawFile = files[0]; // only use files[0]
-      if (!rawFile) {
-        return;
-      }
-      this.upload(rawFile);
-    },
-    upload(rawFile) {
-      this.$refs['excel-upload-input'].value = null; // fix can't select the same excel
-
-      if (!this.beforeUpload) {
-        this.readerData(rawFile);
-        return;
-      }
-      const before = this.beforeUpload(rawFile);
-      if (before) {
-        this.readerData(rawFile);
-      }
-    },
-    readerData(rawFile) {
-      this.loading = true;
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const data = e.target.result;
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
-          const header = this.getHeaderRow(worksheet);
-          const results = XLSX.utils.sheet_to_json(worksheet);
-          this.generateData({ header, results });
-          this.loading = false;
-          resolve();
-        };
-        reader.readAsArrayBuffer(rawFile);
-      });
-    },
-    getHeaderRow(sheet) {
-      const headers = [];
-      const range = XLSX.utils.decode_range(sheet['!ref']);
-      let C;
-      const R = range.s.r;
-      /* start in the first row */
-      for (C = range.s.c; C <= range.e.c; ++C) { /* walk every column in the range */
-        const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })];
-        /* find the cell in the first row */
-        let hdr = 'UNKNOWN ' + C; // <-- replace with your desired default
-        if (cell && cell.t) {
-          hdr = XLSX.utils.format_cell(cell);
-        }
-        headers.push(hdr);
-      }
-      return headers;
-    },
-    isExcel(file) {
-      return /\.(xlsx|xls|csv)$/.test(file.name);
+    onValidate(results) {
+      this.results = results;
     },
   },
 };
+document.getElementsByClassName('dropzone-title').innerHTML = 'Por favor selecione o arquivo';
 </script>
-
-<style scoped>
-.excel-upload-input{
-  display: none;
-  z-index: -9999;
-}
-.drop{
-  border: 2px dashed #bbb;
-  width: 600px;
-  height: 160px;
-  line-height: 160px;
-  margin: 0 auto;
-  font-size: 24px;
-  border-radius: 5px;
-  text-align: center;
-  color: #bbb;
-  position: relative;
-}
+<style lang="scss">
+  .catalog-column-chooser {
+    display: flex;
+    flex-wrap: wrap;
+    .header-tool, .text-right {
+      flex:100%;
+      border:none !important;
+    }
+    > div {
+        padding: 10px 20px;
+        margin: 15px;
+        border: 2px solid #52BAD4;
+        flex-basis: 20%;
+        &:first-child {
+          margin-left:0;
+        }
+        &:last-child {
+          margin-right:0;
+        }
+        .panel-heading {
+          p {
+            margin-top:0;
+            font-weight: 700;
+            color: #666;
+          }
+        }
+        .panel-body {
+          margin-bottom:20px;
+        }
+        table {
+          table-layout: fixed;
+          border-collapse: separate;
+          width:100%;
+          thead {
+            color: #909399;
+            font-weight: 500;
+          }
+          .el-table tr {
+            background-color: #fff;
+          }
+          th {
+            overflow: hidden;
+            user-select: none;
+            background-color: #fff;
+            padding: 12px 0;
+            min-width: 0;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            position: relative;
+            text-align: left;
+          }
+          td {
+            border-bottom: 1px solid #ebeef5;
+            padding: 12px 0;
+            min-width: 0;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            position: relative;
+            text-align: left;
+          }
+        }
+    }
+  }
 </style>

@@ -11,7 +11,7 @@ class Activity extends Model
 {
     use Notifiable, HasRoles, HasApiTokens;
 
-	protected $table = 'bw_activity_log';
+	protected $table = 'activity_log';
    	protected $fillable = ['*'];
 
    	 public function getUser(){

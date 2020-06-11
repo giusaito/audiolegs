@@ -66,12 +66,14 @@
           <el-form-item required>
             <el-col :span="12">
               <el-form-item label="Estado">
-                <el-input v-model="user.user_profile.state_id" />
+                <!-- <el-input v-model="user.user_profile.state_id" /> -->
+                <el-input v-model="estado" maxlength="20" show-word-limit />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="Cidade">
-                <el-input v-model="user.user_profile.city_id" />
+                <!-- <el-input v-model="user.user_profile.city_id" /> -->
+                <el-input v-model="cidade" maxlength="30" show-word-limit />
               </el-form-item>
             </el-col>
           </el-form-item>
@@ -166,16 +168,18 @@ export default {
   },
   data() {
     return {
+      cidade: 'Cascavel',
+      estado: 'Paraná',
       activeActivity: 'first',
       updating: false,
       rules: {
-        name: [
-          { required: true, message: 'Por favor, informe seu nome completo', trigger: 'change' },
-          { min: 3, message: 'Preencha no mínimo 3 caracteres', trigger: 'change' },
-        ],
-        email: [
-          { required: true, message: 'Por favor, informe um Email', trigger: 'change' },
-        ],
+        // name: [
+        //   { required: true, message: 'Por favor, informe seu nome completo', trigger: 'change' },
+        //   { min: 3, message: 'Preencha no mínimo 3 caracteres', trigger: 'change' },
+        // ],
+        // email: [
+        //   { required: true, message: 'Por favor, informe um Email', trigger: 'change' },
+        // ],
         cpf: [
           { required: true, message: 'Por favor, informe seu CPF', trigger: 'change' },
         ],
@@ -210,10 +214,11 @@ export default {
             .then(response => {
               this.updating = false;
               this.$message({
-                message: 'User information has been updated successfully',
+                message: 'Perfil atualizado com sucesso',
                 type: 'success',
                 duration: 5 * 1000,
               });
+              this.getList();
             })
             .catch(error => {
               console.log(error);

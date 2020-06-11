@@ -16,7 +16,7 @@
       </el-button> -->
     </div>
 
-    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
+    <el-table v-loading="loading" :data="list">
       <el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">
           <span>{{ scope.row.index }}</span>
@@ -43,17 +43,17 @@
 
       <el-table-column align="center" label="Ações" width="350">
         <template slot-scope="scope">
-          <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id">
-            <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
-              Editar
-            </el-button>
-          </router-link>
+          <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
+            Editar
+          </el-button>
+          <!-- </router-link> -->
           <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
             Papel
           </el-button>
-          <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+          <!-- <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Remover
-          </el-button>
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -94,7 +94,7 @@
       <div v-loading="userCreating" class="form-container">
         <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item label="Papel" prop="role">
-            <el-select v-model="newUser.role" class="filter-item" placeholder="Please select role">
+            <el-select v-model="newUser.role" class="filter-item" placeholder="Por favor selecione o papel">
               <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" />
             </el-select>
           </el-form-item>
@@ -159,8 +159,8 @@ export default {
         keyword: '',
         role: '',
       },
-      roles: ['admin', 'manager', 'editor', 'user', 'visitor'],
-      nonAdminRoles: ['editor', 'user', 'visitor'],
+      roles: ['admin', 'financeiro', 'editor', 'usuario'],
+      nonAdminRoles: ['financeiro', 'editor', 'usuario'],
       newUser: {},
       dialogFormVisible: false,
       dialogPermissionVisible: false,

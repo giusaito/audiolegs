@@ -38,7 +38,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Fim rota de planos backend
 
-    Route::post('/usuario/importar-usuario', 'UserController@userImport');
+    Route::post('/usuario/importar-usuario', 'ActivitieController@userImport');
 
     Route::get('atividades', 'ActivitieController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });

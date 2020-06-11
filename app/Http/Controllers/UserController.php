@@ -242,6 +242,8 @@ class UserController extends Controller
 
     public function userImport(Request $request){ 
 
+        dd($request->all());
+
         foreach($request->all() as $inserUser){
             $user = User::create([
                 'name' => $inserUser['nome'],

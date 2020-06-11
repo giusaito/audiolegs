@@ -31,5 +31,21 @@ class ActivitieController extends Controller
 
        return response()->json($response);
     }
+    
+     public function userImport(Request $request){ 
+
+        dd($request->all());
+
+        foreach($request->all() as $inserUser){
+            $user = User::create([
+                'name' => $inserUser['nome'],
+                'email' => $inserUser['email'],
+                'password' => Hash::make('12345678'),
+            ]);
+        }
+
+        return 'ok';
+
+    }
 
 }

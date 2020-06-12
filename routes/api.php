@@ -31,14 +31,13 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('permissions', 'PermissionController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
+    Route::post('/usuario/importar-usuario', 'UserController@userImport')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
     Route::group(['namespace' => 'Backend'], function()
     {
     // Rota de planos backend
     Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Fim rota de planos backend
-
-    Route::post('/usuario/importar-usuario', 'UserController@userImport');
 
     Route::get('atividades', 'ActivitieController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });

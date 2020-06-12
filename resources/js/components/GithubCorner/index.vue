@@ -1,5 +1,5 @@
 <template>
-  <a href="https://github.com/tuandm/laravue" target="_blank" class="github-corner" aria-label="View source on Github">
+  <a href="https://audiolegis.com.br" target="_blank" class="github-corner" aria-label="Audiolegis">
     <svg
       width="80"
       height="80"

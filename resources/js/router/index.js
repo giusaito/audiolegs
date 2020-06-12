@@ -140,16 +140,16 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'usuarios',
+        path: 'administrativo',
         component: () => import('@/views/activities/logs'),
         name: 'Logs de acesso ao sistema',
         meta: { title: 'log_util', icon: 'admin' },
       },
       {
         path: 'utilizacao',
-        component: () => import('@/views/activities/logs'),
+        component: () => import('@/views/activities/logsUserFront'),
         name: 'Logs de utilização',
-        meta: { title: 'log_util', icon: 'documentation' },
+        meta: { title: 'log_frontend', icon: 'documentation' },
       },
 
     ],

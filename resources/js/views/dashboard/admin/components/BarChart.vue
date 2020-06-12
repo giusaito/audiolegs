@@ -66,7 +66,7 @@ export default {
         },
         xAxis: [{
           type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
           axisTick: {
             alignWithLabel: true,
           },
@@ -78,21 +78,21 @@ export default {
           },
         }],
         series: [{
-          name: 'pageA',
+          name: 'Código Penal',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
           data: [79, 52, 200, 334, 390, 330, 220],
           animationDuration,
         }, {
-          name: 'pageB',
+          name: 'Lei 8.429/92 - Art. 9',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
           data: [80, 52, 200, 334, 390, 330, 220],
           animationDuration,
         }, {
-          name: 'pageC',
+          name: 'Código Civil - Das pessoas',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',

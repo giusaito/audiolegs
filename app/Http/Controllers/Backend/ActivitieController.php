@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Laravue\Models\Activity;
 use Illuminate\Http\Request;
 
+use App\Laravue\Models\User;
+
+use Illuminate\Support\Facades\Hash;
+
 class ActivitieController extends Controller
 {
     /**
@@ -31,5 +35,4 @@ class ActivitieController extends Controller
 
        return response()->json($response);
     }
-
 }

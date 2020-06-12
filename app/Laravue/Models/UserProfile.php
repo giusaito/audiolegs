@@ -8,7 +8,7 @@ class UserProfile extends Model
 {
 	// protected $table = ['user_profiles'];
 
-	// protected $guarded = [''];
+	protected $guarded = [''];
 
 
     public function user(){

@@ -72,4 +72,4 @@ if (mix.inProduction()) {
 }
 
 
-mix.browserSync("localhost:8080");
+mix.browserSync("audiolegs.leo");

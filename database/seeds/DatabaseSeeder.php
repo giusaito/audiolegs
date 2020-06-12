@@ -55,6 +55,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(StateTableSeeder::class);
         $this->call(CityTableSeeder::class);
+        $this->call(CollegeTableSeeder::class);
 
         $admin->userProfile()->create([
             'user_id' => $admin->id,

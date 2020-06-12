@@ -35,27 +35,4 @@ class ActivitieController extends Controller
 
        return response()->json($response);
     }
-    
-     public function userImport(Request $request){
-
-        foreach($request->all() as $key => $value) {
-          // foreach ($value as $ket => $v) {
-             $user = user::firstOrCreate([
-              'name' => $value['data'][$key],
-              'email' => $value['data'][$key],
-              'password' => 12345,
-            ]);
-          // }
-         
-            // $user = user::firstOrCreate([
-            //   'name' => $value['data'][$key],
-            //   'email' => $value['data'][$key],
-            //   'password' => 12345,
-            // ]);
-        }
-
-
-        return 'ok';
-    }
-
 }

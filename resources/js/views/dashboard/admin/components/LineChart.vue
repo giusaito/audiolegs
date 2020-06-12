@@ -107,7 +107,7 @@ export default {
           },
         },
         legend: {
-          data: ['Usuário', 'Receita'],
+          data: ['Usuário', 'Assinatura'],
         },
         series: [
           {
@@ -128,7 +128,7 @@ export default {
             animationEasing: 'cubicInOut',
           },
           {
-            name: 'Receita',
+            name: 'Assinatura',
             smooth: true,
             type: 'line',
             itemStyle: {

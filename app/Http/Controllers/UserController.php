@@ -273,17 +273,15 @@ class UserController extends Controller
         ];
     }
 
-    public function userImport(Request $request){
-     foreach(json_decode($request->all()) as $inserUser){
-            $user = User::create([
-                'name' => $inserUser['nome'],
-                'email' => $inserUser['email'],
-                'password' => Hash::make('12345678'),
+      public function userImport(Request $request){
+        foreach($request->all() as $key => $value) {
+          // foreach ($value as $ket => $v) {
+             $user = user::firstOrCreate([
+              'name' => $value['data'][$key],
+              'email' => $value['data'][$key],
+              'password' => 12345,
             ]);
 
-            $user->userProfile()->create([
-                'user_id' => $user->id
-            ]);
         }
         return 'ok';
     }

@@ -16,27 +16,45 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(StateTableSeeder::class);
+        $this->call(CityTableSeeder::class);
+        $this->call(CollegeTableSeeder::class);
         $admin = User::create([
+            'universidade_id' => rand(1,5),
+            'state_id' => 18,
+            'city_id' => 3994,
             'name' => 'Admin',
             'email' => 'admin@laravue.dev',
             'password' => Hash::make('laravue'),
         ]);
         $manager = User::create([
+            'universidade_id' => rand(1,5),
+            'state_id' => 18,
+            'city_id' => 3994,
             'name' => 'Manager',
             'email' => 'manager@laravue.dev',
             'password' => Hash::make('laravue'),
         ]);
         $editor = User::create([
+            'universidade_id' => rand(1,5),
+            'state_id' => 18,
+            'city_id' => 3994,
             'name' => 'Editor',
             'email' => 'editor@laravue.dev',
             'password' => Hash::make('laravue'),
         ]);
         $user = User::create([
+            'universidade_id' => rand(1,5),
+            'state_id' => 18,
+            'city_id' => 3994,
             'name' => 'User',
             'email' => 'user@laravue.dev',
             'password' => Hash::make('laravue'),
         ]);
         $visitor = User::create([
+            'universidade_id' => rand(1,5),
+            'state_id' => 18,
+            'city_id' => 3994,
             'name' => 'Visitor',
             'email' => 'visitor@laravue.dev',
             'password' => Hash::make('laravue'),
@@ -53,21 +71,13 @@ class DatabaseSeeder extends Seeder
         $user->syncRoles($userRole);
         $visitor->syncRoles($visitorRole);
 
-        $this->call(StateTableSeeder::class);
-        $this->call(CityTableSeeder::class);
-        $this->call(CollegeTableSeeder::class);
-
         $admin->userProfile()->create([
-            'user_id' => $admin->id,
-             'state_id' => 18,
-             'city_id' => 3994,
+             'user_id' => $admin->id,
              'path' => 'https://picsum.photos/',
              'photo' => '200'
         ]);
         $editor->userProfile()->create([
-            'user_id' => $editor->id,
-             'state_id' => 18,
-             'city_id' => 3994,
+             'user_id' => $editor->id,
              'path' => 'https://picsum.photos/',
              'photo' => '200'
         ]);

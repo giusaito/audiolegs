@@ -3,7 +3,7 @@ import request from '@/utils/request';
 
 export function fetchUniversities(query) {
   return request({
-    url: '/v1/bw/universidades',
+    url: '/v1/bw/universidades/lista',
     method: 'get',
     params: query,
   });

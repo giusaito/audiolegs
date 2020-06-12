@@ -2,6 +2,9 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        Procurar
+      </el-button>
       <el-select v-model="query.role" placeholder="Papel" clearable style="width: 90px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
       </el-select>
@@ -9,9 +12,9 @@
       <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
       </el-select>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-        Procurar
-      </el-button>
+      <el-select v-model="query.cidade" placeholder="Cidade" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="cidade in cidades" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
+      </el-select>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
         Adicionar
       </el-button>
@@ -136,6 +139,7 @@ import waves from '@/directive/waves'; // Waves directive
 import permission from '@/directive/permission'; // Permission directive
 import checkPermission from '@/utils/permission'; // Permission checking
 import { fetchUniversities } from '@/api/universities';
+import { fetchCities } from '@/api/cities';
 
 const userResource = new UserResource();
 const permissionResource = new Resource('permissions');
@@ -159,6 +163,7 @@ export default {
       downloading: false,
       userCreating: false,
       universidades: [],
+      cidades: [],
       query: {
         page: 1,
         limit: 15,
@@ -264,6 +269,7 @@ export default {
     this.resetNewUser();
     this.getList();
     this.getUniversities();
+    this.getCities();
     if (checkPermission(['manage permission'])) {
       this.getPermissions();
     }
@@ -291,18 +297,22 @@ export default {
     },
     async getUniversities() {
       this.listLoading = true;
-      console.log('-----------');
-      console.log(this.query);
-      console.log('-----------');
       const { data } = await fetchUniversities(this.query);
       this.listLoading = false;
       this.universidades = data;
-      console.log(this.universidades);
+    },
+    async getCities() {
+      this.listLoading = true;
+      const { data } = await fetchCities(this.query);
+      this.listLoading = false;
+      this.cidades = data;
+      console.log(this.cidades);
     },
     handleFilter() {
       this.query.page = 1;
       this.getList();
       this.getUniversities();
+      this.getCities();
     },
     handleCreate() {
       this.resetNewUser();

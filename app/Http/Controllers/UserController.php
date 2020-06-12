@@ -45,6 +45,7 @@ class UserController extends Controller
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
         $role = Arr::get($searchParams, 'role', '');
         $university = Arr::get($searchParams, 'universidade', '');
+        $city = Arr::get($searchParams, 'cidade', '');
         $keyword = Arr::get($searchParams, 'keyword', '');
 
         if (!empty($role)) {
@@ -58,6 +59,10 @@ class UserController extends Controller
 
         if (!empty($university)) {
             $userQuery->where('universidade_id', $university);
+        }
+
+        if (!empty($city)) {
+            $userQuery->where('city_id', $city);
         }
 
         return UserResource::collection($userQuery->paginate($limit));

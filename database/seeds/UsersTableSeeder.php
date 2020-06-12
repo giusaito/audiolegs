@@ -78,6 +78,8 @@ class UsersTableSeeder extends Seeder
             ]);
             $user = \App\Laravue\Models\User::create([
                 'universidade_id' => $college,
+                'state_id' => 18,
+                'city_id' => 3994,
                 'name' => $fullName,
                 'email' => strtolower($name) . '@laravue.dev',
                 'password' => \Illuminate\Support\Facades\Hash::make('laravue'),
@@ -88,8 +90,6 @@ class UsersTableSeeder extends Seeder
 
             $user->userProfile()->create([
                 'user_id' => $user->id,
-                 'state_id' => 18,
-                 'city_id' => 3994,
                  'path' => 'https://picsum.photos/',
                  'photo' => '200'
             ]);

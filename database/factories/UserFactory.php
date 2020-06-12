@@ -18,6 +18,8 @@ use Illuminate\Support\Str;
 $factory->define(User::class, function (Faker $faker) {
     return [
     	'universidade_id' => rand(1,5),
+    	'state_id' => 18,
+        'city_id' => 3994,
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'email_verified_at' => now(),

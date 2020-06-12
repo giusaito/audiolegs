@@ -5,6 +5,10 @@
       <el-select v-model="query.role" placeholder="Papel" clearable style="width: 90px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
       </el-select>
+      <!-- <el-select v-model="query.colleges" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
+      <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Procurar
       </el-button>
@@ -131,6 +135,7 @@ import Resource from '@/api/resource';
 import waves from '@/directive/waves'; // Waves directive
 import permission from '@/directive/permission'; // Permission directive
 import checkPermission from '@/utils/permission'; // Permission checking
+import { fetchUniversities } from '@/api/universities';
 
 const userResource = new UserResource();
 const permissionResource = new Resource('permissions');
@@ -153,6 +158,7 @@ export default {
       loading: true,
       downloading: false,
       userCreating: false,
+      universidades: [],
       query: {
         page: 1,
         limit: 15,
@@ -257,6 +263,7 @@ export default {
   created() {
     this.resetNewUser();
     this.getList();
+    this.getUniversities();
     if (checkPermission(['manage permission'])) {
       this.getPermissions();
     }
@@ -282,9 +289,20 @@ export default {
       this.total = meta.total;
       this.loading = false;
     },
+    async getUniversities() {
+      this.listLoading = true;
+      console.log('-----------');
+      console.log(this.query);
+      console.log('-----------');
+      const { data } = await fetchUniversities(this.query);
+      this.listLoading = false;
+      this.universidades = data;
+      console.log(this.universidades);
+    },
     handleFilter() {
       this.query.page = 1;
       this.getList();
+      this.getUniversities();
     },
     handleCreate() {
       this.resetNewUser();

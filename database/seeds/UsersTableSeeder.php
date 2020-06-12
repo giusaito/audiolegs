@@ -66,6 +66,7 @@ class UsersTableSeeder extends Seeder
             "Wilhelm Conrad Roentgen",
             "Wolfgang Ernst Pauli",
         ];
+        $college = rand(1,5);
 
         foreach ($userList as $fullName) {
             $name = str_replace(' ', '.', $fullName);
@@ -76,6 +77,7 @@ class UsersTableSeeder extends Seeder
                 Acl::ROLE_VISITOR,
             ]);
             $user = \App\Laravue\Models\User::create([
+                'universidade_id' => $college,
                 'name' => $fullName,
                 'email' => strtolower($name) . '@laravue.dev',
                 'password' => \Illuminate\Support\Facades\Hash::make('laravue'),

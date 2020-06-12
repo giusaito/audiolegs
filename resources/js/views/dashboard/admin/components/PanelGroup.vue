@@ -91,29 +91,29 @@ export default {
         color: #fff;
       }
       .icon-people {
-         background: #40c9c6;
+         background: #272f4c;
       }
       .icon-message {
-        background: #36a3f7;
+        background: #dbb200;
       }
       .icon-money {
-        background: #f4516c;
+        background: #272f4c;
       }
       .icon-shopping {
-        background: #34bfa3
+        background: #dbb200
       }
     }
     .icon-people {
-      color: #40c9c6;
+      color: #272f4c;
     }
     .icon-message {
-      color: #36a3f7;
+      color: #dbb200;
     }
     .icon-money {
-      color: #f4516c;
+      color: #272f4c;
     }
     .icon-shopping {
-      color: #34bfa3
+      color: #dbb200
     }
     .card-panel-icon-wrapper {
       float: left;

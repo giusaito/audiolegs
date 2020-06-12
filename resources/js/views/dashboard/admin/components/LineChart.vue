@@ -6,7 +6,6 @@
 import echarts from 'echarts';
 require('echarts/theme/macarons'); // echarts theme
 import { debounce } from '@/utils';
-
 export default {
   props: {
     className: {
@@ -54,7 +53,6 @@ export default {
       }, 100);
       window.addEventListener('resize', this.__resizeHandler);
     }
-
     // Monitor the sidebar changes
     this.sidebarElm = document.getElementsByClassName('sidebar-container')[0];
     this.sidebarElm && this.sidebarElm.addEventListener('transitionend', this.sidebarResizeHandler);
@@ -66,9 +64,7 @@ export default {
     if (this.autoResize) {
       window.removeEventListener('resize', this.__resizeHandler);
     }
-
     this.sidebarElm && this.sidebarElm.removeEventListener('transitionend', this.sidebarResizeHandler);
-
     this.chart.dispose();
     this.chart = null;
   },

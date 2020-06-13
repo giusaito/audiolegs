@@ -192,3 +192,21 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+.el-breadcrumb__inner.is-link, .el-breadcrumb__inner a {
+  color:#000 !important;
+}
+.navbar {
+  svg {
+    fill:#fff !important;
+  }
+}
+.el-button--primary {
+    color: #FFFFFF;
+    background-color: #272f4c !important;
+    border-color: #272f4c !important;
+    &:hover, &:focus {
+        background: #3e4a77 !important;
+        border-color: #2c365a !important;
+        color: #FFFFFF;
+    }
+}

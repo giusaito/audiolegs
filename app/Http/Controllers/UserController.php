@@ -45,6 +45,7 @@ class UserController extends Controller
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
         $role = Arr::get($searchParams, 'role', '');
         $university = Arr::get($searchParams, 'universidade', '');
+        $state = Arr::get($searchParams, 'estado', '');
         $city = Arr::get($searchParams, 'cidade', '');
         $keyword = Arr::get($searchParams, 'keyword', '');
 
@@ -59,6 +60,10 @@ class UserController extends Controller
 
         if (!empty($university)) {
             $userQuery->where('universidade_id', $university);
+        }
+
+        if (!empty($state)) {
+            $userQuery->where('state_id', $state);
         }
 
         if (!empty($city)) {

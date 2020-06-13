@@ -8,4 +8,8 @@ class City extends Model
 {
     protected $table = 'cities';
     protected $guarded = [''];
+
+    public function state(){
+    	return $this->belongsTo('App\Laravue\Models\State');
+    }
 }

@@ -12,6 +12,9 @@
       <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
       </el-select>
+      <el-select v-model="query.estado" placeholder="Estado" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
+      </el-select>
       <el-select v-model="query.cidade" placeholder="Cidade" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="cidade in cidades" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
       </el-select>
@@ -140,6 +143,7 @@ import permission from '@/directive/permission'; // Permission directive
 import checkPermission from '@/utils/permission'; // Permission checking
 import { fetchUniversities } from '@/api/universities';
 import { fetchCities } from '@/api/cities';
+import { fetchStates } from '@/api/states';
 
 const userResource = new UserResource();
 const permissionResource = new Resource('permissions');
@@ -164,6 +168,7 @@ export default {
       userCreating: false,
       universidades: [],
       cidades: [],
+      estados: [],
       query: {
         page: 1,
         limit: 15,
@@ -269,6 +274,7 @@ export default {
     this.resetNewUser();
     this.getList();
     this.getUniversities();
+    this.getStates();
     this.getCities();
     if (checkPermission(['manage permission'])) {
       this.getPermissions();
@@ -301,6 +307,13 @@ export default {
       this.listLoading = false;
       this.universidades = data;
     },
+    async getStates() {
+      this.listLoading = true;
+      const { data } = await fetchStates(this.query);
+      this.listLoading = false;
+      this.estados = data;
+      console.log(this.estados);
+    },
     async getCities() {
       this.listLoading = true;
       const { data } = await fetchCities(this.query);
@@ -312,6 +325,7 @@ export default {
       this.query.page = 1;
       this.getList();
       this.getUniversities();
+      this.getStates();
       this.getCities();
     },
     handleCreate() {

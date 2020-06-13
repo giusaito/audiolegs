@@ -85,7 +85,7 @@ class CityController extends Controller
     }
 
     public function getList(){
-        $cidades = City::orderBy('id', 'DESC')->get();
+        $cidades = City::orderBy('title', 'ASC')->where('status',1)->get();
 
         $response = [
             'data' => $cidades

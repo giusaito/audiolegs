@@ -42,6 +42,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('atividades', 'ActivitieController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::get('universidades/lista', 'CollegeController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::get('cidades/lista', 'CityController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::get('estados/lista', 'StateController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });
 });
 

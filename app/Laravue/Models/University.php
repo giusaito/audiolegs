@@ -4,8 +4,8 @@ namespace App\Laravue\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class College extends Model
+class University extends Model
 {
-    protected $table = 'colleges';
+    protected $table = 'universities';
     protected $guarded = [''];
 }

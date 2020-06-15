@@ -8,14 +8,14 @@
       <el-select v-model="query.role" placeholder="Papel" clearable style="width: 90px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
       </el-select>
-      <!-- <el-select v-model="query.colleges" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
+      <!-- <el-select v-model="query.universities" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
       <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
       </el-select>
       <el-select v-model="query.estado" placeholder="Estado" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
       </el-select>
-      <el-select v-model="query.cidade" placeholder="Cidade" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+      <el-select v-model="query.cidade" placeholder="Cidade" filterable clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="cidade in cidades" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
       </el-select>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">

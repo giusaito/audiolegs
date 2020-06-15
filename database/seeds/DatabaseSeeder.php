@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(StateTableSeeder::class);
         $this->call(CityTableSeeder::class);
-        $this->call(CollegeTableSeeder::class);
+        $this->call(UniversityTableSeeder::class);
         $admin = User::create([
-            'universidade_id' => rand(1,5),
+            'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Admin',
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('laravue'),
         ]);
         $manager = User::create([
-            'universidade_id' => rand(1,5),
+            'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Manager',
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('laravue'),
         ]);
         $editor = User::create([
-            'universidade_id' => rand(1,5),
+            'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Editor',
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('laravue'),
         ]);
         $user = User::create([
-            'universidade_id' => rand(1,5),
+            'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'User',
@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('laravue'),
         ]);
         $visitor = User::create([
-            'universidade_id' => rand(1,5),
+            'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Visitor',

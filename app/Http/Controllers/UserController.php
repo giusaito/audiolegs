@@ -59,7 +59,7 @@ class UserController extends Controller
         }
 
         if (!empty($university)) {
-            $userQuery->where('universidade_id', $university);
+            $userQuery->where('university_id', $university);
         }
 
         if (!empty($state)) {

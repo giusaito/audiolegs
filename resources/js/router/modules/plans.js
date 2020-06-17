@@ -5,7 +5,7 @@ const plansRoutes = {
   component: Layout,
   name: 'Planos de assinatura',
   meta: {
-    title: 'Planos',
+    title: 'Planos & Cupons',
     icon: 'edit',
   },
   children: [
@@ -13,7 +13,13 @@ const plansRoutes = {
       path: 'lista',
       component: () => import('@/views/plans/Index'),
       name: 'Planos',
-      meta: { title: 'plans', icon: 'edit' },
+      meta: { title: 'plans' },
+    },
+    {
+      path: 'cupons',
+      component: () => import('@/views/plans/Cupons'),
+      name: 'Cupons',
+      meta: { title: 'coupons' },
     },
   ],
 };

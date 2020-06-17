@@ -5,6 +5,7 @@ export default {
     documentation: 'Documentação	',
     guide: 'Guia',
     plans: 'Planos',
+    coupons: 'Cupons',
     log_util: 'Logs administrativo',
     log_frontend: 'Logs de utilização',
     Settings: 'Logs de leis',

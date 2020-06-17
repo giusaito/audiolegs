@@ -99,6 +99,9 @@ class UserController extends Controller
             $user = User::create([
                 'name' => $params['name'],
                 'email' => $params['email'],
+                'universidade_id' => 1,
+                'state_id' => 18,
+                'city_id' => 3994,
                 'password' => Hash::make($params['password']),
             ]);
             $role = Role::findByName($params['role']);
@@ -145,10 +148,6 @@ class UserController extends Controller
 
         $user->userProfile()->update([
             'nickname' => $request['user_profile']['nickname'],
-            // 'state_id' => $request['user_profile']['state_id'],
-            // 'state_id' => $request['user_profile']['state_id'],
-            'city_id' => 18,
-            'city_id' => 3994,
             'cep' => $request['user_profile']['cep'],
             'address' => $request['user_profile']['address'],
             'number_address' => $request['user_profile']['number_address'],

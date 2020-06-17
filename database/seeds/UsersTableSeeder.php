@@ -81,8 +81,8 @@ class UsersTableSeeder extends Seeder
                 'state_id' => 18,
                 'city_id' => 3994,
                 'name' => $fullName,
-                'email' => strtolower($name) . '@laravue.dev',
-                'password' => \Illuminate\Support\Facades\Hash::make('laravue'),
+                'email' => strtolower($name) . '@admin.com.br',
+                'password' => \Illuminate\Support\Facades\Hash::make('123456'),
             ]);
 
             $role = Role::findByName($roleName);

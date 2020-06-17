@@ -134,7 +134,7 @@
             <el-input v-model="user.user_profile.youtube" maxlength="100" show-word-limit />
           </el-form-item>
           <el-form-item label="Sobre mim">
-            <el-input v-model="user.user_profile.biography" type="textarea" maxlength="255" show-word-limit />
+            <el-input v-model="user.user_profile.biography" type="textarea" maxlength="250" show-word-limit />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" :disabled="user.role === 'admin'" @click="onSubmit('user')">

@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Laravue\Models\College;
+use App\Laravue\Models\University;
 
-class CollegeTableSeeder extends Seeder
+class UniversityTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,7 +12,7 @@ class CollegeTableSeeder extends Seeder
      */
     public function run()
     {
-    $fag = College::create([
+    $fag = University::create([
             'fantasy_name' => 'FAG',
             'social_reason' => 'Centro Universitário da Fundação Assis Gurgacz',
             'nickname' => 'FAG',
@@ -23,7 +23,7 @@ class CollegeTableSeeder extends Seeder
              'state_id' => 18,
              'city_id' => 3994
         ]);
-    $unopar = College::create([
+    $unopar = University::create([
             'fantasy_name' => 'Unopar',
             'social_reason' => 'Kroton Educacional S.A.',
             'nickname' => 'Unopar',
@@ -34,7 +34,7 @@ class CollegeTableSeeder extends Seeder
              'state_id' => 18,
              'city_id' => 3994
         ]);
-    $unipar = College::create([
+    $unipar = University::create([
             'fantasy_name' => 'Unipar',
             'social_reason' => 'Universidade Paranaense',
             'nickname' => 'Unipar',
@@ -45,7 +45,7 @@ class CollegeTableSeeder extends Seeder
              'state_id' => 18,
              'city_id' => 3994
         ]);
-    $cesumar = College::create([
+    $cesumar = University::create([
             'fantasy_name' => 'Unicesumar',
             'social_reason' => 'Universidade Cesumar',
             'nickname' => 'Unicesumar',
@@ -56,7 +56,7 @@ class CollegeTableSeeder extends Seeder
              'state_id' => 18,
              'city_id' => 3994
         ]);
-    $unioeste =  College::create([
+    $unioeste =  University::create([
             'fantasy_name' => 'Unioeste',
             'social_reason' => 'Universidade Estadual do Oeste do Paraná',
             'nickname' => 'Unioeste',

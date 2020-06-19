@@ -13,7 +13,7 @@ class CreateCollegesTable extends Migration
      */
     public function up()
     {
-        Schema::create('colleges', function (Blueprint $table) {
+        Schema::create('universities', function (Blueprint $table) {
             $table->id();
             $table->string('fantasy_name', 255);
             $table->string('social_reason', 255);
@@ -43,6 +43,6 @@ class CreateCollegesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('colleges');
+        Schema::dropIfExists('universities');
     }
 }

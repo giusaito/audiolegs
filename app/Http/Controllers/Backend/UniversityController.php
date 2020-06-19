@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
-use App\Laravue\Models\College;
+use App\Laravue\Models\University;
 use Illuminate\Http\Request;
 
-class CollegeController extends Controller
+class UniversityController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -85,7 +85,7 @@ class CollegeController extends Controller
     }
 
     public function getList(){
-        $universidades = College::orderBy('id', 'DESC')->get();
+        $universidades = University::orderBy('id', 'DESC')->get();
 
         $response = [
             'data' => $universidades

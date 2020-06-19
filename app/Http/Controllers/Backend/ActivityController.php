@@ -10,7 +10,7 @@ use App\Laravue\Models\User;
 
 use Illuminate\Support\Facades\Hash;
 
-class ActivitieController extends Controller
+class ActivityController extends Controller
 {
     /**
      * Display a listing of the resource.

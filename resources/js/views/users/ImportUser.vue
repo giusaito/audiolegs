@@ -1,5 +1,20 @@
 <template>
   <div class="app-container">
+    <div class="plans-choose">
+      <h2 class="step"><small>1</small> Escolha o Plano:</h2>
+      <div class="plans">
+        <div v-for="plano in planos" :key="plano.id" v-loading="listLoading" class="box-plan el-card box-card is-always-shadow" :plano="plano.id">
+          <div class="el-card__header">{{ plano.name }}</div>
+          <div class="el-card__body">
+            <el-switch
+              v-model="planos[planChoose(planos, plano.id)].value"
+              active-color="#13ce66"
+              @change="activePlan(planos, plano.id)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
     <xls-csv-parser :columns="columns" :help="help" lang="ptBR" @on-validate="onValidate" />
     <!-- <pre>{{ JSON.stringify(results, null, 2) }}</pre> -->
     <simplert
@@ -14,6 +29,8 @@
 import { XlsCsvParser } from 'vue-xls-csv-parser';
 import request from '@/utils/request';
 import Simplert from 'vue2-simplert';
+import Resource from '@/api/resource';
+const PlanResource = new Resource('planos');
 export default {
   name: 'App',
   components: {
@@ -30,7 +47,16 @@ export default {
       results: null,
       // help: 'Campos necessários: login, firstname and lastname',
       help: 'Campos necessários: Nome, E-mail e Telefone',
+      listLoading: true,
+      planos: [],
+      listQuery: {
+        page: 1,
+        limit: 10,
+      },
     };
+  },
+  created() {
+    this.getPlans();
   },
   methods: {
     onValidate(results) {
@@ -77,10 +103,48 @@ export default {
       });
       this.results = results;
     },
+    async getPlans() {
+      this.listLoading = true;
+      const { data } = await PlanResource.list({});
+      this.total = data.total;
+      this.planos = data.data;
+      this.listLoading = false;
+    },
+    planChoose(list, id) {
+      // alert(id);
+      return list.findIndex((e) => e.id === id);
+    },
+    activePlan(list, id){
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id !== id){
+          // this.planChoose = true;
+          console.log(list[i].id);
+        }
+      }
+      return true;
+    },
   },
 };
 </script>
 <style lang="scss">
+  .plans {
+    display:flex;
+    justify-content:space-between;
+    .box-plan {
+      width: calc(33.3333% - 15px);
+      margin: 0 0 15px 15px;
+    }
+  }
+  h2.step {
+    small {
+      font-weight: 700;
+      color: #dbb200;
+      display: inline-block;
+      &:after {
+        content:") ";
+      }
+    }
+  }
   .catalog-column-chooser {
     display: flex;
     position:relative;

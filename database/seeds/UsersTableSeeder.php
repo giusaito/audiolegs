@@ -77,7 +77,7 @@ class UsersTableSeeder extends Seeder
                 Acl::ROLE_VISITOR,
             ]);
             $user = \App\Laravue\Models\User::create([
-                'universidade_id' => $college,
+                'university_id' => $college,
                 'state_id' => 18,
                 'city_id' => 3994,
                 'name' => $fullName,

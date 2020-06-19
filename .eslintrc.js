@@ -13,6 +13,7 @@ module.exports = {
   },
   extends: ['plugin:vue/recommended', 'eslint:recommended'],
   rules: {
+    // "no-mixed-spaces-and-tabs": 0, // disable rule
     'array-bracket-spacing': [2, 'never'],
     'arrow-spacing': [2, {
       'before': true,

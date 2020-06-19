@@ -53,6 +53,7 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
+    "@shahin7511/laravue-form-validator": "^6.0.0",
     "axios": "^0.19.2",
     "babel-loader": "^8.1.0",
     "browser-sync": "^2.26.7",

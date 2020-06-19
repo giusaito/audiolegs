@@ -166,4 +166,15 @@ class VoucherController extends Controller
 
         return response()->json($response);
     }
+
+    public function getChave(Request $request){
+        // echo $request->input('0');
+        $chave = Voucher::where('chave', '=', $request->input('chave'))->first();
+        if ($chave != null) {
+            $response = ['count'=>1];
+        }else {
+            $response = ['count'=>0];
+        }
+        return response()->json($response);
+    }
 }

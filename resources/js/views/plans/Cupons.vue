@@ -20,16 +20,17 @@
                 inactive-text="R$"
                 active-color="#999"
                 inactive-color="#999"
+                @change="toggleDescontoMandatory"
               />
             </el-col>
             <el-col :span="11">
-              <el-form-item prop="desconto">
+              <el-form-item ref="desconto_input" prop="desconto">
                 <el-input v-model="currentVoucher.desconto" v-money="money" placeholder="Valor (R$)" :disabled="tipo_desconto" />
               </el-form-item>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
             <el-col :span="11">
-              <el-form-item prop="desconto_porcentagem">
+              <el-form-item ref="desconto_porcentagem_input" prop="desconto_porcentagem">
                 <el-input v-model="currentVoucher.desconto_porcentagem" v-mask="'9{1,3}'" placeholder="Valor (%)" :disabled="!tipo_desconto">
                   <i slot="suffix" class="el-input__icon">%</i>
                 </el-input>
@@ -150,6 +151,8 @@ export default {
       listLoading: true,
       btnInsertUpdate: '',
       cupomEditing: false,
+      descontoMandatory: false,
+      descontoPorcentagemMandatory: false,
       baseUrlApi: '/api/v1/bw/cupons',
       listQuery: {
         page: 1,
@@ -162,12 +165,12 @@ export default {
           trigger: 'blur',
         },
         desconto: {
-          required: false,
+          required: this.descontoMandatory,
           validator: this.customValidator,
           trigger: 'blur',
         },
         desconto_porcentagem: {
-          required: false,
+          required: this.descontoPorcentagemMandatory,
           validator: this.customValidator,
           trigger: 'blur',
         },
@@ -192,9 +195,23 @@ export default {
       this.list = data.data;
       this.listLoading = false;
     },
+    toggleDescontoMandatory() {
+      if (this.tipo_desconto === true) {
+        this.descontoPorcentagemMandatory = true;
+        this.descontoMandatory = false;
+      } else {
+        this.descontoPorcentagemMandatory = false;
+        this.descontoMandatory = true;
+      }
+      setTimeout(() => this.$refs.desconto_input.clearValidate(), 0);
+      setTimeout(() => this.$refs.desconto_porcentagem_input.clearValidate(), 0);
+    },
     customValidator(rule, value, callback) {
       console.log(rule);
-      if (!value) {
+      if ((rule.field === 'desconto' && this.descontoMandatory === true) || (rule.field === 'desconto_porcentagem' && this.descontoPorcentagemMandatory === true)) {
+        rule.required = true;
+      }
+      if (!value && rule.required) {
         callback(new Error('O campo é obrigatório'));
       }
 
@@ -210,15 +227,16 @@ export default {
           }
         });
       }
-      const errors = [{
-        'message': 'email address is invalid',
-        'path': ['desconto'],
-      },
-      {
-        'message': 'example error for password field',
-        'path': ['password'],
-      },
-      ];
+      const errors = [];
+      // const errors = [{
+      //   'message': 'email address is invalid',
+      //   'path': ['desconto'],
+      // },
+      // {
+      //   'message': 'example error for password field',
+      //   'path': ['password'],
+      // },
+      // ];
       setTimeout(() => {
         this.errors = errors;
 

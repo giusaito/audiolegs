@@ -289,15 +289,29 @@ class UserController extends Controller
     }
 
       public function userImport(Request $request){
-        foreach($request->all() as $key => $value) {
-          // foreach ($value as $ket => $v) {
-             $user = user::firstOrCreate([
-              'name' => $value['data'][$key],
-              'email' => $value['data'][$key],
-              'password' => 12345,
-            ]);
+        $coluna1 = $request[0]['column'];
+        $coluna2 = $request[1]['column'];
+        $coluna3 = $request[2]['column'];
+        $coluna4 = "password";
+        $data1 = $request[0]['data'];
+        $data2 = $request[1]['data'];
+        $data3 = $request[2]['data'];
+        $data4 = Hash::make('AUDIOLEGIS');
 
+        $field = [];
+
+        $i = 0;
+        foreach($data1 as $key => $campo){
+          $field[$key][$coluna1] = $campo;
+          $field[$key][$coluna2] = $data2[$key];
+          $field[$key][$coluna3] = $data3[$key];
+          $field[$key][$coluna4] = $data4;
+          $i++;
         }
-        return 'ok';
+
+      $ignoreEmpty = array_map('array_filter', $field);
+      $users = User::insertOrIgnore($ignoreEmpty);
+
+      return response()->json($users . ' cadastrados no banco');
     }
 }

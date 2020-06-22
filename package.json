@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@shahin7511/laravue-form-validator": "^6.0.0",
+    "@supercharge/strings": "^1.9.0",
     "axios": "^0.19.2",
     "babel-loader": "^8.1.0",
     "browser-sync": "^2.26.7",
@@ -91,7 +92,7 @@
     "vue-splitpane": "^1.0.4",
     "vue-the-mask": "^0.11.1",
     "vue-xls-csv-parser": "0.0.21",
-    "vuedraggable": "^2.23.0",
+    "vuedraggable": "^2.23.2",
     "vuex": "3.1.1",
     "xlsx": "^0.15.5"
   }

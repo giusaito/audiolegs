@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Validator;
 
 class VoucherController extends Controller
 {
@@ -41,56 +42,43 @@ class VoucherController extends Controller
      */
     public function store(Request $request)
     {
+		$validator =  $validator = Validator::make($request->all(), [
+            'chave' 				=> 'required|unique:vouchers|min:3|max:20',
+            'quantidade_total' 		=> 'sometimes|required|numeric',
+            'statusSwitch' 			=> 'required',
+        ],
+	    [
+	    	'chave.required' => 'Por favor, preencha com a chave (nome) do cupom',
+	    	'chave.unique' => 'Já existe um outro cupom com este nome',
+	    	'chave.min' => 'Preencha no mínimo 3 caracteres para o nome do cupom',
+	    	'chave.max' => 'Preencha no máximo 50 caracteres para o nome do cupom',
+	    ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar o CUPOM! Por favor, verifique os campos e tente novamente'], 403);
+        } else {
+            $desconto = str_replace('R$ ', '', $request->desconto);
+            $request->desconto = number_format((float)str_replace(",",".",str_replace(".","",$desconto)), 2, '.', '');
 
-  //   	$this->validate(request(), [
-  //           'name' => 'required|max:191',
-  //           'email' => 'required|email|unique:users|max:191',
-  //           'password' => 'required|max:191'
-  //       ]);
+            $request->data_inicio = $request->data_expiracao[0];
+            $request->data_fim = $request->data_expiracao[1];
 
-
-
-
-		// request()->validate([
-		//         'file' => 'required',
-		//         'type' => 'required'
-		//     ],
-		//     [
-		//         'file.required' => 'You have to choose the file!',
-		//         'type.required' => 'You have to choose type of the file!'
-		//     ]);
-
-		$this->validate(request(), [
-	            'chave' 				=> 'required|unique:vouchers|min:3|max:20',
-	            'desconto' 				=> 'required',
-	            'desconto_porcentagem' 	=> 'required',
-	            'quantidade_total' 		=> 'required|number',
-	            'status' 				=> 'required|number',
-	        ],
-		    [
-		    	'chave.required' => 'Por favor, preencha com a chave (nome) do cupom!',
-		    	'chave.unique' => 'Já existe um outro cupom com este nome!',
-		    	'chave.min' => 'Preencha no mínimo 3 caracteres para o nome do cupom!',
-		    	'chave.max' => 'Preencha no máximo 50 caracteres para o nome do cupom!',
-		    ]
-	    );
-
-       $voucher = Voucher::firstOrCreate([
+            $voucher = Voucher::firstOrCreate([
                 'chave' => $request->chave,
                 'desconto' => $request->desconto,
                 'desconto_porcentagem' => $request->desconto_porcentagem,
                 'quantidade_total' => $request->quantidade_total,
                 'quantidade_usado' => $request->quantidade_total,
-                'data_inicio' => Carbon::parse($request->data_inicio)->format('d-m-Y H:i:s'),
-                'data_fim' => Carbon::parse($request->data_fim)->format('d-m-Y H:i:s'),
+                'data_inicio' => $request->data_inicio,
+                'data_fim' => $request->data_fim,
                 'status' => $request->statusSwitch ? 'PUBLISHED' : 'UNPUBLISHED'
             ]);
 
-       if($voucher){
-           return 'ok';
-       }else {
-        return 'error';
-       }
+           // if($voucher){
+           //     return 'ok';
+           // }else {
+           //  return 'error';
+           // }
+        }
     }
 
     /**

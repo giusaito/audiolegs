@@ -16,8 +16,8 @@ class CreateVouchersTable extends Migration
         Schema::create('vouchers', function (Blueprint $table) {
             $table->id();
             $table->string('chave', 255);
-            $table->decimal('desconto',10,2);
-            $table->bigInteger('desconto_porcentagem')->unsigned();
+            $table->decimal('desconto',10,2)->nullable();
+            $table->bigInteger('desconto_porcentagem')->nullable()->unsigned();
             $table->bigInteger('quantidade_total')->nullable()->unsigned();
             $table->bigInteger('quantidade_usado')->nullable()->unsigned();
             $table->dateTime('data_inicio')->nullable();

@@ -5,7 +5,70 @@
         Adicionar cupom de desconto
       </el-button>
     </div>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+
+    <el-table v-loading="listLoading" :data="cupons" style="width: 100%">
+      <el-table-column align="center" label="ID" width="80">
+        <template slot-scope="{row}">
+          <span> {{ row.id }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Chave">
+        <template slot-scope="{row}">
+          <span>{{ row.chave }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Desconto">
+        <template slot-scope="{row}">
+          <span>
+            <span v-if="row.desconto" class="cupom-desconto">
+              <el-button size="mini" type="warning" plain round>R$ {{ formatPrice(row.desconto) }}</el-button>
+            </span>
+            <span v-if="row.desconto_porcentagem" class="cupom-desconto-porc">
+              <el-button size="mini" type="success" plain round>{{ row.desconto_porcentagem }}%</el-button>
+            </span>
+          </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Quantidade">
+        <template slot-scope="{row}">
+          <span>
+            <span v-if="row.quantidade_total > 0">
+              <el-button-group>
+                <el-tooltip class="item" effect="dark" content="Quantidade total" placement="top-start">
+                  <el-button size="mini" type="success" round>{{ row.quantidade_total }}</el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="Quantidade usada" placement="top-start">
+                  <el-button size="mini" type="warning" round>{{ row.quantidade_usado-row.quantidade_total }}</el-button>
+                </el-tooltip>
+              </el-button-group>
+            </span>
+            <span v-else> - </span>
+          </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Status">
+        <template slot-scope="{row}">
+          <span>{{ row.status | statusVouchers }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Ações" width="300">
+        <template slot-scope="scope">
+          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.status)">
+            Editar
+          </el-button>
+          <el-button type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.chave);">
+            Remover
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination v-show="total>10" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+
     <el-dialog :title="formTitle " :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <div v-loading="cupomEditing" class="form-container">
         <el-form ref="currentVoucher" :model="currentVoucher" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
@@ -60,8 +123,9 @@
             <el-date-picker
               v-show="data_expiracao_checked"
               v-model="currentVoucher.data_expiracao"
-              type="daterange"
-              format="dd/MM/yyyy"
+              type="datetimerange"
+              format="dd/MM/yyyy HH:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss"
               range-separator="-"
               start-placeholder="Início"
               end-placeholder="Fim"
@@ -98,11 +162,7 @@ import { VMoney } from 'v-money';
 import { getToken } from '@/utils/auth';
 import axios from 'axios';
 const VoucherResource = new Resource('cupons');
-// Vue.directive('mask', {
-//     bind: function (el, binding) {
-//         Inputmask(binding.value).mask(el.getElementsByTagName('INPUT')[0])
-//     }
-// });
+const Str = require('@supercharge/strings');
 export default {
   name: 'Vouchers',
   components: { Pagination },
@@ -140,7 +200,7 @@ export default {
   },
   data() {
     return {
-      list: [],
+      cupons: [],
       total: 0,
       formTitle: '',
       currentVoucher: {},
@@ -192,7 +252,7 @@ export default {
       this.listLoading = true;
       const { data } = await VoucherResource.list({});
       this.total = data.total;
-      this.list = data.data;
+      this.cupons = data.data;
       this.listLoading = false;
     },
     toggleDescontoMandatory() {
@@ -208,6 +268,9 @@ export default {
     },
     customValidator(rule, value, callback) {
       console.log(rule);
+      if (rule.field === 'desconto' && value === 'R$ 0,00') {
+        callback(new Error('Insira um valor (R$)'));
+      }
       if ((rule.field === 'desconto' && this.descontoMandatory === true) || (rule.field === 'desconto_porcentagem' && this.descontoPorcentagemMandatory === true)) {
         rule.required = true;
       }
@@ -283,7 +346,7 @@ export default {
       this.formTitle = 'Adicionar novo cupom';
       this.btnInsertUpdate = 'Adicionar cupom';
       this.currentVoucher = {
-        chave: this.randomString(12, '#AA'),
+        chave: Str.random(10), // Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), // this.randomString(12, '#AA')
         desconto: '',
         desconto_porcentagem: '',
         quantidade_total: 0,
@@ -320,15 +383,17 @@ export default {
                 duration: 5 * 1000,
               });
               this.currentVoucher = {
-                name: '',
+                chave: '',
                 desconto: '',
                 desconto_porcentagem: '',
-                days: '',
-                status: '',
+                quantidade_total: 0,
+                data_expiracao: '',
+                statusSwitch: true,
               };
               this.planFormVisible = false;
               this.getList();
             }).catch(err => {
+              console.log('quase');
               console.log(err);
             }).finally(() => {
               console.log('fim');
@@ -338,8 +403,8 @@ export default {
         }
       });
     },
-    handleEdit(id, chave, desconto, desconto_porcentagem, days, status){
-      this.currentVoucher = this.list.find(category => category.id === id);
+    handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, status){
+      this.currentVoucher = this.cupons.find(category => category.id === id);
       this.dialogFormVisible = true;
       this.formTitle = 'Editar cupom ' + chave;
       this.btnInsertUpdate = 'Atualizar cupom';
@@ -354,10 +419,12 @@ export default {
         chave: chave,
         desconto: desconto,
         desconto_porcentagem: desconto_porcentagem,
-        days: days,
+        quantidade_total: quantidade_total,
+        quantidade_usado: quantidade_usado,
         status: status,
         statusSwitch: statusSwitch,
       };
+      console.log(this.currentVoucher);
     },
     handleDelete(id, chave) {
       this.$confirm('Tem certeza que deseja remover permanentemente o cupom ' + chave + ' ?', 'ATENÇÃO', {
@@ -409,6 +476,10 @@ export default {
       }
       return result;
     },
+    formatPrice(value) {
+      const val = (value / 1).toFixed(2).replace('.', ',');
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    },
   },
 };
 </script>
@@ -424,5 +495,20 @@ export default {
 	}
   .line {
     text-align: center;
+  }
+  .item {
+    margin-bottom: 18px;
+  }
+  hr {
+    background: #ccc !important;
+    border: 1px solid #eee;
+  }
+  .el-button-group button {
+      margin-bottom:3px;
+  }
+  small {
+    font-size: 11px !important;
+    color: #999;
+    font-weight: 700;
   }
 </style>

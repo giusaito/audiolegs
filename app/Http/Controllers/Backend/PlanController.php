@@ -41,7 +41,6 @@ class PlanController extends Controller
 
     public function index()
     {
-
         $plans = Plan::orderBy('id', 'DESC')->paginate(10);
 
         $response = [
@@ -57,6 +56,14 @@ class PlanController extends Controller
         ];
 
         return response()->json($response);
+    }
+
+    public function all()
+    {
+        $plans = Plan::orderBy('id', 'DESC')->get();
+        // dd(response()->json($response));
+
+        return response()->json($plans);
     }
 
     /**

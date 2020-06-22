@@ -38,10 +38,28 @@
             <span v-if="row.quantidade_total > 0">
               <el-button-group>
                 <el-tooltip class="item" effect="dark" content="Quantidade total" placement="top-start">
-                  <el-button size="mini" type="success" round>{{ row.quantidade_total }}</el-button>
+                  <el-button size="mini" type="info" round>{{ row.quantidade_total }}</el-button>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="Quantidade usada" placement="top-start">
-                  <el-button size="mini" type="warning" round>{{ row.quantidade_usado-row.quantidade_total }}</el-button>
+                  <el-button size="mini" type="info" round>{{ row.quantidade_usado }}</el-button>
+                </el-tooltip>
+              </el-button-group>
+            </span>
+            <span v-else> - </span>
+          </span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Data de expiração" width="500">
+        <template slot-scope="{row}">
+          <span>
+            <span v-if="row.data_inicio && row.data_fim">
+              <el-button-group>
+                <el-tooltip class="item" effect="dark" content="Data Início" placement="top-start">
+                  <el-button size="mini" type="info" round>{{ row.data_inicio | format_date }}</el-button>
+                </el-tooltip>
+                <el-tooltip class="item" effect="dark" content="Data Fim" placement="top-start">
+                  <el-button size="mini" type="info" round>{{ row.data_fim | format_date }}</el-button>
                 </el-tooltip>
               </el-button-group>
             </span>
@@ -56,9 +74,15 @@
         </template>
       </el-table-column>
 
+      <el-table-column align="center" label="Planos">
+        <template slot-scope="scope">
+          <el-button type="info" circle icon="el-icon-guide" @click="handleDefinePlans(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.data_inicio, scope.row.data_fim, scope.row.status)" />
+        </template>
+      </el-table-column>
+
       <el-table-column align="center" label="Ações" width="300">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.status)">
+          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.data_inicio, scope.row.data_fim, scope.row.status)">
             Editar
           </el-button>
           <el-button type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.chave);">
@@ -67,7 +91,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>10" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination v-show="total>listQuery.limit" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="formTitle " :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <div v-loading="cupomEditing" class="form-container">
@@ -88,7 +112,7 @@
             </el-col>
             <el-col :span="11">
               <el-form-item ref="desconto_input" prop="desconto">
-                <el-input v-model="currentVoucher.desconto" v-money="money" placeholder="Valor (R$)" :disabled="tipo_desconto" />
+                <money v-model="currentVoucher.desconto" v-bind="money" placeholder="Valor (R$)" :disabled="tipo_desconto" class="el-input__inner" />
               </el-form-item>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
@@ -151,6 +175,31 @@
         </div>
       </div>
     </el-dialog>
+
+    <el-dialog :title="planTitle" :visible.sync="dialogPlanVisible" :close-on-click-modal="false">
+      <div v-loading="cupomPlan" class="form-container">
+        <el-row :gutter="20">
+          <el-col v-for="plano in planos" :key="plano.id" :span="8">
+            <div class="grid-content bg-purple">
+              <el-card class="box-card plan-item">
+                <div slot="header" class="clearfix">
+                  <span>{{ plano.name }}</span>
+                  <!-- <el-button style="float: right; padding: 3px 0" type="text">asd</el-button> -->
+                  <el-switch
+                    v-model="planoAtivo[plano.id]"
+                    style="float: right; padding: 3px 0"
+                    @change="ativarPlano(plano.id)"
+                  />
+                </div>
+                <div class="text item">
+                  <h1>R$ {{ formatPrice(plano.price) }}</h1>
+                </div>
+              </el-card>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -158,14 +207,15 @@
 import Resource from '@/api/resource';
 import Pagination from '@/components/Pagination';
 import Inputmask from 'inputmask';
-import { VMoney } from 'v-money';
+import { Money } from 'v-money';
 import { getToken } from '@/utils/auth';
 import axios from 'axios';
+import moment from 'moment';
 const VoucherResource = new Resource('cupons');
 const Str = require('@supercharge/strings');
 export default {
   name: 'Vouchers',
-  components: { Pagination },
+  components: { Pagination, Money },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -182,9 +232,14 @@ export default {
         return 'Inativo';
       }
     },
+    format_date(value){
+      if (value) {
+        moment.locale('pt-br');
+        return moment(String(value)).format('lll');
+      }
+    },
   },
   directives: {
-    money: VMoney,
     mask: {
       bind: function(el, binding) {
         Inputmask(binding.value).mask(el.getElementsByTagName('INPUT')[0]);
@@ -203,16 +258,21 @@ export default {
       cupons: [],
       total: 0,
       formTitle: '',
+      planTitle: 'Atribuir cupons aos planos',
       currentVoucher: {},
       quantidade_total_checked: false,
       data_expiracao_checked: false,
       tipo_desconto: false,
       dialogFormVisible: false,
+      dialogPlanVisible: false,
       listLoading: true,
       btnInsertUpdate: '',
       cupomEditing: false,
+      cupomPlan: false,
       descontoMandatory: false,
       descontoPorcentagemMandatory: false,
+      planos: [],
+      planoAtivo: [],
       baseUrlApi: '/api/v1/bw/cupons',
       listQuery: {
         page: 1,
@@ -259,9 +319,11 @@ export default {
       if (this.tipo_desconto === true) {
         this.descontoPorcentagemMandatory = true;
         this.descontoMandatory = false;
+        this.currentVoucher.desconto = '';
       } else {
         this.descontoPorcentagemMandatory = false;
         this.descontoMandatory = true;
+        this.currentVoucher.desconto_porcentagem = '';
       }
       setTimeout(() => this.$refs.desconto_input.clearValidate(), 0);
       setTimeout(() => this.$refs.desconto_porcentagem_input.clearValidate(), 0);
@@ -390,7 +452,7 @@ export default {
                 data_expiracao: '',
                 statusSwitch: true,
               };
-              this.planFormVisible = false;
+              this.voucherFormVisible = false;
               this.getList();
             }).catch(err => {
               console.log('quase');
@@ -403,11 +465,30 @@ export default {
         }
       });
     },
-    handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, status){
+    handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.currentVoucher = this.cupons.find(category => category.id === id);
       this.dialogFormVisible = true;
       this.formTitle = 'Editar cupom ' + chave;
       this.btnInsertUpdate = 'Atualizar cupom';
+      if (desconto === null) {
+        this.tipo_desconto = true;
+        desconto = 0;
+      } else {
+        this.tipo_desconto = false;
+      }
+
+      if (quantidade_total !== 0){
+        this.quantidade_total_checked = true;
+      } else {
+        this.quantidade_total_checked = false;
+      }
+      // alert(data_inicio);
+      // alert(data_fim);
+      if (data_inicio && data_fim) {
+        this.data_expiracao_checked = true;
+      } else {
+        this.data_expiracao_checked = false;
+      }
       var statusSwitch = status;
       if (statusSwitch === 'PUBLISHED') {
         statusSwitch = true;
@@ -421,10 +502,21 @@ export default {
         desconto_porcentagem: desconto_porcentagem,
         quantidade_total: quantidade_total,
         quantidade_usado: quantidade_usado,
+        data_expiracao: [data_inicio, data_fim],
         status: status,
         statusSwitch: statusSwitch,
       };
       console.log(this.currentVoucher);
+    },
+    handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
+      this.dialogPlanVisible = true;
+      axios.get('api/v1/bw/planos/all', {
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+      }).then(response => {
+        this.planos = response.data;
+      });
     },
     handleDelete(id, chave) {
       this.$confirm('Tem certeza que deseja remover permanentemente o cupom ' + chave + ' ?', 'ATENÇÃO', {
@@ -480,6 +572,10 @@ export default {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
+    ativarPlano(id){
+      // alert(this.planoAtivo[id]);
+      // alert(id);
+    },
   },
 };
 </script>
@@ -510,5 +606,14 @@ export default {
     font-size: 11px !important;
     color: #999;
     font-weight: 700;
+  }
+  input:disabled {
+    background-color: #F5F7FA;
+    border-color: #dfe4ed;
+    color: #C0C4CC;
+    cursor: not-allowed;
+  }
+  .plan-item {
+    margin-bottom:20px;
   }
 </style>

@@ -56,18 +56,21 @@ class VoucherController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar o CUPOM! Por favor, verifique os campos e tente novamente'], 403);
         } else {
-            $desconto = str_replace('R$ ', '', $request->desconto);
-            $request->desconto = number_format((float)str_replace(",",".",str_replace(".","",$desconto)), 2, '.', '');
+            // $desconto = str_replace('R$ ', '', $request->desconto);
+            // $request->desconto = number_format((float)str_replace(",",".",str_replace(".","",$desconto)), 2, '.', '');
 
             $request->data_inicio = $request->data_expiracao[0];
             $request->data_fim = $request->data_expiracao[1];
 
+            if($request->desconto == '0.00'){
+                $request->desconto = null;
+            }
             $voucher = Voucher::firstOrCreate([
                 'chave' => $request->chave,
                 'desconto' => $request->desconto,
                 'desconto_porcentagem' => $request->desconto_porcentagem,
                 'quantidade_total' => $request->quantidade_total,
-                'quantidade_usado' => $request->quantidade_total,
+                'quantidade_usado' => 0,
                 'data_inicio' => $request->data_inicio,
                 'data_fim' => $request->data_fim,
                 'status' => $request->statusSwitch ? 'PUBLISHED' : 'UNPUBLISHED'
@@ -112,13 +115,21 @@ class VoucherController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $voucher = Voucher::findOrFail($id);
-        $voucher->name = $request->name;
-        $voucher->description = $request->description;
-        $voucher->slug = Str::slug($request->name);
-        $voucher->price = $request->price;
-        $voucher->quantity_days = $request->days;
-        $voucher->status = $request->statusSwitch ? 'PUBLISHED' : 'UNPUBLISHED';
+        $request->data_inicio = $request->data_expiracao[0];
+        $request->data_fim = $request->data_expiracao[1];
+
+        if($request->desconto == '0.00'){
+            $request->desconto = null;
+        }
+        $voucher                        = Voucher::findOrFail($id);
+        $voucher->chave                 = $request->chave;
+        $voucher->desconto              = $request->desconto;
+        $voucher->desconto_porcentagem  = $request->desconto_porcentagem;
+        $voucher->quantidade_total      = $request->quantidade_total;
+        $voucher->quantidade_usado      = $request->quantidade_usado;
+        $voucher->data_inicio           = $request->data_inicio;
+        $voucher->data_fim              = $request->data_fim;
+        $voucher->status                = $request->statusSwitch ? 'PUBLISHED' : 'UNPUBLISHED';
         $voucher->update();
 
         if($voucher){
@@ -136,7 +147,7 @@ class VoucherController extends Controller
      */
     public function destroy($id)
     {
-        $voucher = plan::findOrFail($id)->delete();
+        $voucher = Voucher::findOrFail($id)->delete();
 
         if($voucher){
             return 'ok';

@@ -9,6 +9,7 @@
             <el-switch
               v-model="planos[planChoose(planos, plano.id)].value"
               active-color="#13ce66"
+              :disabled="disabledPlan"
               @change="activePlan(planos, plano.id)"
             />
           </div>
@@ -39,6 +40,7 @@ export default {
   },
   data() {
     return {
+      disabledPlan: false,
       columns: [
         { name: 'Nome', value: 'name', isOptional: true },
         { name: 'E-mail', value: 'email', isOptional: true },
@@ -115,6 +117,7 @@ export default {
       return list.findIndex((e) => e.id === id);
     },
     activePlan(list, id){
+      this.disabledPlan = !this.disabledPlan;
       for (var i = 0; i < list.length; i++) {
         if (list[i].id !== id){
           // this.planChoose = true;

@@ -192,7 +192,17 @@
                   />
                 </div>
                 <div class="text item">
-                  <h1>R$ {{ formatPrice(plano.price) }}</h1>
+                  <h1>
+                    R$ {{ formatPrice(plano.price) }}
+                    <el-tooltip v-if="planoDesconto.price && planoAtivo[plano.id]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
+                      <template v-if="currentVoucher.desconto">
+                        <el-tag type="warning">R$ {{ formatPrice(plano.price - currentVoucher.desconto) }}</el-tag>
+                      </template>
+                      <template v-else-if="currentVoucher.desconto_porcentagem">
+                        <el-tag type="success">R$ {{ formatPrice(plano.price - ((currentVoucher.desconto_porcentagem / 100.0) * plano.price)) }}</el-tag>
+                      </template>
+                    </el-tooltip>
+                  </h1>
                 </div>
               </el-card>
             </div>
@@ -278,6 +288,10 @@ export default {
       descontoPorcentagemMandatory: false,
       planos: [],
       planoAtivo: [],
+      planoDesconto: {
+        id: null,
+        price: null,
+      },
       baseUrlApi: '/api/v1/bw/cupons',
       listQuery: {
         page: 1,
@@ -589,14 +603,15 @@ export default {
       // alert(this.currentVoucher.chave);
       // alert(this.planoAtivo[id]);
       // alert(id);
-      if (this.planoAtivo[plano.id] === true) {
-        if (this.currentVoucher.desconto) {
-          plano.price = (plano.price - this.currentVoucher.desconto);
-        } else if (this.currentVoucher.desconto_porcentagem) {
-          var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
-          plano.price = (plano.price - (percentual * plano.price));
-        }
-      }
+      // this.planoDesconto.id = plano.id;
+      // if (this.planoAtivo[plano.id] === true) {
+      //   if (this.currentVoucher.desconto) {
+      //     this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
+      //   } else if (this.currentVoucher.desconto_porcentagem) {
+      //     var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
+      //     this.planoDesconto.price = (plano.price - (percentual * plano.price));
+      //   }
+      // }
     },
   },
 };
@@ -637,5 +652,8 @@ export default {
   }
   .plan-item {
     margin-bottom:20px;
+  }
+  .el-tag {
+    margin-bottom:-5px !important;
   }
 </style>

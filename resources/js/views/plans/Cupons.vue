@@ -179,7 +179,7 @@
     <el-dialog :title="planTitle" :visible.sync="dialogPlanVisible" :close-on-click-modal="false">
       <div v-loading="cupomPlan" class="form-container">
         <el-row :gutter="20">
-          <el-col v-for="plano in planos" :key="plano.id" :span="8">
+          <el-col v-for="plano in planos" :key="plano.id" :plano-atual="plano" :span="8">
             <div class="grid-content bg-purple">
               <el-card class="box-card plan-item">
                 <div slot="header" class="clearfix">
@@ -188,7 +188,7 @@
                   <el-switch
                     v-model="planoAtivo[plano.id]"
                     style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano.id)"
+                    @change="ativarPlano(plano)"
                   />
                 </div>
                 <div class="text item">
@@ -251,6 +251,11 @@ export default {
     max: {
       type: Number,
       required: false,
+    },
+    planoAtual: {
+      type: Object,
+      required: false,
+      default: () => ({}),
     },
   },
   data() {
@@ -353,15 +358,6 @@ export default {
         });
       }
       const errors = [];
-      // const errors = [{
-      //   'message': 'email address is invalid',
-      //   'path': ['desconto'],
-      // },
-      // {
-      //   'message': 'example error for password field',
-      //   'path': ['password'],
-      // },
-      // ];
       setTimeout(() => {
         this.errors = errors;
 
@@ -516,6 +512,23 @@ export default {
         },
       }).then(response => {
         this.planos = response.data;
+        var statusSwitch = status;
+        if (statusSwitch === 'PUBLISHED') {
+          statusSwitch = true;
+        } else {
+          statusSwitch = false;
+        }
+        this.currentVoucher = {
+          id: id,
+          chave: chave,
+          desconto: desconto,
+          desconto_porcentagem: desconto_porcentagem,
+          quantidade_total: quantidade_total,
+          quantidade_usado: quantidade_usado,
+          data_expiracao: [data_inicio, data_fim],
+          status: status,
+          statusSwitch: statusSwitch,
+        };
       });
     },
     handleDelete(id, chave) {
@@ -572,9 +585,18 @@ export default {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
-    ativarPlano(id){
+    ativarPlano(plano){
+      // alert(this.currentVoucher.chave);
       // alert(this.planoAtivo[id]);
       // alert(id);
+      if (this.planoAtivo[plano.id] === true) {
+        if (this.currentVoucher.desconto) {
+          plano.price = (plano.price - this.currentVoucher.desconto);
+        } else if (this.currentVoucher.desconto_porcentagem) {
+          var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
+          plano.price = (plano.price - (percentual * plano.price));
+        }
+      }
     },
   },
 };

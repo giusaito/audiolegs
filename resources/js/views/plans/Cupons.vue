@@ -603,15 +603,15 @@ export default {
       // alert(this.currentVoucher.chave);
       // alert(this.planoAtivo[id]);
       // alert(id);
-      // this.planoDesconto.id = plano.id;
-      // if (this.planoAtivo[plano.id] === true) {
-      //   if (this.currentVoucher.desconto) {
-      //     this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
-      //   } else if (this.currentVoucher.desconto_porcentagem) {
-      //     var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
-      //     this.planoDesconto.price = (plano.price - (percentual * plano.price));
-      //   }
-      // }
+      this.planoDesconto.id = plano.id;
+      if (this.planoAtivo[plano.id] === true) {
+        if (this.currentVoucher.desconto) {
+          this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
+        } else if (this.currentVoucher.desconto_porcentagem) {
+          var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
+          this.planoDesconto.price = (plano.price - (percentual * plano.price));
+        }
+      }
     },
   },
 };

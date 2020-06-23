@@ -60,9 +60,8 @@ class PlanController extends Controller
 
     public function all()
     {
-        $plans = Plan::orderBy('id', 'DESC')->get();
+        $plans = Plan::orderBy('id', 'DESC')->with('vouchers')->get();
         // dd(response()->json($response));
-
         return response()->json($plans);
     }
 

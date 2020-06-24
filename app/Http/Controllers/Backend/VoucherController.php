@@ -14,7 +14,7 @@ use Validator;
 class VoucherController extends Controller
 {
 	public function index(){
-		$vouchers = Voucher::orderBy('id', 'DESC')->paginate(10);
+		$vouchers = Voucher::orderBy('id', 'DESC')->with('plans')->paginate(10);
 
         $response = [
             'pagination' => [
@@ -175,5 +175,9 @@ class VoucherController extends Controller
             $response = ['count'=>0];
         }
         return response()->json($response);
+    }
+
+    public function savePlan(Request $request){
+        dd('a');
     }
 }

@@ -194,7 +194,7 @@
                 <div class="text item">
                   <h1>
                     R$ {{ formatPrice(plano.price) }}
-                    <el-tooltip v-if="(plano.price - currentVoucher.desconto) && planoAtivo[index]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
+                    <el-tooltip v-if="(plano.price - currentVoucher.desconto) && plano.vouchers_count" class="item" effect="dark" content="Preço com desconto" placement="top-start">
                       <template v-if="currentVoucher.desconto">
                         <el-tag type="warning">R$ {{ formatPrice(plano.price - currentVoucher.desconto) }}</el-tag>
                       </template>
@@ -592,6 +592,15 @@ export default {
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
     ativarPlano(plano, index){
+      axios.post('api/v1/bw/cupons/plano', {
+        id: index,
+        plano: plano,
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+      }).then((response) => {
+        console.log(response);
+      });
       // alert(this.planoAtivo[index]);
     },
   },
@@ -599,14 +608,14 @@ export default {
 </script>
 
 <style scoped>
-	.edit-input {
-		padding-right: 100px;
-	}
-	.cancel-btn {
-		position: absolute;
-		right: 15px;
-		top: 10px;
-	}
+  .edit-input {
+    padding-right: 100px;
+  }
+  .cancel-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
   .line {
     text-align: center;
   }

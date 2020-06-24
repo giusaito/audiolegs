@@ -17,8 +17,9 @@
       </el-col> -->
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <p class="text-center">Faculdades com mais alunos</p>
+          <p class="text-center">5 leis mais acessadas</p>
           <pie-chart />
+          <small class="right">Ver todos</small>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">

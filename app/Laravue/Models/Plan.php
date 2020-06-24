@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Plan extends Model
 {
-	use HasRoles, HasApiTokens, LogsActivity;
+    use HasRoles, HasApiTokens, LogsActivity;
 
     protected $table = 'plans';
     protected $guarded = [''];
@@ -44,5 +44,8 @@ class Plan extends Model
        } else {
         return false;
        }
+
     }
 }
+
+

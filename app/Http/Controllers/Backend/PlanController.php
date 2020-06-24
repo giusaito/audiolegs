@@ -61,15 +61,9 @@ class PlanController extends Controller
     public function all($voucher)
     {
         $plans = Plan::orderBy('id', 'DESC')->with(['vouchers' => function($query) use ($voucher) {
-                // $query->where(['id'=>$voucher]);
-                $query->where(['id'=>$voucher])->select(['id', 'chave', 'desconto', 'desconto_porcentagem', 'quantidade_total', 'quantidade_usado', 'data_inicio', 'data_fim', 'status' ]);
+            $query->where(['id'=>$voucher])->select(['id', 'chave', 'desconto', 'desconto_porcentagem', 'quantidade_total', 'quantidade_usado', 'data_inicio', 'data_fim', 'status' ]);
             }
         ])->get();
-        // $plans = $plans->select('name','description','slug','price','quantity_days','status')->addSelect(Plan::raw("'fakeValue' as fakeColumn"));
-
-        // $plans = $plans->get();
-        // dd(response()->json($response));
-        // dd(response()->json($response));
         return response()->json($plans);
     }
 
@@ -148,7 +142,7 @@ class PlanController extends Controller
         $plan->price = $request->price;
         $plan->quantity_days = $request->days;
         $plan->status = $request->statusSwitch ? 'PUBLISHED' : 'DRAFT';
-        $plan->update();    
+        $plan->update();
 
         if($plan){
             echo 'ok';

@@ -179,7 +179,7 @@
     <el-dialog :title="planTitle" :visible.sync="dialogPlanVisible" :close-on-click-modal="false">
       <div v-loading="cupomPlan" class="form-container">
         <el-row :gutter="20">
-          <el-col v-for="(plano, index) in planos" :key="plano.id" :plano-atual="plano" :span="8">
+          <el-col v-for="plano in planos" :key="plano.id" :plano-atual="plano" :span="8">
             <div class="grid-content bg-purple">
               <el-card class="box-card plan-item">
                 <div slot="header" class="clearfix">
@@ -188,7 +188,7 @@
                   <el-switch
                     v-model="plano.vouchers_count"
                     style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano, index)"
+                    @change="ativarPlano(plano, currentVoucher.id)"
                   />
                 </div>
                 <div class="text item">
@@ -215,6 +215,7 @@
 
 <script>
 import Resource from '@/api/resource';
+import { fetchVouchers } from '@/api/vouchers';
 import Pagination from '@/components/Pagination';
 import Inputmask from 'inputmask';
 import { Money } from 'v-money';
@@ -323,23 +324,14 @@ export default {
       },
     };
   },
-  computed: {
-    isChecked: {
-      set(checked) {
-        this.checked = (checked) ? 1 : 0;
-      },
-      get() {
-        return this.checked;
-      },
-    },
-  },
   created() {
     this.getList();
   },
   methods: {
     async getList() {
       this.listLoading = true;
-      const { data } = await VoucherResource.list({});
+      // const { data } = await VoucherResource.list({});
+      const { data } = await fetchVouchers(this.listQuery);
       this.total = data.total;
       this.cupons = data.data;
       this.listLoading = false;
@@ -368,7 +360,6 @@ export default {
       if (!value && rule.required) {
         callback(new Error('O campo é obrigatório'));
       }
-
       if (rule.field === 'chave'){
         console.log(value);
         axios.get(this.baseUrlApi + '/buscar-chave?chave=' + value, {
@@ -384,7 +375,6 @@ export default {
       const errors = [];
       setTimeout(() => {
         this.errors = errors;
-
         if (this.isErrorForField(rule.fullField, this.errors)) {
           callback(new Error(this.getErrorForField(rule.fullField, this.errors)));
         }
@@ -496,7 +486,6 @@ export default {
       } else {
         this.tipo_desconto = false;
       }
-
       if (quantidade_total !== 0){
         this.quantidade_total_checked = true;
       } else {
@@ -535,9 +524,7 @@ export default {
           'Authorization': 'Bearer ' + getToken(),
         },
       }).then(response => {
-        console.log(response);
         this.planos = response.data;
-        console.log(this.planos);
         var statusSwitch = status;
         if (statusSwitch === 'PUBLISHED') {
           statusSwitch = true;
@@ -591,17 +578,20 @@ export default {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
-    ativarPlano(plano, index){
-      axios.post('api/v1/bw/cupons/plano', {
-        id: index,
-        plano: plano,
+    ativarPlano(plano, id){
+      axios({
+        method: 'post',
+        url: `api/v1/bw/cupons/plano`,
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
+        data: {
+          id: id,
+          plano: plano,
+        },
       }).then((response) => {
         console.log(response);
-      });
-      // alert(this.planoAtivo[index]);
+      }).catch(error => console.log(error));
     },
   },
 };

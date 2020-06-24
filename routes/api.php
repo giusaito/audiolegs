@@ -46,9 +46,14 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('estados/lista', 'StateController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Rota de planos backend
+<<<<<<< HEAD
     Route::post('cupons/plano', 'VoucherController@savePlan')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+=======
+
+>>>>>>> 57204ba95db89f6130b6107c012e2c2b67f51bb7
     // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::get('cupons/buscar-chave', 'VoucherController@getChave')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::post('cupons/plano', 'VoucherController@savePlan')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('cupons', 'VoucherController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Fim rota de planos backend
     });

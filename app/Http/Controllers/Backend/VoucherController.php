@@ -176,4 +176,16 @@ class VoucherController extends Controller
         }
         return response()->json($response);
     }
+
+    public function savePlan(Request $request){
+        // dd($request);
+        // $plano = $request->plano['id'];
+        // $plano->vouchers()->sync($request->id);
+        $voucher = Voucher::find($request->id);
+        if($request->plano['vouchers_count'] == true){
+            $voucher->plans()->attach($request->plano['id']);
+        }else {
+            $voucher->plans()->detach($request->plano['id']);
+        }
+    }
 }

@@ -3,7 +3,7 @@ import request from '@/utils/request';
 const baseUrlApi = 'v1/bw/cupons';
 export function fetchVouchers(query) {
   return request({
-    url: baseUrlApi + '/listar',
+    url: baseUrlApi,
     method: 'get',
     params: query,
   });

@@ -323,6 +323,16 @@ export default {
       },
     };
   },
+  computed: {
+    isChecked: {
+      set(checked) {
+        this.checked = (checked) ? 1 : 0;
+      },
+      get() {
+        return this.checked;
+      },
+    },
+  },
   created() {
     this.getList();
   },

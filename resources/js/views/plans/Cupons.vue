@@ -76,13 +76,13 @@
 
       <el-table-column align="center" label="Planos">
         <template slot-scope="scope">
-          <el-button type="info" circle icon="el-icon-guide" @click="handleDefinePlans(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.data_inicio, scope.row.data_fim, scope.row.status, scope.row.plans)" />
+          <el-button type="info" circle icon="el-icon-guide" @click="handleDefinePlans(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.data_inicio, scope.row.data_fim, scope.row.status)" />
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="Ações" width="300">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.data_inicio, scope.row.data_fim, scope.row.status, scope.row.plans)">
+          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.chave, scope.row.desconto, scope.row.desconto_porcentagem, scope.row.quantidade_total, scope.row.quantidade_usado, scope.row.data_inicio, scope.row.data_fim, scope.row.status)">
             Editar
           </el-button>
           <el-button type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.chave);">
@@ -179,26 +179,22 @@
     <el-dialog :title="planTitle" :visible.sync="dialogPlanVisible" :close-on-click-modal="false">
       <div v-loading="cupomPlan" class="form-container">
         <el-row :gutter="20">
-          <el-col v-for="plano in planos" :key="plano.id" :plano-atual="plano" :span="8">
+          <el-col v-for="(plano, index) in planos" :key="plano.id" :plano-atual="plano" :span="8">
             <div class="grid-content bg-purple">
               <el-card class="box-card plan-item">
                 <div slot="header" class="clearfix">
                   <span>{{ plano.name }}</span>
-                  <!-- <el-switch
-                    v-model="planoAtivo[plano.id]"
-                    style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano)"
-                  /> -->
+                  <!-- <el-button style="float: right; padding: 3px 0" type="text">asd</el-button> -->
                   <el-switch
-                    v-model="planoAtivo[3]"
+                    v-model="plano.vouchers_count"
                     style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano)"
+                    @change="ativarPlano(plano, index)"
                   />
                 </div>
                 <div class="text item">
                   <h1>
                     R$ {{ formatPrice(plano.price) }}
-                    <el-tooltip v-if="planoDesconto.price && planoAtivo[plano.id]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
+                    <el-tooltip v-if="(plano.price - currentVoucher.desconto) && plano.vouchers_count" class="item" effect="dark" content="Preço com desconto" placement="top-start">
                       <template v-if="currentVoucher.desconto">
                         <el-tag type="warning">R$ {{ formatPrice(plano.price - currentVoucher.desconto) }}</el-tag>
                       </template>
@@ -479,7 +475,7 @@ export default {
         }
       });
     },
-    handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status, planos){
+    handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.currentVoucher = this.cupons.find(category => category.id === id);
       this.dialogFormVisible = true;
       this.formTitle = 'Editar cupom ' + chave;
@@ -519,13 +515,12 @@ export default {
         data_expiracao: [data_inicio, data_fim],
         status: status,
         statusSwitch: statusSwitch,
-        planos: planos,
       };
       console.log(this.currentVoucher);
     },
-    handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status, planos){
+    handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.dialogPlanVisible = true;
-      axios.get('api/v1/bw/planos/all', {
+      axios.get('api/v1/bw/planos/all/' + id, {
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
@@ -547,7 +542,6 @@ export default {
           data_expiracao: [data_inicio, data_fim],
           status: status,
           statusSwitch: statusSwitch,
-          planos: planos,
         };
       });
     },
@@ -581,57 +575,26 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-    randomString(length, chars) {
-      var mask = '';
-      if (chars.indexOf('a') > -1) {
-        mask += 'abcdefghijklmnopqrstuvwxyz';
-      }
-      if (chars.indexOf('A') > -1) {
-        mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      }
-      if (chars.indexOf('#') > -1) {
-        mask += '0123456789';
-      }
-      if (chars.indexOf('!') > -1) {
-        mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
-      }
-      var result = '';
-      for (var i = length; i > 0; --i) {
-        result += mask[Math.round(Math.random() * (mask.length - 1))];
-      }
-      return result;
-    },
     formatPrice(value) {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
-    ativarPlano(plano){
-      // alert(this.currentVoucher.chave);
-      // alert(this.planoAtivo[id]);
-      // alert(id);
-      // this.planoDesconto.id = plano.id;
-      // if (this.planoAtivo[plano.id] === true) {
-      //   if (this.currentVoucher.desconto) {
-      //     this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
-      //   } else if (this.currentVoucher.desconto_porcentagem) {
-      //     var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
-      //     this.planoDesconto.price = (plano.price - (percentual * plano.price));
-      //   }
-      // }
+    ativarPlano(plano, index){
+      // alert(this.planoAtivo[index]);
     },
   },
 };
 </script>
 
 <style scoped>
-	.edit-input {
-		padding-right: 100px;
-	}
-	.cancel-btn {
-		position: absolute;
-		right: 15px;
-		top: 10px;
-	}
+  .edit-input {
+    padding-right: 100px;
+  }
+  .cancel-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
   .line {
     text-align: center;
   }

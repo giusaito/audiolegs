@@ -36,7 +36,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::group(['namespace' => 'Backend'], function()
     {
     // Rota de planos backend
-    Route::get('planos/all', 'PlanController@all')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::get('planos/all/{voucher}', 'PlanController@all')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Fim rota de planos backend
 

@@ -186,7 +186,7 @@
                   <span>{{ plano.name }}</span>
                   <!-- <el-button style="float: right; padding: 3px 0" type="text">asd</el-button> -->
                   <el-switch
-                    v-model="planoAtivo[index]"
+                    v-model="plano.vouchers_count"
                     style="float: right; padding: 3px 0"
                     @change="ativarPlano(plano, index)"
                   />
@@ -530,12 +530,14 @@ export default {
     },
     handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.dialogPlanVisible = true;
-      axios.get('api/v1/bw/planos/all', {
+      axios.get('api/v1/bw/planos/all/' + id, {
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
       }).then(response => {
+        console.log(response);
         this.planos = response.data;
+        console.log(this.planos);
         var statusSwitch = status;
         if (statusSwitch === 'PUBLISHED') {
           statusSwitch = true;
@@ -590,7 +592,7 @@ export default {
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
     ativarPlano(plano, index){
-      alert(this.planoAtivo[index]);
+      // alert(this.planoAtivo[index]);
     },
   },
 };

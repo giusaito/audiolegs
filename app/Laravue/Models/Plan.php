@@ -16,6 +16,8 @@ class Plan extends Model
 
     protected static $logFillable = true;
     protected static $logName = 'Planos';
+    protected $appends = ['vouchers_count'];
+
 
     public function getDescriptionForEvent(string $eventName): string
     {
@@ -32,5 +34,15 @@ class Plan extends Model
     public function vouchers()
     {
         return $this->belongsToMany('App\Laravue\Models\Voucher');
+    }
+
+
+    public function getVouchersCountAttribute()
+    {
+       if($this->vouchers->count() > 0){
+        return true;
+       } else {
+        return false;
+       }
     }
 }

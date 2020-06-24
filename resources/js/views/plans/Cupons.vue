@@ -179,22 +179,22 @@
     <el-dialog :title="planTitle" :visible.sync="dialogPlanVisible" :close-on-click-modal="false">
       <div v-loading="cupomPlan" class="form-container">
         <el-row :gutter="20">
-          <el-col v-for="plano in planos" :key="plano.id" :plano-atual="plano" :span="8">
+          <el-col v-for="(plano, index) in planos" :key="plano.id" :plano-atual="plano" :span="8">
             <div class="grid-content bg-purple">
               <el-card class="box-card plan-item">
                 <div slot="header" class="clearfix">
                   <span>{{ plano.name }}</span>
                   <!-- <el-button style="float: right; padding: 3px 0" type="text">asd</el-button> -->
                   <el-switch
-                    v-model="planoAtivo[plano.id]"
+                    v-model="planoAtivo[index]"
                     style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano)"
+                    @change="ativarPlano(plano, index)"
                   />
                 </div>
                 <div class="text item">
                   <h1>
                     R$ {{ formatPrice(plano.price) }}
-                    <el-tooltip v-if="planoDesconto.price && planoAtivo[plano.id]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
+                    <el-tooltip v-if="(plano.price - currentVoucher.desconto) && planoAtivo[index]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
                       <template v-if="currentVoucher.desconto">
                         <el-tag type="warning">R$ {{ formatPrice(plano.price - currentVoucher.desconto) }}</el-tag>
                       </template>
@@ -575,43 +575,12 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-    randomString(length, chars) {
-      var mask = '';
-      if (chars.indexOf('a') > -1) {
-        mask += 'abcdefghijklmnopqrstuvwxyz';
-      }
-      if (chars.indexOf('A') > -1) {
-        mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      }
-      if (chars.indexOf('#') > -1) {
-        mask += '0123456789';
-      }
-      if (chars.indexOf('!') > -1) {
-        mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
-      }
-      var result = '';
-      for (var i = length; i > 0; --i) {
-        result += mask[Math.round(Math.random() * (mask.length - 1))];
-      }
-      return result;
-    },
     formatPrice(value) {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
-    ativarPlano(plano){
-      // alert(this.currentVoucher.chave);
-      // alert(this.planoAtivo[id]);
-      // alert(id);
-      this.planoDesconto.id = plano.id;
-      if (this.planoAtivo[plano.id] === true) {
-        if (this.currentVoucher.desconto) {
-          this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
-        } else if (this.currentVoucher.desconto_porcentagem) {
-          var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
-          this.planoDesconto.price = (plano.price - (percentual * plano.price));
-        }
-      }
+    ativarPlano(plano, index){
+      alert(this.planoAtivo[index]);
     },
   },
 };

@@ -73,4 +73,3 @@ if (mix.inProduction()) {
 
 // mix.browserSync("localhost:8080");
 mix.browserSync("audiolegis.leo");
-// mix.browserSync("audiolegis.leo");

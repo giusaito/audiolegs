@@ -26,16 +26,30 @@ class CreateVouchersTable extends Migration
             $table->timestamps();
         });
         Schema::create('voucher_user', function (Blueprint $table) {
+            $table->id();
             $table->bigInteger('voucher_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
-            $table->foreign('voucher_id')->references('id')->on('vouchers');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('voucher_id')
+            ->references('id')
+            ->on('vouchers')
+            ->onDelete('cascade');
+            $table->foreign('user_id')
+            ->references('id')
+            ->on('users')
+            ->onDelete('cascade');
         });
         Schema::create('plan_voucher', function (Blueprint $table) {
+            $table->id();
             $table->bigInteger('plan_id')->unsigned();
             $table->bigInteger('voucher_id')->unsigned();
-            $table->foreign('plan_id')->references('id')->on('plans');
-            $table->foreign('voucher_id')->references('id')->on('vouchers');
+            $table->foreign('plan_id')
+            ->references('id')
+            ->on('plans')
+            ->onDelete('cascade');
+            $table->foreign('voucher_id')
+            ->references('id')
+            ->on('vouchers')
+            ->onDelete('cascade');
         });
     }
 

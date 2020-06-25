@@ -56,20 +56,22 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: ['Fag', 'Unopar', 'Univel'],
+          data: ['Constituição Federal de 1988', 'Código de Processo Civil', 'Código Processo Penal', 'POLÍCIA MILITAR GOIÁS', 'Técnico Judiciário do TRF3'],
         },
         calculable: true,
         series: [
           {
-            name: 'Alunos',
+            name: '10 Mais Acessadas',
             type: 'pie',
             roseType: 'radius',
             radius: [15, 95],
             center: ['50%', '38%'],
             data: [
-              { value: 320, name: 'Fag' },
-              { value: 240, name: 'Unopar' },
-              { value: 149, name: 'Univel' },
+              { value: 700, name: 'Constituição Federal de 1988' },
+              { value: 500, name: 'Código de Processo Civil' },
+              { value: 468, name: 'Código Processo Penal' },
+              { value: 445, name: 'POLÍCIA MILITAR GOIÁS' },
+              { value: 392, name: 'Técnico Judiciário do TRF3' },
             ],
             animationEasing: 'cubicInOut',
             animationDuration: 2600,

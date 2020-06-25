@@ -13,8 +13,8 @@ use Validator;
 
 class VoucherController extends Controller
 {
-	public function index(){
-		$vouchers = Voucher::orderBy('id', 'DESC')->with('plans')->paginate(10);
+    public function index(){
+        $vouchers = Voucher::orderBy('id', 'DESC')->with('plans')->paginate(10);
 
         $response = [
             'pagination' => [
@@ -29,8 +29,8 @@ class VoucherController extends Controller
         ];
 
         return response()->json($response);
-	}
-	public function create()
+    }
+    public function create()
     {
         //
     }
@@ -42,23 +42,20 @@ class VoucherController extends Controller
      */
     public function store(Request $request)
     {
-		$validator =  $validator = Validator::make($request->all(), [
-            'chave' 				=> 'required|unique:vouchers|min:3|max:20',
-            'quantidade_total' 		=> 'sometimes|required|numeric',
-            'statusSwitch' 			=> 'required',
+        $validator =  $validator = Validator::make($request->all(), [
+            'chave'                 => 'required|unique:vouchers|min:3|max:20',
+            'quantidade_total'      => 'sometimes|required|numeric',
+            'statusSwitch'          => 'required',
         ],
-	    [
-	    	'chave.required' => 'Por favor, preencha com a chave (nome) do cupom',
-	    	'chave.unique' => 'Já existe um outro cupom com este nome',
-	    	'chave.min' => 'Preencha no mínimo 3 caracteres para o nome do cupom',
-	    	'chave.max' => 'Preencha no máximo 50 caracteres para o nome do cupom',
-	    ]);
+        [
+            'chave.required' => 'Por favor, preencha com a chave (nome) do cupom',
+            'chave.unique' => 'Já existe um outro cupom com este nome',
+            'chave.min' => 'Preencha no mínimo 3 caracteres para o nome do cupom',
+            'chave.max' => 'Preencha no máximo 50 caracteres para o nome do cupom',
+        ]);
         if ($validator->fails()) {
             return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar o CUPOM! Por favor, verifique os campos e tente novamente'], 403);
         } else {
-            // $desconto = str_replace('R$ ', '', $request->desconto);
-            // $request->desconto = number_format((float)str_replace(",",".",str_replace(".","",$desconto)), 2, '.', '');
-
             $request->data_inicio = $request->data_expiracao[0];
             $request->data_fim = $request->data_expiracao[1];
 
@@ -76,11 +73,6 @@ class VoucherController extends Controller
                 'status' => $request->statusSwitch ? 'PUBLISHED' : 'UNPUBLISHED'
             ]);
 
-           // if($voucher){
-           //     return 'ok';
-           // }else {
-           //  return 'error';
-           // }
         }
     }
 
@@ -167,7 +159,6 @@ class VoucherController extends Controller
     }
 
     public function getChave(Request $request){
-        // echo $request->input('0');
         $chave = Voucher::where('chave', '=', $request->input('chave'))->first();
         if ($chave != null) {
             $response = ['count'=>1];
@@ -175,5 +166,14 @@ class VoucherController extends Controller
             $response = ['count'=>0];
         }
         return response()->json($response);
+    }
+
+    public function savePlan(Request $request){
+        $voucher = Voucher::find($request->id);
+        if($request->plano['vouchers_count'] == true){
+            $voucher->plans()->attach($request->plano['id']);
+        }else {
+            $voucher->plans()->detach($request->plano['id']);
+        }
     }
 }

@@ -185,17 +185,16 @@
                 <div slot="header" class="clearfix">
                   <span>{{ plano.name }}</span>
                   <!-- <el-button style="float: right; padding: 3px 0" type="text">asd</el-button> -->
-                  {{ planoAtivo }}
                   <el-switch
-                    v-model="planoAtivo[plano.id]"
+                    v-model="plano.vouchers_count"
                     style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano)"
+                    @change="ativarPlano(plano, currentVoucher.id)"
                   />
                 </div>
                 <div class="text item">
                   <h1>
                     R$ {{ formatPrice(plano.price) }}
-                    <el-tooltip v-if="planoDesconto.price && planoAtivo[plano.id]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
+                    <el-tooltip v-if="(plano.price - currentVoucher.desconto) && plano.vouchers_count" class="item" effect="dark" content="Preço com desconto" placement="top-start">
                       <template v-if="currentVoucher.desconto">
                         <el-tag type="warning">R$ {{ formatPrice(plano.price - currentVoucher.desconto) }}</el-tag>
                       </template>
@@ -216,6 +215,7 @@
 
 <script>
 import Resource from '@/api/resource';
+import { fetchVouchers } from '@/api/vouchers';
 import Pagination from '@/components/Pagination';
 import Inputmask from 'inputmask';
 import { Money } from 'v-money';
@@ -330,7 +330,8 @@ export default {
   methods: {
     async getList() {
       this.listLoading = true;
-      const { data } = await VoucherResource.list({});
+      // const { data } = await VoucherResource.list({});
+      const { data } = await fetchVouchers(this.listQuery);
       this.total = data.total;
       this.cupons = data.data;
       this.listLoading = false;
@@ -359,7 +360,6 @@ export default {
       if (!value && rule.required) {
         callback(new Error('O campo é obrigatório'));
       }
-
       if (rule.field === 'chave'){
         console.log(value);
         axios.get(this.baseUrlApi + '/buscar-chave?chave=' + value, {
@@ -375,7 +375,6 @@ export default {
       const errors = [];
       setTimeout(() => {
         this.errors = errors;
-
         if (this.isErrorForField(rule.fullField, this.errors)) {
           callback(new Error(this.getErrorForField(rule.fullField, this.errors)));
         }
@@ -487,7 +486,6 @@ export default {
       } else {
         this.tipo_desconto = false;
       }
-
       if (quantidade_total !== 0){
         this.quantidade_total_checked = true;
       } else {
@@ -521,9 +519,7 @@ export default {
     },
     handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.dialogPlanVisible = true;
-      // this.planoAtivo = true;
-      alert(id);
-      axios.get('api/v1/bw/planos/all', {
+      axios.get('api/v1/bw/planos/all/' + id, {
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
@@ -578,58 +574,38 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-    randomString(length, chars) {
-      var mask = '';
-      if (chars.indexOf('a') > -1) {
-        mask += 'abcdefghijklmnopqrstuvwxyz';
-      }
-      if (chars.indexOf('A') > -1) {
-        mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      }
-      if (chars.indexOf('#') > -1) {
-        mask += '0123456789';
-      }
-      if (chars.indexOf('!') > -1) {
-        mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
-      }
-      var result = '';
-      for (var i = length; i > 0; --i) {
-        result += mask[Math.round(Math.random() * (mask.length - 1))];
-      }
-      return result;
-    },
     formatPrice(value) {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
-    ativarPlano(plano){
-      // alert(this.currentVoucher.chave);
-      // alert(this.planoAtivo[id]);
-      // alert(id);
-      this.planoAtivo[plano.id] === true;
-      this.planoDesconto.id = plano.id;
-      if (this.planoAtivo[plano.id] === true) {
-        if (this.currentVoucher.desconto) {
-          this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
-        } else if (this.currentVoucher.desconto_porcentagem) {
-          var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
-          this.planoDesconto.price = (plano.price - (percentual * plano.price));
-        }
-      }
+    ativarPlano(plano, id){
+      axios({
+        method: 'post',
+        url: `api/v1/bw/cupons/plano`,
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+        data: {
+          id: id,
+          plano: plano,
+        },
+      }).then((response) => {
+        console.log(response);
+      }).catch(error => console.log(error));
     },
   },
 };
 </script>
 
 <style scoped>
-	.edit-input {
-		padding-right: 100px;
-	}
-	.cancel-btn {
-		position: absolute;
-		right: 15px;
-		top: 10px;
-	}
+  .edit-input {
+    padding-right: 100px;
+  }
+  .cancel-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
   .line {
     text-align: center;
   }

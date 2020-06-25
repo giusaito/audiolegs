@@ -9,13 +9,15 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Plan extends Model
 {
-	use HasRoles, HasApiTokens, LogsActivity;
+    use HasRoles, HasApiTokens, LogsActivity;
 
     protected $table = 'plans';
     protected $guarded = [''];
 
     protected static $logFillable = true;
     protected static $logName = 'Planos';
+    protected $appends = ['vouchers_count'];
+
 
     public function getDescriptionForEvent(string $eventName): string
     {
@@ -33,4 +35,17 @@ class Plan extends Model
     {
         return $this->belongsToMany('App\Laravue\Models\Voucher');
     }
+
+
+    public function getVouchersCountAttribute()
+    {
+       if($this->vouchers->count() > 0){
+        return true;
+       } else {
+        return false;
+       }
+
+    }
 }
+
+

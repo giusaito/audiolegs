@@ -19,13 +19,18 @@
         <div class="chart-wrapper">
           <p class="text-center">5 leis mais acessadas</p>
           <pie-chart />
-          <small class="right">Ver todos</small>
+          <router-link :to="'/perfil/editar'" class="bw-btn bw-btn-all">
+            Veja mais
+          </router-link>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <p class="text-center">Leis mais acessadas</p>
           <bar-chart />
+          <router-link :to="'/perfil/editar'" class="bw-btn bw-btn-all">
+            Veja mais
+          </router-link>
         </div>
       </el-col>
     </el-row>
@@ -35,6 +40,9 @@
         <div class="chart-wrapper">
           <p class="text-center">Horário mais acessado do dia</p>
           <hourChat />
+          <router-link :to="'/perfil/editar'" class="bw-btn bw-btn-all">
+            Veja mais
+          </router-link>
         </div>
       </el-col>
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
@@ -120,5 +128,30 @@ export default {
 }
 .text-center {
   text-align: center !important;
+}
+.bw-btn {
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #FFFFFF;
+  border: 1px solid #DCDFE6;
+  border-color: #DCDFE6;
+  color: #606266;
+  -webkit-appearance: none;
+  text-align: center;
+  box-sizing: border-box;
+  outline: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  padding: 9px 15px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.bw-btn-all {
+  color: #FFFFFF !important;
+  background-color: #dbb200 !important;
+  border-color: #dbb200 !important;
 }
 </style>

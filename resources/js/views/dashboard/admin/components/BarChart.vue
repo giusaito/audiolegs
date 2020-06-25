@@ -78,25 +78,11 @@ export default {
           },
         }],
         series: [{
-          name: 'Código Penal',
+          name: 'Horário mais acessado',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
-          data: [79, 52, 200, 334, 390, 330, 220],
-          animationDuration,
-        }, {
-          name: 'Lei 8.429/92 - Art. 9',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [80, 52, 200, 334, 390, 330, 220],
-          animationDuration,
-        }, {
-          name: 'Código Civil - Das pessoas',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [30, 52, 200, 334, 390, 330, 220],
+          data: [19, 21, 1, 6, 12, 17, 21],
           animationDuration,
         }],
       });

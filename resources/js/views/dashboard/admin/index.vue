@@ -5,7 +5,7 @@
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
     <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-      <p class="text-center">Usuário/Assinatura</p>
+      <p class="text-center">Assinatura / Cancelamento</p>
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
@@ -19,7 +19,7 @@
         <div class="chart-wrapper">
           <p class="text-center">5 leis mais acessadas</p>
           <pie-chart />
-          <router-link :to="'/perfil/editar'" class="bw-btn bw-btn-all">
+          <router-link :to="'/leis-mais-acessadas'" class="bw-btn bw-btn-all">
             Veja mais
           </router-link>
         </div>
@@ -145,8 +145,8 @@ export default {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  padding: 9px 15px;
-  border-radius: 4px;
+  padding: 5px;
+  border-radius: 6px;
   margin-bottom: 10px;
 }
 .bw-btn-all {

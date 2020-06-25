@@ -9,13 +9,14 @@
             <el-switch
               v-model="planos[planChoose(planos, plano.id)].value"
               active-color="#13ce66"
+              :disabled="disabledPlan"
               @change="activePlan(planos, plano.id)"
             />
           </div>
         </div>
       </div>
     </div>
-    <xls-csv-parser :columns="columns" :help="help" lang="ptBR" @on-validate="onValidate" />
+    <xls-csv-parser :columns="columns" :help="help" @on-validate="onValidate" />
     <!-- <pre>{{ JSON.stringify(results, null, 2) }}</pre> -->
     <simplert
       ref="simplert"
@@ -39,10 +40,11 @@ export default {
   },
   data() {
     return {
+      disabledPlan: false,
       columns: [
-        { name: 'Nome', value: 'nome', isOptional: true },
+        { name: 'Nome', value: 'name', isOptional: true },
         { name: 'E-mail', value: 'email', isOptional: true },
-        { name: 'Telefone', value: 'telefone', isOptional: true },
+        { name: 'Telefone', value: 'main_telephone', isOptional: true },
       ],
       results: null,
       // help: 'Campos necessários: login, firstname and lastname',
@@ -93,7 +95,7 @@ export default {
       }).then(function(response) {
         // alert('Usuários importados com sucesso');
         refsModal.simplert.openSimplert(sucessoModal);
-        // console.log(response);
+        console.log(response);
       }).catch(function(error) {
         if (error) {
           console.log(error.stack);
@@ -115,6 +117,7 @@ export default {
       return list.findIndex((e) => e.id === id);
     },
     activePlan(list, id){
+      this.disabledPlan = !this.disabledPlan;
       for (var i = 0; i < list.length; i++) {
         if (list[i].id !== id){
           // this.planChoose = true;

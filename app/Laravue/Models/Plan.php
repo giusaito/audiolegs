@@ -28,4 +28,9 @@ class Plan extends Model
         }
         return $eventName;
     }
+
+    public function vouchers()
+    {
+        return $this->belongsToMany('App\Laravue\Models\Voucher');
+    }
 }

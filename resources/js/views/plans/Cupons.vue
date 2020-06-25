@@ -179,20 +179,31 @@
     <el-dialog :title="planTitle" :visible.sync="dialogPlanVisible" :close-on-click-modal="false">
       <div v-loading="cupomPlan" class="form-container">
         <el-row :gutter="20">
-          <el-col v-for="plano in planos" :key="plano.id" :span="8">
+          <el-col v-for="plano in planos" :key="plano.id" :plano-atual="plano" :span="8">
             <div class="grid-content bg-purple">
               <el-card class="box-card plan-item">
                 <div slot="header" class="clearfix">
                   <span>{{ plano.name }}</span>
                   <!-- <el-button style="float: right; padding: 3px 0" type="text">asd</el-button> -->
+                  {{ planoAtivo }}
                   <el-switch
                     v-model="planoAtivo[plano.id]"
                     style="float: right; padding: 3px 0"
-                    @change="ativarPlano(plano.id)"
+                    @change="ativarPlano(plano)"
                   />
                 </div>
                 <div class="text item">
-                  <h1>R$ {{ formatPrice(plano.price) }}</h1>
+                  <h1>
+                    R$ {{ formatPrice(plano.price) }}
+                    <el-tooltip v-if="planoDesconto.price && planoAtivo[plano.id]" class="item" effect="dark" content="Preço com desconto" placement="top-start">
+                      <template v-if="currentVoucher.desconto">
+                        <el-tag type="warning">R$ {{ formatPrice(plano.price - currentVoucher.desconto) }}</el-tag>
+                      </template>
+                      <template v-else-if="currentVoucher.desconto_porcentagem">
+                        <el-tag type="success">R$ {{ formatPrice(plano.price - ((currentVoucher.desconto_porcentagem / 100.0) * plano.price)) }}</el-tag>
+                      </template>
+                    </el-tooltip>
+                  </h1>
                 </div>
               </el-card>
             </div>
@@ -252,6 +263,11 @@ export default {
       type: Number,
       required: false,
     },
+    planoAtual: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -273,6 +289,10 @@ export default {
       descontoPorcentagemMandatory: false,
       planos: [],
       planoAtivo: [],
+      planoDesconto: {
+        id: null,
+        price: null,
+      },
       baseUrlApi: '/api/v1/bw/cupons',
       listQuery: {
         page: 1,
@@ -353,15 +373,6 @@ export default {
         });
       }
       const errors = [];
-      // const errors = [{
-      //   'message': 'email address is invalid',
-      //   'path': ['desconto'],
-      // },
-      // {
-      //   'message': 'example error for password field',
-      //   'path': ['password'],
-      // },
-      // ];
       setTimeout(() => {
         this.errors = errors;
 
@@ -510,12 +521,31 @@ export default {
     },
     handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.dialogPlanVisible = true;
+      // this.planoAtivo = true;
+      alert(id);
       axios.get('api/v1/bw/planos/all', {
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
       }).then(response => {
         this.planos = response.data;
+        var statusSwitch = status;
+        if (statusSwitch === 'PUBLISHED') {
+          statusSwitch = true;
+        } else {
+          statusSwitch = false;
+        }
+        this.currentVoucher = {
+          id: id,
+          chave: chave,
+          desconto: desconto,
+          desconto_porcentagem: desconto_porcentagem,
+          quantidade_total: quantidade_total,
+          quantidade_usado: quantidade_usado,
+          data_expiracao: [data_inicio, data_fim],
+          status: status,
+          statusSwitch: statusSwitch,
+        };
       });
     },
     handleDelete(id, chave) {
@@ -572,9 +602,20 @@ export default {
       const val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     },
-    ativarPlano(id){
+    ativarPlano(plano){
+      // alert(this.currentVoucher.chave);
       // alert(this.planoAtivo[id]);
       // alert(id);
+      this.planoAtivo[plano.id] === true;
+      this.planoDesconto.id = plano.id;
+      if (this.planoAtivo[plano.id] === true) {
+        if (this.currentVoucher.desconto) {
+          this.planoDesconto.price = (plano.price - this.currentVoucher.desconto);
+        } else if (this.currentVoucher.desconto_porcentagem) {
+          var percentual = this.currentVoucher.desconto_porcentagem / 100.0;
+          this.planoDesconto.price = (plano.price - (percentual * plano.price));
+        }
+      }
     },
   },
 };
@@ -615,5 +656,8 @@ export default {
   }
   .plan-item {
     margin-bottom:20px;
+  }
+  .el-tag {
+    margin-bottom:-5px !important;
   }
 </style>

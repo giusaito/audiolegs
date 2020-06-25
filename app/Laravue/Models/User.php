@@ -109,7 +109,7 @@ class User extends Authenticatable
     }
 
     public function userProfile(){
-        return $this->hasOne('App\Laravue\Models\userProfile');
+        return $this->hasOne('App\Laravue\Models\UserProfile');
     }
 
     public function getDescriptionForEvent(string $eventName): string

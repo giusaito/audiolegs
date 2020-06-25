@@ -48,15 +48,15 @@ export default {
     };
     const validatePass = (rule, value, callback) => {
       if (value.length < 4) {
-        callback(new Error('Digite uma senha com mais de quatro dígitos'));
+        callback(new Error('A senha deve possuír no mínimo 6 digitos'));
       } else {
         callback();
       }
     };
     return {
       loginForm: {
-        email: 'admin@laravue.dev',
-        password: 'laravue',
+        email: 'admin@admin.com.br',
+        password: '123456',
       },
       loginRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],

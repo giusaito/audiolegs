@@ -78,7 +78,7 @@ export default {
           },
         }],
         series: [{
-          name: 'Hora mais acessada',
+          name: 'Horário mais acessado acessada',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',

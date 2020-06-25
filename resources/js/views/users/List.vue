@@ -123,10 +123,10 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">
-            {{ $t('table.cancel') }}
+            Cancelar
           </el-button>
           <el-button type="primary" @click="createUser()">
-            {{ $t('table.confirm') }}
+            Adicionar
           </el-button>
         </div>
       </div>
@@ -175,8 +175,8 @@ export default {
         keyword: '',
         role: '',
       },
-      roles: ['admin', 'financeiro', 'editor', 'usuario'],
-      nonAdminRoles: ['financeiro', 'editor', 'usuario'],
+      roles: ['admin', 'editor'],
+      nonAdminRoles: ['editor'],
       newUser: {},
       dialogFormVisible: false,
       dialogPermissionVisible: false,

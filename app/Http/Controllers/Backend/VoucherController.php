@@ -159,8 +159,9 @@ class VoucherController extends Controller
     }
 
     public function getChave(Request $request){
-        $chave = Voucher::where('chave', '=', $request->input('chave'))->first();
-        if ($chave != null) {
+        // $chave = Voucher::where('chave', '=', $request->input('chave'))->first();
+        $chave = Voucher::where('chave', '=', $request->input('chave'))->exists();
+        if ($chave && !(boolean)$request->input('editform')) {
             $response = ['count'=>1];
         }else {
             $response = ['count'=>0];

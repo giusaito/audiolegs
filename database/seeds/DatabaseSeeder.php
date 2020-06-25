@@ -24,40 +24,40 @@ class DatabaseSeeder extends Seeder
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Admin',
-            'email' => 'admin@laravue.dev',
-            'password' => Hash::make('laravue'),
+            'email' => 'admin@admin.com.br',
+            'password' => Hash::make('123456'),
         ]);
         $manager = User::create([
             'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Manager',
-            'email' => 'manager@laravue.dev',
-            'password' => Hash::make('laravue'),
+            'email' => 'manager@admin.com.br',
+            'password' => Hash::make('123456'),
         ]);
         $editor = User::create([
             'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Editor',
-            'email' => 'editor@laravue.dev',
-            'password' => Hash::make('laravue'),
+            'email' => 'editor@admin.com.br',
+            'password' => Hash::make('123456'),
         ]);
         $user = User::create([
             'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'User',
-            'email' => 'user@laravue.dev',
-            'password' => Hash::make('laravue'),
+            'email' => 'user@admin.com.br',
+            'password' => Hash::make('123456'),
         ]);
         $visitor = User::create([
             'university_id' => rand(1,5),
             'state_id' => 18,
             'city_id' => 3994,
             'name' => 'Visitor',
-            'email' => 'visitor@laravue.dev',
-            'password' => Hash::make('laravue'),
+            'email' => 'visitor@admin.com.br',
+            'password' => Hash::make('123456'),
         ]);
 
         $adminRole = Role::findByName(\App\Laravue\Acl::ROLE_ADMIN);

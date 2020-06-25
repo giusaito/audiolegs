@@ -33,6 +33,8 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
 
     Route::post('/usuario/importar-usuario', 'UserController@userImport')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
+    Route::get('clientes', 'UserController@visitors')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+
     Route::group(['namespace' => 'Backend'], function()
     {
         Route::group(['prefix' => 'relatorios'], function()

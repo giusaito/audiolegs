@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-     <div class="filter-container">
+    <div class="filter-container">
       <!-- <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" /> -->
       <el-select v-model="query.role" placeholder="Tipo de ação" clearable style="width: 200px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in tipoAcao" :key="item" :label="item | uppercaseFirst" :value="item" />
@@ -50,7 +50,7 @@ import waves from '@/directive/waves';
 export default {
   name: 'Plans',
   components: { Pagination },
-    directives: { waves },
+  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {

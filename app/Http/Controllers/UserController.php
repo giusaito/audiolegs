@@ -49,6 +49,56 @@ class UserController extends Controller
         $city = Arr::get($searchParams, 'cidade', '');
         $keyword = Arr::get($searchParams, 'keyword', '');
 
+        $userQuery->whereHas('roles', function($q) {
+          $q->whereIn('id',[1,2,3]);
+        });
+        // dd($userQuery);
+
+        if (!empty($role)) {
+            $userQuery->whereHas('roles', function($q) use ($role) { $q->where('name', $role); });
+        }
+
+        if (!empty($keyword)) {
+            $userQuery->where('name', 'LIKE', '%' . $keyword . '%');
+            $userQuery->where('email', 'LIKE', '%' . $keyword . '%');
+        }
+
+        if (!empty($university)) {
+            $userQuery->where('university_id', $university);
+        }
+
+        if (!empty($state)) {
+            $userQuery->where('state_id', $state);
+        }
+
+        if (!empty($city)) {
+            $userQuery->where('city_id', $city);
+        }
+
+        return UserResource::collection($userQuery->paginate($limit));
+    }
+    /**
+     * Display a listing of the user resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response|ResourceCollection
+     */
+    public function visitors(Request $request)
+    {
+        $searchParams = $request->all();
+        $userQuery = User::query();
+        $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
+        $role = Arr::get($searchParams, 'role', '');
+        $university = Arr::get($searchParams, 'universidade', '');
+        $state = Arr::get($searchParams, 'estado', '');
+        $city = Arr::get($searchParams, 'cidade', '');
+        $keyword = Arr::get($searchParams, 'keyword', '');
+
+        $userQuery->whereHas('roles', function($q) {
+          $q->whereNotIn('id',[1,2,3]);
+        });
+        // dd($userQuery);
+
         if (!empty($role)) {
             $userQuery->whereHas('roles', function($q) use ($role) { $q->where('name', $role); });
         }

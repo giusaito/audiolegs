@@ -75,6 +75,7 @@ export default {
     elementUi: 'Element UI',
     administrator: 'Administrador',
     users: 'Usuários',
+    visitors: 'Clientes',
     userProfile: 'Meu perfil',
   },
   navbar: {

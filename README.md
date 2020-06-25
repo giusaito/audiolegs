@@ -1,5 +1,9 @@
 <p align="center">
+<<<<<<< HEAD
   <img width="320" src="https://i.imgur.com/zy0uccV.png">
+=======
+  <img width="350" src="https://i.imgur.com/byxpeGg.png">
+>>>>>>> f5e6ff50140595dde672e33c142f0dd81fb26849
 </p>
 <p align="center">
   <a href="https://laravel.com">

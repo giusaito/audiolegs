@@ -38,7 +38,7 @@
           </div>
           <div class="card-panel-description">
             <div class="card-panel-text">
-              Novos assinantes
+              Assinantes
             </div>
             <count-to :start-val="0" :end-val="3057" :duration="3000" class="card-panel-num" />
           </div>

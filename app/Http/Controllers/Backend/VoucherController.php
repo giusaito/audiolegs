@@ -109,9 +109,13 @@ class VoucherController extends Controller
     {
         $request->data_inicio = $request->data_expiracao[0];
         $request->data_fim = $request->data_expiracao[1];
-
-        if($request->desconto == '0.00'){
+        // if($request->desconto == '0.00'){
+        //     $request->desconto = null;
+        // }
+        if($request->tipo_desconto){
             $request->desconto = null;
+        }else {
+            $request->desconto_porcentagem = null;
         }
         $voucher                        = Voucher::findOrFail($id);
         $voucher->chave                 = $request->chave;

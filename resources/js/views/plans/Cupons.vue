@@ -93,7 +93,7 @@
     </el-table>
     <pagination v-show="total>listQuery.limit" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :title="formTitle " :visible.sync="dialogFormVisible" :close-on-click-modal="false">
+    <el-dialog :title="formTitle " :visible.sync="dialogFormVisible" :close-on-click-modal="false" :destroy-on-close="true" :before-close="beforeClose">
       <div v-loading="cupomEditing" class="form-container">
         <el-form ref="currentVoucher" :model="currentVoucher" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
           <el-form-item ref="chave_input" label="Chave" prop="chave">
@@ -102,7 +102,7 @@
           <el-form-item label="Desconto">
             <el-col :span="24">
               <el-switch
-                v-model="tipo_desconto"
+                v-model="currentVoucher.tipo_desconto"
                 active-text="%"
                 inactive-text="R$"
                 active-color="#999"
@@ -112,13 +112,13 @@
             </el-col>
             <el-col :span="11">
               <el-form-item ref="desconto_input" prop="desconto">
-                <money v-model="currentVoucher.desconto" v-bind="money" placeholder="Valor (R$)" :disabled="tipo_desconto" class="el-input__inner" />
+                <money v-model="currentVoucher.desconto" v-bind="money" placeholder="Valor (R$)" :disabled="currentVoucher.tipo_desconto" class="el-input__inner" />
               </el-form-item>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
             <el-col :span="11">
               <el-form-item ref="desconto_porcentagem_input" prop="desconto_porcentagem">
-                <el-input v-model="currentVoucher.desconto_porcentagem" v-mask="'9{1,3}'" placeholder="Valor (%)" :disabled="!tipo_desconto">
+                <el-input v-model="currentVoucher.desconto_porcentagem" v-mask="'9{1,3}'" placeholder="Valor (%)" :disabled="!currentVoucher.tipo_desconto">
                   <i slot="suffix" class="el-input__icon">%</i>
                 </el-input>
               </el-form-item>
@@ -278,7 +278,6 @@ export default {
       currentVoucher: {},
       quantidade_total_checked: false,
       data_expiracao_checked: false,
-      tipo_desconto: false,
       dialogFormVisible: false,
       dialogPlanVisible: false,
       listLoading: true,
@@ -337,7 +336,7 @@ export default {
       this.listLoading = false;
     },
     toggleDescontoMandatory() {
-      if (this.tipo_desconto === true) {
+      if (this.currentVoucher.tipo_desconto === true) {
         this.descontoPorcentagemMandatory = true;
         this.descontoMandatory = false;
         this.currentVoucher.desconto = '';
@@ -350,12 +349,11 @@ export default {
       setTimeout(() => this.$refs.desconto_porcentagem_input.clearValidate(), 0);
     },
     customValidator(rule, value, callback) {
-      console.log(rule);
-      if (rule.field === 'desconto' && value === 'R$ 0,00') {
+      if (this.currentVoucher.tipo_desconto === false && rule.field === 'desconto' && (value === 'R$ 0,00' || value === 0 || !value)) {
         callback(new Error('Insira um valor (R$)'));
       }
-      if ((rule.field === 'desconto' && this.descontoMandatory === true) || (rule.field === 'desconto_porcentagem' && this.descontoPorcentagemMandatory === true)) {
-        rule.required = true;
+      if (this.currentVoucher.tipo_desconto === true && rule.field === 'desconto_porcentagem' && !value) {
+        callback(new Error('Insira um valor (%)'));
       }
       if (!value && rule.required) {
         callback(new Error('O campo é obrigatório'));
@@ -422,6 +420,7 @@ export default {
       this.btnInsertUpdate = 'Adicionar cupom';
       this.currentVoucher = {
         chave: Str.random(10), // Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), // this.randomString(12, '#AA')
+        tipo_desconto: false,
         desconto: '',
         desconto_porcentagem: '',
         quantidade_total: 0,
@@ -433,13 +432,22 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.currentVoucher.id !== undefined){
-            // setTimeout(() => this.$refs.chave_input.clearValidate(), 0);
             VoucherResource.update(this.currentVoucher.id, this.currentVoucher).then(response => {
               this.$message({
                 type: 'success',
                 message: 'O cupom ' + this.currentVoucher.chave + ' atualizado com sucesso',
                 duration: 5 * 1000,
               });
+              this.currentVoucher = {
+                chave: '',
+                tipo_desconto: false,
+                desconto: '',
+                desconto_porcentagem: '',
+                quantidade_total: 0,
+                data_expiracao: '',
+                statusSwitch: true,
+              };
+
               this.getList();
             }).catch(() => {
               this.$message({
@@ -460,6 +468,7 @@ export default {
               });
               this.currentVoucher = {
                 chave: '',
+                tipo_desconto: false,
                 desconto: '',
                 desconto_porcentagem: '',
                 quantidade_total: 0,
@@ -485,13 +494,6 @@ export default {
       this.formTitle = 'Editar cupom ' + chave;
       this.btnInsertUpdate = 'Atualizar cupom';
 
-      // currentVoucher.chave.clearValidate
-      if (desconto === null) {
-        this.tipo_desconto = true;
-        desconto = 0;
-      } else {
-        this.tipo_desconto = false;
-      }
       if (quantidade_total !== 0){
         this.quantidade_total_checked = true;
       } else {
@@ -503,15 +505,22 @@ export default {
         this.data_expiracao_checked = true;
         datas = [data_inicio, data_fim];
       }
+      if (!desconto || desconto === 0 || desconto === 'R$ 0,00') {
+        this.currentVoucher.tipo_desconto = true;
+      } else {
+        this.currentVoucher.tipo_desconto = false;
+      }
       var statusSwitch = status;
       if (statusSwitch === 'PUBLISHED') {
         statusSwitch = true;
       } else {
         statusSwitch = false;
       }
+      var tipoDesconto = this.currentVoucher.tipo_desconto;
       this.currentVoucher = {
         id: id,
         chave: chave,
+        tipo_desconto: tipoDesconto,
         desconto: desconto,
         desconto_porcentagem: desconto_porcentagem,
         quantidade_total: quantidade_total,
@@ -536,9 +545,11 @@ export default {
         } else {
           statusSwitch = false;
         }
+        var tipoDesconto = this.currentVoucher.tipo_desconto;
         this.currentVoucher = {
           id: id,
           chave: chave,
+          tipo_desconto: tipoDesconto,
           desconto: desconto,
           desconto_porcentagem: desconto_porcentagem,
           quantidade_total: quantidade_total,
@@ -597,6 +608,20 @@ export default {
       }).then((response) => {
         console.log(response);
       }).catch(error => console.log(error));
+    },
+    beforeClose(done) {
+      // this.dialogVisible = false;
+      // this.$refs['ruleForm'].resetFields();
+      this.desconto_input = '';
+      this.$refs.desconto_input.clearValidate();
+      this.desconto_porcentagem_input = '';
+      this.$refs.desconto_porcentagem_input.clearValidate();
+
+      this.currentVoucher.tipo_desconto = false;
+      // this.descontoPorcentagemMandatory = false;
+      // this.descontoMandatory = true;
+      // this.currentVoucher.desconto_porcentagem = '';
+      done();
     },
   },
 };

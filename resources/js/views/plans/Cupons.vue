@@ -96,7 +96,7 @@
     <el-dialog :title="formTitle " :visible.sync="dialogFormVisible" :close-on-click-modal="false">
       <div v-loading="cupomEditing" class="form-container">
         <el-form ref="currentVoucher" :model="currentVoucher" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
-          <el-form-item label="Chave" prop="chave">
+          <el-form-item ref="chave_input" label="Chave" prop="chave">
             <el-input v-model="currentVoucher.chave" />
           </el-form-item>
           <el-form-item label="Desconto">
@@ -274,7 +274,7 @@ export default {
       cupons: [],
       total: 0,
       formTitle: '',
-      planTitle: 'Atribuir cupons aos planos',
+      planTitle: 'Atribuir cupom aos planos',
       currentVoucher: {},
       quantidade_total_checked: false,
       data_expiracao_checked: false,
@@ -361,8 +361,11 @@ export default {
         callback(new Error('O campo é obrigatório'));
       }
       if (rule.field === 'chave'){
-        console.log(value);
-        axios.get(this.baseUrlApi + '/buscar-chave?chave=' + value, {
+        var editForm = false;
+        if (this.currentVoucher.id !== undefined) {
+          editForm = true;
+        }
+        axios.get(this.baseUrlApi + '/buscar-chave?chave=' + value + '&editform=' + editForm, {
           headers: {
             'Authorization': 'Bearer ' + getToken(),
           },
@@ -430,6 +433,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.currentVoucher.id !== undefined){
+            // setTimeout(() => this.$refs.chave_input.clearValidate(), 0);
             VoucherResource.update(this.currentVoucher.id, this.currentVoucher).then(response => {
               this.$message({
                 type: 'success',
@@ -480,6 +484,8 @@ export default {
       this.dialogFormVisible = true;
       this.formTitle = 'Editar cupom ' + chave;
       this.btnInsertUpdate = 'Atualizar cupom';
+
+      // currentVoucher.chave.clearValidate
       if (desconto === null) {
         this.tipo_desconto = true;
         desconto = 0;
@@ -491,12 +497,11 @@ export default {
       } else {
         this.quantidade_total_checked = false;
       }
-      // alert(data_inicio);
-      // alert(data_fim);
+      var datas = null;
+      this.data_expiracao_checked = false;
       if (data_inicio && data_fim) {
         this.data_expiracao_checked = true;
-      } else {
-        this.data_expiracao_checked = false;
+        datas = [data_inicio, data_fim];
       }
       var statusSwitch = status;
       if (statusSwitch === 'PUBLISHED') {
@@ -511,13 +516,13 @@ export default {
         desconto_porcentagem: desconto_porcentagem,
         quantidade_total: quantidade_total,
         quantidade_usado: quantidade_usado,
-        data_expiracao: [data_inicio, data_fim],
+        data_expiracao: datas,
         status: status,
         statusSwitch: statusSwitch,
       };
-      console.log(this.currentVoucher);
     },
     handleDefinePlans(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
+      this.planTitle = 'Atribuir cupom "' + chave + '" aos planos';
       this.dialogPlanVisible = true;
       axios.get('api/v1/bw/planos/all/' + id, {
         headers: {

@@ -60,17 +60,10 @@ class PlanController extends Controller
 
     public function all($voucher)
     {
-<<<<<<< HEAD
-        // dd(Plan::withCount('vouchers')->get());
-        $plans = Plan::orderBy('plans.id', 'DESC')->with(['vouchers' => function($query) use ($voucher) {
-                $query->where(['vouchers.id'=>$voucher])->select(['vouchers.id', 'chave', 'desconto', 'desconto_porcentagem', 'quantidade_total', 'quantidade_usado', 'data_inicio', 'data_fim', 'status' ]);
-=======
         $plans = Plan::orderBy('id', 'DESC')->with(['vouchers' => function($query) use ($voucher) {
             $query->where(['vouchers.id'=>$voucher])->select(['vouchers.id', 'chave', 'desconto', 'desconto_porcentagem', 'quantidade_total', 'quantidade_usado', 'data_inicio', 'data_fim', 'status' ]);
->>>>>>> 49e9b5b3ba0d34e060e9437c63cc183fa9116be6
             }
         ])->get();
-        // dd(response()->json($response));
         return response()->json($plans);
     }
 

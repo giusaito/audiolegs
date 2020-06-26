@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <h1>Administradores</h1>
     <div class="filter-container">
       <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
@@ -9,9 +10,6 @@
         <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
       </el-select>
       <!-- <el-select v-model="query.universities" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
-      <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
-        <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
-      </el-select>
       <el-select v-model="query.estado" placeholder="Estado" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
       </el-select>

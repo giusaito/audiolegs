@@ -1,0 +1,581 @@
+<template>
+  <div class="app-container">
+    <h1>Clientes</h1>
+    <div class="filter-container">
+      <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        Procurar
+      </el-button>
+      <!-- <el-select v-model="query.universities" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
+      <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
+      </el-select>
+      <el-select v-model="query.estado" placeholder="Estado" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
+      </el-select>
+      <el-select v-model="query.cidade" placeholder="Cidade" filterable clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="cidade in cidades" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
+      </el-select>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
+        Adicionar
+      </el-button>
+      <!-- <el-button v-waves :loading="downloading" class="filter-item" type="primary" icon="el-icon-download" @click= "handleDownload">
+        {{ $t('table.export') }}
+      </el-button> -->
+    </div>
+
+    <el-table v-loading="loading" :data="list">
+      <el-table-column align="center" label="ID" width="80">
+        <template slot-scope="scope">
+          <span>{{ scope.row.index }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Nome">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Email">
+        <template slot-scope="scope">
+          <span>{{ scope.row.email }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Ações" width="350">
+        <template slot-scope="scope">
+          <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email)">
+            Editar
+          </el-button>
+          <!-- </router-link> -->
+          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
+            Papel
+          </el-button>
+          <!-- <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+            Remover
+          </el-button> -->
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
+
+    <el-dialog :visible.sync="dialogPermissionVisible" :title="'Edit Permissions - ' + currentUser.name">
+      <div v-if="currentUser.name" v-loading="dialogPermissionLoading" class="form-container">
+        <div class="permissions-container">
+          <div class="block">
+            <el-form :model="currentUser" label-width="80px" label-position="top">
+              <el-form-item label="Menus">
+                <el-tree ref="menuPermissions" :data="normalizedMenuPermissions" :default-checked-keys="permissionKeys(userMenuPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="block">
+            <el-form :model="currentUser" label-width="80px" label-position="top">
+              <el-form-item label="Permissions">
+                <el-tree ref="otherPermissions" :data="normalizedOtherPermissions" :default-checked-keys="permissionKeys(userOtherPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="clear-left" />
+        </div>
+        <div style="text-align:right;">
+          <el-button type="danger" @click="dialogPermissionVisible=false">
+            {{ $t('permission.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="confirmPermission">
+            {{ $t('permission.confirm') }}
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="'Adicionar usuário'" :visible.sync="dialogFormVisible">
+      <div v-loading="userCreating" class="form-container">
+        <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
+          <!-- <el-form-item label="Papel" prop="role">
+            <el-select v-model="newUser.role" class="filter-item" placeholder="Por favor selecione o papel">
+              <el-option v-for="item in roles" :key="item" :label="item.label | uppercaseFirst" :value="item.value" />
+            </el-select>
+          </el-form-item> -->
+          <input type="hidden" name="role" value="user">
+          <el-form-item label="Nome" prop="name">
+            <el-input v-model="newUser.name" />
+          </el-form-item>
+          <el-form-item label="Email" prop="email">
+            <el-input v-model="newUser.email" />
+          </el-form-item>
+          <el-form-item label="Senha" prop="password">
+            <el-input v-model="newUser.password" show-password />
+          </el-form-item>
+          <el-form-item label="Confirmar senha" prop="confirmPassword">
+            <el-input v-model="newUser.confirmPassword" show-password />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">
+            Cancelar
+          </el-button>
+          <el-button type="primary" @click="handleSubmit()">
+            Adicionar
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
+import ClienteResource from '@/api/clientes';
+import Resource from '@/api/resource';
+import waves from '@/directive/waves'; // Waves directive
+import permission from '@/directive/permission'; // Permission directive
+import checkPermission from '@/utils/permission'; // Permission checking
+import { fetchUniversities } from '@/api/universities';
+import { fetchCities } from '@/api/cities';
+import { fetchStates } from '@/api/states';
+import { getToken } from '@/utils/auth';
+// import axios from 'axios';
+
+const clienteResource = new ClienteResource();
+const permissionResource = new Resource('permissions');
+
+export default {
+  name: 'ClientList',
+  components: { Pagination },
+  directives: { waves, permission },
+  data() {
+    var validateConfirmPassword = (rule, value, callback) => {
+      if (value !== this.newUser.password) {
+        callback(new Error('As senhas não combinam'));
+      } else {
+        callback();
+      }
+    };
+    return {
+      list: null,
+      total: 0,
+      loading: true,
+      downloading: false,
+      userCreating: false,
+      universidades: [],
+      cidades: [],
+      estados: [],
+      query: {
+        page: 1,
+        limit: 15,
+        keyword: '',
+        role: '',
+      },
+      roles: [{
+        'label': 'Usuário',
+        'value': 'user',
+      }],
+      nonAdminRoles: ['editor'],
+      newUser: {},
+      dialogFormVisible: false,
+      dialogPermissionVisible: false,
+      dialogPermissionLoading: false,
+      currentUserId: 0,
+      currentUser: {
+        name: '',
+        permissions: [],
+        rolePermissions: [],
+      },
+      rules: {
+        role: [{ required: true, message: 'Permissão obrigatória', trigger: 'change' }],
+        name: [{ required: true, message: 'Nome obrigatório', trigger: 'blur' }],
+        email: [
+          { required: true, message: 'Email obrigatório', trigger: 'blur' },
+          { type: 'email', message: 'Insira um email válido', trigger: ['blur', 'change'] },
+        ],
+        password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
+        confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
+      },
+      permissionProps: {
+        children: 'children',
+        label: 'name',
+        disabled: 'disabled',
+      },
+      permissions: [],
+      menuPermissions: [],
+      otherPermissions: [],
+    };
+  },
+  computed: {
+    normalizedMenuPermissions() {
+      let tmp = [];
+      this.currentUser.permissions.role.forEach(permission => {
+        tmp.push({
+          id: permission.id,
+          name: permission.name,
+          disabled: true,
+        });
+      });
+      const rolePermissions = {
+        id: -1, // Just a faked ID
+        name: 'Inherited from role',
+        disabled: true,
+        children: this.classifyPermissions(tmp).menu,
+      };
+
+      tmp = this.menuPermissions.filter(permission => !this.currentUser.permissions.role.find(p => p.id === permission.id));
+      const userPermissions = {
+        id: 0, // Faked ID
+        name: 'Extra menus',
+        children: tmp,
+        disabled: tmp.length === 0,
+      };
+
+      return [rolePermissions, userPermissions];
+    },
+    normalizedOtherPermissions() {
+      let tmp = [];
+      this.currentUser.permissions.role.forEach(permission => {
+        tmp.push({
+          id: permission.id,
+          name: permission.name,
+          disabled: true,
+        });
+      });
+      const rolePermissions = {
+        id: -1,
+        name: 'Inherited from role',
+        disabled: true,
+        children: this.classifyPermissions(tmp).other,
+      };
+
+      tmp = this.otherPermissions.filter(permission => !this.currentUser.permissions.role.find(p => p.id === permission.id));
+      const userPermissions = {
+        id: 0,
+        name: 'Extra permissions',
+        children: tmp,
+        disabled: tmp.length === 0,
+      };
+
+      return [rolePermissions, userPermissions];
+    },
+    userMenuPermissions() {
+      return this.classifyPermissions(this.userPermissions).menu;
+    },
+    userOtherPermissions() {
+      return this.classifyPermissions(this.userPermissions).other;
+    },
+    userPermissions() {
+      return this.currentUser.permissions.role.concat(this.currentUser.permissions.user);
+    },
+  },
+  created() {
+    this.resetNewUser();
+    this.getList();
+    this.getUniversities();
+    this.getStates();
+    this.getCities();
+    if (checkPermission(['manage permission'])) {
+      this.getPermissions();
+    }
+  },
+  methods: {
+    checkPermission,
+    async getPermissions() {
+      const { data } = await permissionResource.list({});
+      const { all, menu, other } = this.classifyPermissions(data);
+      this.permissions = all;
+      this.menuPermissions = menu;
+      this.otherPermissions = other;
+    },
+
+    async getList() {
+      const { limit, page } = this.query;
+      this.loading = true;
+      const { data, meta } = await clienteResource.list(this.query);
+      this.list = data;
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
+      this.total = meta.total;
+      this.loading = false;
+    },
+    async getUniversities() {
+      this.listLoading = true;
+      const { data } = await fetchUniversities(this.query);
+      this.listLoading = false;
+      this.universidades = data;
+    },
+    async getStates() {
+      this.listLoading = true;
+      const { data } = await fetchStates(this.query);
+      this.listLoading = false;
+      this.estados = data;
+      console.log(this.estados);
+    },
+    async getCities() {
+      this.listLoading = true;
+      const { data } = await fetchCities(this.query);
+      this.listLoading = false;
+      this.cidades = data;
+      console.log(this.cidades);
+    },
+    handleFilter() {
+      this.query.page = 1;
+      this.getList();
+      this.getUniversities();
+      this.getStates();
+      this.getCities();
+    },
+    handleCreate() {
+      this.resetNewUser();
+      this.dialogFormVisible = true;
+      this.$nextTick(() => {
+        this.$refs['userForm'].clearValidate();
+      });
+    },
+    handleEdit(id, nome, email){
+      alert(getToken());
+      this.dialogFormVisible = true;
+      this.formTitle = 'Editando o usuário ' + nome;
+      this.newUser = {
+        id: id,
+        name: nome,
+        email: email,
+        role: 'user',
+      };
+
+      // this.newUser = {
+      //   name: '',
+      //   email: '',
+      //   password: '',
+      //   confirmPassword: '',
+      //   role: 'user',
+      // };
+
+      // axios({
+      //   method: 'post',
+      //   url: `api/v1/bw/cupons/plano`,
+      //   headers: {
+      //     'Authorization': 'Bearer ' + getToken(),
+      //   },
+      //   data: {
+      //     id: id,
+      //     plano: plano,
+      //   },
+      // }).then((response) => {
+      //   console.log(response);
+      // }).catch(error => console.log(error));
+
+      // this.currentVoucher = this.cupons.find(category => category.id === id);
+      // this.dialogFormVisible = true;
+      // this.formTitle = 'Editar cupom ' + chave;
+      // this.btnInsertUpdate = 'Atualizar cupom';
+
+      // if (quantidade_total !== 0){
+      //   this.quantidade_total_checked = true;
+      // } else {
+      //   this.quantidade_total_checked = false;
+      // }
+      // var datas = null;
+      // this.data_expiracao_checked = false;
+      // if (data_inicio && data_fim) {
+      //   this.data_expiracao_checked = true;
+      //   datas = [data_inicio, data_fim];
+      // }
+      // if (!desconto || desconto === 0 || desconto === 'R$ 0,00') {
+      //   this.currentVoucher.tipo_desconto = true;
+      // } else {
+      //   this.currentVoucher.tipo_desconto = false;
+      // }
+      // var statusSwitch = status;
+      // if (statusSwitch === 'PUBLISHED') {
+      //   statusSwitch = true;
+      // } else {
+      //   statusSwitch = false;
+      // }
+      // var tipoDesconto = this.currentVoucher.tipo_desconto;
+      // this.currentVoucher = {
+      //   id: id,
+      //   chave: chave,
+      //   tipo_desconto: tipoDesconto,
+      //   desconto: desconto,
+      //   desconto_porcentagem: desconto_porcentagem,
+      //   quantidade_total: quantidade_total,
+      //   quantidade_usado: quantidade_usado,
+      //   data_expiracao: datas,
+      //   status: status,
+      //   statusSwitch: statusSwitch,
+      // };
+    },
+    handleDelete(id, name) {
+      this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
+        confirmButtonText: 'Remover',
+        cancelButtonText: 'Cancelar',
+        type: 'warning',
+      }).then(() => {
+        clienteResource.destroy(id).then(response => {
+          this.$message({
+            type: 'success',
+            message: 'Usuário removido com sucesso',
+          });
+          this.handleFilter();
+        }).catch(error => {
+          console.log(error);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Operação cancelada',
+        });
+      });
+    },
+    async handleEditPermissions(id) {
+      this.currentUserId = id;
+      this.dialogPermissionLoading = true;
+      this.dialogPermissionVisible = true;
+      const found = this.list.find(user => user.id === id);
+      const { data } = await clienteResource.permissions(id);
+      this.currentUser = {
+        id: found.id,
+        name: found.name,
+        permissions: data,
+      };
+      this.dialogPermissionLoading = false;
+      this.$nextTick(() => {
+        this.$refs.menuPermissions.setCheckedKeys(this.permissionKeys(this.userMenuPermissions));
+        this.$refs.otherPermissions.setCheckedKeys(this.permissionKeys(this.userOtherPermissions));
+      });
+    },
+    handleSubmit() {
+      this.$refs['userForm'].validate((valid) => {
+        if (valid) {
+          if (this.newUser.id !== undefined){
+            alert('editar');
+          } else {
+            this.newUser.roles = [this.newUser.role];
+            this.userCreating = true;
+            clienteResource
+              .store(this.newUser)
+              .then(response => {
+                this.$message({
+                  message: 'Usuário ' + this.newUser.name + '(' + this.newUser.email + ') foi criado com sucesso',
+                  type: 'success',
+                  duration: 5 * 1000,
+                });
+                this.resetNewUser();
+                this.dialogFormVisible = false;
+                this.handleFilter();
+              })
+              .catch(error => {
+                console.log('ops' + error);
+              })
+              .finally(() => {
+                this.userCreating = false;
+              });
+          }
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    resetNewUser() {
+      this.newUser = {
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'user',
+      };
+    },
+    handleDownload() {
+      this.downloading = true;
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['id', 'user_id', 'name', 'email', 'role'];
+        const filterVal = ['index', 'id', 'name', 'email', 'role'];
+        const data = this.formatJson(filterVal, this.list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'user-list',
+        });
+        this.downloading = false;
+      });
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+    permissionKeys(permissions) {
+      return permissions.map(permssion => permssion.id);
+    },
+    classifyPermissions(permissions) {
+      const all = []; const menu = []; const other = [];
+      permissions.forEach(permission => {
+        const permissionName = permission.name;
+        all.push(permission);
+        if (permissionName.startsWith('view menu')) {
+          menu.push(this.normalizeMenuPermission(permission));
+        } else {
+          other.push(this.normalizePermission(permission));
+        }
+      });
+      return { all, menu, other };
+    },
+
+    normalizeMenuPermission(permission) {
+      return { id: permission.id, name: this.$options.filters.uppercaseFirst(permission.name.substring(10)), disabled: permission.disabled || false };
+    },
+
+    normalizePermission(permission) {
+      const disabled = permission.disabled || permission.name === 'manage permission';
+      return { id: permission.id, name: this.$options.filters.uppercaseFirst(permission.name), disabled: disabled };
+    },
+
+    confirmPermission() {
+      const checkedMenu = this.$refs.menuPermissions.getCheckedKeys();
+      const checkedOther = this.$refs.otherPermissions.getCheckedKeys();
+      const checkedPermissions = checkedMenu.concat(checkedOther);
+      this.dialogPermissionLoading = true;
+
+      clienteResource.updatePermission(this.currentUserId, { permissions: checkedPermissions }).then(response => {
+        this.$message({
+          message: 'Permissions has been updated successfully',
+          type: 'success',
+          duration: 5 * 1000,
+        });
+        this.dialogPermissionLoading = false;
+        this.dialogPermissionVisible = false;
+      });
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.edit-input {
+  padding-right: 100px;
+}
+.cancel-btn {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+.dialog-footer {
+  text-align: left;
+  padding-top: 0;
+  margin-left: 150px;
+}
+.app-container {
+  flex: 1;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+  .block {
+    float: left;
+    min-width: 250px;
+  }
+  .clear-left {
+    clear: left;
+  }
+}
+</style>

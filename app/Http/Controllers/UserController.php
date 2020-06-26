@@ -60,7 +60,7 @@ class UserController extends Controller
 
         if (!empty($keyword)) {
             $userQuery->where('name', 'LIKE', '%' . $keyword . '%');
-            $userQuery->where('email', 'LIKE', '%' . $keyword . '%');
+            $userQuery->orWhere('email', 'LIKE', '%' . $keyword . '%');
         }
 
         if (!empty($university)) {
@@ -105,7 +105,7 @@ class UserController extends Controller
 
         if (!empty($keyword)) {
             $userQuery->where('name', 'LIKE', '%' . $keyword . '%');
-            $userQuery->where('email', 'LIKE', '%' . $keyword . '%');
+            $userQuery->orWhere('email', 'LIKE', '%' . $keyword . '%');
         }
 
         if (!empty($university)) {
@@ -120,7 +120,7 @@ class UserController extends Controller
             $userQuery->where('city_id', $city);
         }
 
-        return UserResource::collection($userQuery->paginate($limit));
+        return UserResource::collection($userQuery->orderBy('id', 'DESC')->paginate($limit));
     }
 
     /**

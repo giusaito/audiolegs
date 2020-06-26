@@ -338,6 +338,7 @@ class UserController extends Controller
     }
 
       public function userImport(Request $request){
+        dd($request->all());
         $coluna1 = $request[0]['column'];
         $coluna2 = $request[1]['column'];
         $coluna3 = $request[2]['column'];

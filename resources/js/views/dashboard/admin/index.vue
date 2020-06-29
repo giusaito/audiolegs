@@ -19,7 +19,7 @@
         <div class="chart-wrapper">
           <p class="text-center">5 leis mais acessadas</p>
           <pie-chart />
-          <router-link :to="'/leis-mais-acessadas'" class="bw-btn bw-btn-all">
+          <router-link :to="'/relatorios/leis-mais-acessadas'" class="bw-btn bw-btn-all">
             Veja mais
           </router-link>
         </div>
@@ -145,7 +145,7 @@ export default {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  padding: 5px;
+  padding: 3px;
   border-radius: 6px;
   margin-bottom: 10px;
 }

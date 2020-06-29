@@ -39,7 +39,8 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     {
         Route::group(['prefix' => 'relatorios'], function()
     {
-      Route::get('leis-acessadas', 'ReportController@reportLaws ')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+      Route::get('leis-acessadas', 'ReportController@reportLaws')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+      Route::get('assinaturas-cancelamentos', 'ReportController@subsOrCancel')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });
     // Rota de planos backend
     Route::get('planos/all/{voucher}', 'PlanController@all')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);

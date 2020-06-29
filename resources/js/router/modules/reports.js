@@ -16,10 +16,10 @@ const reportsRoutes = {
       meta: { title: 'AcessLaws' },
     },
     {
-      path: 'leis-mais-acessadas',
-      component: () => import('@/views/reports/AcessLaws'),
-      name: 'Horário mais acessado',
-      meta: { title: 'AcessLaws' },
+      path: 'assinatura-e-cancelamento',
+      component: () => import('@/views/reports/SubsOrCancel'),
+      name: 'Assinatura/Cancelamento',
+      meta: { title: 'SubsOrCancel' },
     },
   ],
 };

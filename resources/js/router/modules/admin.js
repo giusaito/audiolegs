@@ -5,10 +5,10 @@ const adminRoutes = {
   path: '/administrator',
   component: Layout,
   redirect: '/administrator/users',
-  name: 'Administrator',
+  name: 'Usuários',
   alwaysShow: true,
   meta: {
-    title: 'administrator',
+    title: 'users',
     icon: 'admin',
     permissions: ['view menu administrator'],
   },
@@ -25,7 +25,13 @@ const adminRoutes = {
       path: 'users',
       component: () => import('@/views/users/List'),
       name: 'UserList',
-      meta: { title: 'users', icon: 'user', permissions: ['manage user'] },
+      meta: { title: 'administrators', icon: 'user', permissions: ['manage user'] },
+    },
+    {
+      path: 'clientes',
+      component: () => import('@/views/users/Clients'),
+      name: 'ClientList',
+      meta: { title: 'visitors', icon: 'user', permissions: ['manage user'] },
     },
     /** Role and permission */
     // {

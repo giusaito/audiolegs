@@ -33,6 +33,17 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
 
     Route::post('/usuario/importar-usuario', 'UserController@userImport')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
+
+
+    Route::get('clientes', 'UserController@visitors')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+    Route::get('clientes/{user}', 'UserController@show')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+    Route::post('clientes', 'UserController@store');
+    Route::get('cliente/profile/edit/', 'UserController@edit');
+    Route::put('clientes/{user}', 'UserController@update');
+    Route::delete('clientes/{user}', 'UserController@destroy')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+    Route::get('clientes/{user}/permissions', 'UserController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::put('clientes/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+
     Route::group(['namespace' => 'Backend'], function()
     {
     // Rota de planos backend

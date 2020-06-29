@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class ReportController extends Controller
 {
     public function reportLaws(){
-    	dd('oi');
+    	dd('a');
     }
 }

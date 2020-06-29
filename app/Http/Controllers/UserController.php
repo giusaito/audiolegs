@@ -338,15 +338,17 @@ class UserController extends Controller
     }
 
       public function userImport(Request $request){
-        dd($request->all());
-        $coluna1 = $request[0]['column'];
-        $coluna2 = $request[1]['column'];
-        $coluna3 = $request[2]['column'];
+        $coluna1 = $request[1]['column'];
+        $coluna2 = $request[2]['column'];
+        $coluna3 = $request[3]['column'];
         $coluna4 = "password";
-        $data1 = $request[0]['data'];
-        $data2 = $request[1]['data'];
-        $data3 = $request[2]['data'];
+        $coluna5 = 'plan_id';
+
+        $data1 = $request[1]['data'];
+        $data2 = $request[2]['data'];
+        $data3 = $request[3]['data'];
         $data4 = Hash::make('AUDIOLEGIS');
+        $data5 = $request[0]['plan_id'];
 
         $field = [];
 
@@ -356,11 +358,12 @@ class UserController extends Controller
           $field[$key][$coluna2] = $data2[$key];
           $field[$key][$coluna3] = $data3[$key];
           $field[$key][$coluna4] = $data4;
+          $field[$key][$coluna5] = $data5;
           $i++;
         }
 
       $ignoreEmpty = array_map('array_filter', $field);
-      $users = User::insertOrIgnore($ignoreEmpty);
+      $users = User::insertGetId($ignoreEmpty);
 
       return response()->json($users . ' cadastrados no banco');
     }

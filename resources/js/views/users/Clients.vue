@@ -46,7 +46,7 @@
       <el-table-column align="center" label="Ações" width="350">
         <template slot-scope="scope">
           <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
-          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email)">
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email, scope.row.estado, scope.row.cidade, scope.row.instituicao)">
             Editar
           </el-button>
           <!-- </router-link> -->
@@ -92,7 +92,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="'Adicionar usuário'" :visible.sync="dialogFormVisible">
+    <el-dialog :title="title" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
         <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
           <!-- <el-form-item label="Papel" prop="role">
@@ -107,6 +107,22 @@
           <el-form-item label="Email" prop="email">
             <el-input v-model="newUser.email" />
           </el-form-item>
+          <el-form-item label="Estado" prop="estado">
+            <el-select v-model="newUser.estado" placeholder="Estado" class="filter-item">
+              <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Cidade" prop="cidade">
+            <el-select v-model="newUser.cidade" placeholder="Cidade" class="filter-item" :loading="loadingCities">
+              <el-option v-for="cidade in citylist" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Instituição" prop="insituicao">
+            <el-select v-model="newUser.instituicao" placeholder="---" class="filter-item">
+              <el-option>---</el-option>
+              <el-option v-for="instituicao in universidades" :key="instituicao.id" :label="instituicao.fantasy_name | uppercaseFirst" :value="instituicao.id" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="Senha" prop="password">
             <el-input v-model="newUser.password" show-password />
           </el-form-item>
@@ -119,7 +135,7 @@
             Cancelar
           </el-button>
           <el-button type="primary" @click="handleSubmit()">
-            Adicionar
+            {{ botao }}
           </el-button>
         </div>
       </div>
@@ -137,7 +153,7 @@ import checkPermission from '@/utils/permission'; // Permission checking
 import { fetchUniversities } from '@/api/universities';
 import { fetchCities } from '@/api/cities';
 import { fetchStates } from '@/api/states';
-import { getToken } from '@/utils/auth';
+// import { getToken } from '@/utils/auth';
 // import axios from 'axios';
 
 const clienteResource = new ClienteResource();
@@ -157,6 +173,7 @@ export default {
     };
     return {
       list: null,
+      loadingCities: false,
       total: 0,
       loading: true,
       downloading: false,
@@ -192,6 +209,8 @@ export default {
           { required: true, message: 'Email obrigatório', trigger: 'blur' },
           { type: 'email', message: 'Insira um email válido', trigger: ['blur', 'change'] },
         ],
+        estado: [{ required: true, message: 'Estado obrigatório', trigger: 'blur' }],
+        cidade: [{ required: true, message: 'Cidade obrigatório', trigger: 'blur' }],
         password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
         confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
       },
@@ -203,9 +222,23 @@ export default {
       permissions: [],
       menuPermissions: [],
       otherPermissions: [],
+      title: 'Adicionar Cliente',
+      botao: 'Adicionar',
+      // configsCities: {
+      //   orderBy: 'name',
+      //   order: 'asc',
+      //   filter: ''
+      // }
     };
   },
   computed: {
+    citylist() {
+      let resultData = this.cidades;
+      if (this.newUser.estado) {
+        resultData = resultData.filter(cidade => cidade.state_id === this.newUser.estado);
+      }
+      return resultData;
+    },
     normalizedMenuPermissions() {
       let tmp = [];
       this.currentUser.permissions.role.forEach(permission => {
@@ -268,6 +301,14 @@ export default {
       return this.currentUser.permissions.role.concat(this.currentUser.permissions.user);
     },
   },
+  // watch: {
+  //   citylist: {
+  //     deep: true,
+  //     handler: function() {
+  //       this.loadingCities = true;
+  //     },
+  //   },
+  // },
   created() {
     this.resetNewUser();
     this.getList();
@@ -310,14 +351,15 @@ export default {
       const { data } = await fetchStates(this.query);
       this.listLoading = false;
       this.estados = data;
-      console.log(this.estados);
+      // console.log(this.estados);
     },
     async getCities() {
       this.listLoading = true;
+      console.log(this.query);
       const { data } = await fetchCities(this.query);
       this.listLoading = false;
       this.cidades = data;
-      console.log(this.cidades);
+      // console.log(this.cidades);
     },
     handleFilter() {
       this.query.page = 1;
@@ -329,83 +371,26 @@ export default {
     handleCreate() {
       this.resetNewUser();
       this.dialogFormVisible = true;
+      this.title = 'Adicionar Cliente';
+      this.botao = 'Adicionar';
       this.$nextTick(() => {
         this.$refs['userForm'].clearValidate();
       });
     },
-    handleEdit(id, nome, email){
-      alert(getToken());
+    handleEdit(id, nome, email, estado, cidade, instituicao){
+      // alert(getToken());
       this.dialogFormVisible = true;
-      this.formTitle = 'Editando o usuário ' + nome;
+      this.title = 'Editando o usuário ' + nome;
+      this.botao = 'Editar';
       this.newUser = {
         id: id,
         name: nome,
         email: email,
+        estado: estado,
+        cidade: cidade,
+        instituicao: instituicao,
         role: 'user',
       };
-
-      // this.newUser = {
-      //   name: '',
-      //   email: '',
-      //   password: '',
-      //   confirmPassword: '',
-      //   role: 'user',
-      // };
-
-      // axios({
-      //   method: 'post',
-      //   url: `api/v1/bw/cupons/plano`,
-      //   headers: {
-      //     'Authorization': 'Bearer ' + getToken(),
-      //   },
-      //   data: {
-      //     id: id,
-      //     plano: plano,
-      //   },
-      // }).then((response) => {
-      //   console.log(response);
-      // }).catch(error => console.log(error));
-
-      // this.currentVoucher = this.cupons.find(category => category.id === id);
-      // this.dialogFormVisible = true;
-      // this.formTitle = 'Editar cupom ' + chave;
-      // this.btnInsertUpdate = 'Atualizar cupom';
-
-      // if (quantidade_total !== 0){
-      //   this.quantidade_total_checked = true;
-      // } else {
-      //   this.quantidade_total_checked = false;
-      // }
-      // var datas = null;
-      // this.data_expiracao_checked = false;
-      // if (data_inicio && data_fim) {
-      //   this.data_expiracao_checked = true;
-      //   datas = [data_inicio, data_fim];
-      // }
-      // if (!desconto || desconto === 0 || desconto === 'R$ 0,00') {
-      //   this.currentVoucher.tipo_desconto = true;
-      // } else {
-      //   this.currentVoucher.tipo_desconto = false;
-      // }
-      // var statusSwitch = status;
-      // if (statusSwitch === 'PUBLISHED') {
-      //   statusSwitch = true;
-      // } else {
-      //   statusSwitch = false;
-      // }
-      // var tipoDesconto = this.currentVoucher.tipo_desconto;
-      // this.currentVoucher = {
-      //   id: id,
-      //   chave: chave,
-      //   tipo_desconto: tipoDesconto,
-      //   desconto: desconto,
-      //   desconto_porcentagem: desconto_porcentagem,
-      //   quantidade_total: quantidade_total,
-      //   quantidade_usado: quantidade_usado,
-      //   data_expiracao: datas,
-      //   status: status,
-      //   statusSwitch: statusSwitch,
-      // };
     },
     handleDelete(id, name) {
       this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
@@ -450,7 +435,35 @@ export default {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
           if (this.newUser.id !== undefined){
-            alert('editar');
+            // alert('editar');
+            clienteResource
+              .update(this.newUser.id, this.newUser).then(response => {
+                this.$message({
+                  type: 'success',
+                  message: 'O cliente ' + this.newUser.name + ' foi atualizado com sucesso',
+                  duration: 5 * 1000,
+                });
+                this.newUser = {
+                  id: '',
+                  name: '',
+                  email: '',
+                  role: '',
+                  estado: '',
+                  cidade: '',
+                  instituicao: '',
+                };
+
+                this.getList();
+              }).catch(() => {
+                this.$message({
+                  type: 'error',
+                  message: 'Ocorreu um erro ao tentar atualizar o cliente ' + this.newUser.name + ' por favor, tente novamente mais tarde',
+                  duration: 5 * 1000,
+                });
+              }).finally(() => {
+                console.log('fim');
+                this.dialogFormVisible = false;
+              });
           } else {
             this.newUser.roles = [this.newUser.role];
             this.userCreating = true;

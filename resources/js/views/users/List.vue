@@ -52,7 +52,7 @@
       <el-table-column align="center" label="Ações" width="350">
         <template slot-scope="scope">
           <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
-          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id)">
             Editar
           </el-button>
           <!-- </router-link> -->

@@ -46,12 +46,12 @@
       <el-table-column align="center" label="Ações" width="350">
         <template slot-scope="scope">
           <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
-          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email, scope.row.estado, scope.row.cidade, scope.row.instituicao)">
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.university_id, scope.row.plan_id)">
             Editar
           </el-button>
           <!-- </router-link> -->
-          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
-            Papel
+          <el-button type="warning" size="small" icon="el-icon-unlock" @click="handleChangePassword(scope.row.id, scope.row.name);">
+            Alterar Senha
           </el-button>
           <!-- <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Remover
@@ -117,16 +117,20 @@
               <el-option v-for="cidade in citylist" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
             </el-select>
           </el-form-item>
-          <el-form-item label="Instituição" prop="insituicao">
-            <el-select v-model="newUser.instituicao" placeholder="---" class="filter-item">
-              <el-option>---</el-option>
+          <el-form-item label="Instituição" prop="instituicao">
+            <el-select v-model="newUser.instituicao" clearable placeholder="---" class="filter-item">
               <el-option v-for="instituicao in universidades" :key="instituicao.id" :label="instituicao.fantasy_name | uppercaseFirst" :value="instituicao.id" />
             </el-select>
           </el-form-item>
-          <el-form-item label="Senha" prop="password">
+          <el-form-item label="Planos" prop="plano">
+            <el-select v-model="newUser.plano" placeholder="Planos" class="filter-item">
+              <el-option v-for="plano in planos" :key="plano.id" :label="plano.name | uppercaseFirst" :value="plano.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="!newUser.id" label="Senha" prop="password">
             <el-input v-model="newUser.password" show-password />
           </el-form-item>
-          <el-form-item label="Confirmar senha" prop="confirmPassword">
+          <el-form-item v-if="!newUser.id" label="Confirmar senha" prop="confirmPassword">
             <el-input v-model="newUser.confirmPassword" show-password />
           </el-form-item>
         </el-form>
@@ -138,6 +142,22 @@
             {{ botao }}
           </el-button>
         </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="dialogPasswordVisible">
+      <div class="form-container">
+        <el-form ref="passwordForm" :rules="rules" :model="passwordUser" label-position="left" label-width="150px" style="max-width: 500px;">
+          <el-form-item label="Senha" prop="password">
+            <el-input v-model="passwordUser.password" show-password />
+          </el-form-item>
+          <el-form-item label="Confirmar senha" prop="confirmPassword">
+            <el-input v-model="passwordUser.confirmPassword" show-password />
+          </el-form-item>
+          <el-button type="primary" @click="handleSubmitPassword()">
+            {{ botao }}
+          </el-button>
+        </el-form>
       </div>
     </el-dialog>
   </div>
@@ -153,6 +173,7 @@ import checkPermission from '@/utils/permission'; // Permission checking
 import { fetchUniversities } from '@/api/universities';
 import { fetchCities } from '@/api/cities';
 import { fetchStates } from '@/api/states';
+import { fetchPlans } from '@/api/plans';
 // import { getToken } from '@/utils/auth';
 // import axios from 'axios';
 
@@ -181,6 +202,7 @@ export default {
       universidades: [],
       cidades: [],
       estados: [],
+      planos: [],
       query: {
         page: 1,
         limit: 15,
@@ -193,7 +215,9 @@ export default {
       }],
       nonAdminRoles: ['editor'],
       newUser: {},
+      passwordUser: {},
       dialogFormVisible: false,
+      dialogPasswordVisible: false,
       dialogPermissionVisible: false,
       dialogPermissionLoading: false,
       currentUserId: 0,
@@ -211,6 +235,7 @@ export default {
         ],
         estado: [{ required: true, message: 'Estado obrigatório', trigger: 'blur' }],
         cidade: [{ required: true, message: 'Cidade obrigatório', trigger: 'blur' }],
+        plano: [{ required: true, message: 'Planos obrigatório', trigger: 'blur' }],
         password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
         confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
       },
@@ -315,6 +340,7 @@ export default {
     this.getUniversities();
     this.getStates();
     this.getCities();
+    this.getPlans();
     if (checkPermission(['manage permission'])) {
       this.getPermissions();
     }
@@ -355,11 +381,18 @@ export default {
     },
     async getCities() {
       this.listLoading = true;
-      console.log(this.query);
       const { data } = await fetchCities(this.query);
       this.listLoading = false;
       this.cidades = data;
       // console.log(this.cidades);
+    },
+    async getPlans() {
+      this.listLoading = true;
+      console.log(this.query);
+      const { data } = await fetchPlans(this.query);
+      console.log(data);
+      this.listLoading = false;
+      this.planos = data;
     },
     handleFilter() {
       this.query.page = 1;
@@ -367,6 +400,7 @@ export default {
       this.getUniversities();
       this.getStates();
       this.getCities();
+      this.getPlans();
     },
     handleCreate() {
       this.resetNewUser();
@@ -377,10 +411,11 @@ export default {
         this.$refs['userForm'].clearValidate();
       });
     },
-    handleEdit(id, nome, email, estado, cidade, instituicao){
+    handleEdit(id, nome, email, estado, cidade, instituicao, plan_id){
+      // scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.university_id, scope.row.plan_id
       // alert(getToken());
       this.dialogFormVisible = true;
-      this.title = 'Editando o usuário ' + nome;
+      this.title = 'Editando o cliente ' + nome;
       this.botao = 'Editar';
       this.newUser = {
         id: id,
@@ -389,8 +424,18 @@ export default {
         estado: estado,
         cidade: cidade,
         instituicao: instituicao,
+        plano: plan_id,
         role: 'user',
       };
+    },
+    handleChangePassword(id, nome){
+      this.dialogPasswordVisible = true;
+      this.title = 'Alterar senha do cliente ' + nome;
+      this.botao = 'Alterar';
+      // this.passwordUser = {
+
+      // }
+      // alert(id);
     },
     handleDelete(id, name) {
       this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
@@ -431,6 +476,13 @@ export default {
         this.$refs.otherPermissions.setCheckedKeys(this.permissionKeys(this.userOtherPermissions));
       });
     },
+    handleSubmitPassword() {
+      this.$refs['passwordForm'].validate((valid) => {
+        if (valid) {
+          console.log(this.passwordUser);
+        }
+      });
+    },
     handleSubmit() {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
@@ -451,6 +503,7 @@ export default {
                   estado: '',
                   cidade: '',
                   instituicao: '',
+                  plano: '',
                 };
 
                 this.getList();
@@ -498,6 +551,10 @@ export default {
         email: '',
         password: '',
         confirmPassword: '',
+        estado: '',
+        cidade: '',
+        instituicao: '',
+        plano: '',
         role: 'user',
       };
     },

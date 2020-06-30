@@ -21,6 +21,18 @@ const reportsRoutes = {
       name: 'Assinatura/Cancelamento',
       meta: { title: 'SubsOrCancel' },
     },
+    {
+      path: 'hora-acessada',
+      component: () => import('@/views/reports/AcessHour'),
+      name: 'Horários mais acessados',
+      meta: { title: 'AcessHours' },
+    },
+    {
+      path: 'transacoes',
+      component: () => import('@/views/reports/Transactions'),
+      name: 'Transações',
+      meta: { title: 'Transactions' },
+    },
   ],
 };
 

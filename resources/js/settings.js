@@ -4,7 +4,7 @@ export default {
   /**
    * @type {String}
    */
-  title: 'AudioLegs',
+  title: 'Audiolegis',
   theme: variables.theme,
 
   /**

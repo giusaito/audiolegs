@@ -15,3 +15,19 @@ export function fetchSubsOrCancel(query) {
     params: query,
   });
 }
+
+export function fetchAcessHour(query) {
+  return request({
+    url: '/v1/bw/relatorios/hora-acessada',
+    method: 'get',
+    params: query,
+  });
+}
+
+export function fetchTransactions(query) {
+  return request({
+    url: '/v1/bw/relatorios/transacoes',
+    method: 'get',
+    params: query,
+  });
+}

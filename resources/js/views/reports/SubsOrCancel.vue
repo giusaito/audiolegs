@@ -129,7 +129,7 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Leis mais acessadas',
+          filename: 'Assinaturas e cancelamentos',
         });
         this.downloading = false;
       });

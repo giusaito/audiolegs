@@ -10,6 +10,8 @@ export default {
     log_frontend: 'Logs de utilização',
     AcessLaws: 'Leis mais acessadas',
     SubsOrCancel: 'Assinatura/cancelamento',
+    AcessHours: 'Horários mais acessados',
+    Transactions: 'Transações',
     Settings: 'Logs de leis',
     permission: 'Permissões',
     pagePermission: 'Página de permissões',

@@ -55,4 +55,41 @@ class ReportController extends Controller
 
     return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
     }
+    
+    public function acessHour(){
+      $rowsNumber = 10;
+      $data = [];
+
+    for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
+        $row = [
+            'id' => mt_rand(1, 100),
+            'data' => Faker::randomDateTime()->format('d/m/Y'),
+            'hour_acess' => Faker::randomDateTime()->format('h') . ' às ' . Faker::randomDateTime()->format('h') ,
+            'qtd_ass' => mt_rand(10, 2000)
+        ];
+
+        $data[] = $row;
+    }
+
+    return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+    }
+   
+   public function transactions(){
+        $rowsNumber = 10;
+        $data = [];
+        for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
+            $row = [
+                'order_no' => 'aud-' . mt_rand(1000000, 9999999),
+                'price' => mt_rand(30, 250),
+                'name' => Faker::randomString(mt_rand(5, 10)),
+                'date' => Faker::randomDateTime()->format('d/m/Y h:m'),
+                'plan' => Faker::randomInArray(['7 dias grátis', 'Mensal', 'Trimestral', 'Semestral', 'Anual']),
+                'status' => Faker::randomInArray(['Sucesso', 'Pendente', 'Cancelado']),
+            ];
+
+            $data[] = $row;
+        }
+
+        return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+    }
 }

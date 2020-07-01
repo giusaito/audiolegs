@@ -23,18 +23,27 @@
     <el-table v-loading="listLoading" :data="list" style="width: 100%">
       <el-table-column align="center" label="Data">
         <template slot-scope="{row}">
-          <span>{{ row.data }}</span>
+          <span>{{ row.date }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column align="center" label="Assinaturas">
+      <el-table-column align="center" label="Nome">
         <template slot-scope="{row}">
-          <span>{{ row.qtd_ass }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Cancelamentos">
+      <el-table-column align="center" label="E-mail">
         <template slot-scope="{row}">
-          <span>{{ row.qtd_cancel }}</span>
+          <span>{{ row.email }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="Plano">
+        <template slot-scope="{row}">
+          <span>{{ row.plan }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="Status">
+        <template slot-scope="{row}">
+          <span>{{ row.status }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -43,7 +52,7 @@
 </template>
 
 <script>
-import { fetchCancels } from '@/api/reports';
+import { fetchSubscriptions } from '@/api/reports';
 import Pagination from '@/components/Pagination';
 import waves from '@/directive/waves';
 export default {
@@ -123,13 +132,13 @@ export default {
     handleDownload() {
       this.downloading = true;
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Data', 'Assinaturas', 'Cancelamentos'];
-        const filterVal = ['data', 'qtd_ass', 'qtd_cancel'];
+        const tHeader = ['Data', 'Nome', 'E-mail', 'Plano', 'Status'];
+        const filterVal = ['date', 'name', 'email', 'plan', 'status'];
         const data = this.formatJson(filterVal, this.list);
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Assinaturas e cancelamentos',
+          filename: 'Cancelamentos',
         });
         this.downloading = false;
       });
@@ -139,7 +148,7 @@ export default {
     },
     async getLaws() {
       this.listLoading = true;
-      const { data } = await fetchCancels(this.listQuery);
+      const { data } = await fetchSubscriptions(this.listQuery);
       this.total = data.total;
       this.list = data.data;
       this.listLoading = false;

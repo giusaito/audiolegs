@@ -20,28 +20,28 @@
         Exportar
       </el-button>
     </div>
-    <el-table v-loading="listLoading" :data="list" style="width: 100%">
-      <el-table-column align="center" label="Data">
+    <el-table v-loading="listLoading" :data="list" style="width: 100%" :default-sort="{prop: 'name', order: 'descending'}">
+      <el-table-column align="center" label="Data" prop="data" sortable>
         <template slot-scope="{row}">
           <span>{{ row.date }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Nome">
+      <el-table-column align="center" label="Nome" prop="name" sortable>
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="E-mail">
+      <el-table-column align="center" label="E-mail" prop="email" sortable>
         <template slot-scope="{row}">
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Plano">
+      <el-table-column align="center" label="Plano" prop="plan" sortable>
         <template slot-scope="{row}">
           <span>{{ row.plan }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Status">
+      <el-table-column align="center" label="Status" prop="status" sortable>
         <template slot-scope="{row}">
           <span>{{ row.status }}</span>
         </template>
@@ -132,8 +132,8 @@ export default {
     handleDownload() {
       this.downloading = true;
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Data', 'Nome', 'E-mail'];
-        const filterVal = ['data', 'name', 'email'];
+        const tHeader = ['Data', 'Nome', 'E-mail', 'Plano', 'Status'];
+        const filterVal = ['date', 'name', 'email', 'plan', 'status'];
         const data = this.formatJson(filterVal, this.list);
         excel.export_json_to_excel({
           header: tHeader,

@@ -20,19 +20,19 @@
         Exportar
       </el-button>
     </div>
-    <el-table v-loading="listLoading" :data="list" style="width: 100%">
-      <el-table-column align="center" label="Data">
+    <el-table v-loading="listLoading" :data="list" style="width: 100%" :default-sort="{prop: 'data', order: 'descending'}">
+      <el-table-column align="center" label="Data" prop="data" sortable>
         <template slot-scope="{row}">
           <span>{{ row.data }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Horário mais acessado">
+      <el-table-column align="center" label="Horário mais acessado" prop="hour_acess" sortable>
         <template slot-scope="{row}">
           <span>{{ row.hour_acess }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Quantidade de acessos">
+      <el-table-column align="center" label="Quantidade de acessos" prop="qtd_ss" sortable>
         <template slot-scope="{row}">
           <span>{{ row.qtd_ass }}</span>
         </template>

@@ -35,7 +35,7 @@ class ReportController extends Controller
         $data[] = $row;
     }
 
-    return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+    return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
 
     public function subsOrCancel(){
@@ -53,7 +53,7 @@ class ReportController extends Controller
         $data[] = $row;
     }
 
-    return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+    return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
     
     public function acessHour(){
@@ -71,26 +71,52 @@ class ReportController extends Controller
         $data[] = $row;
     }
 
-    return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+    return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
    
    public function transactions(){
+    $names = [
+        'Helena Domingues',
+        'Miguel Santos',
+        'Alice Rodrigues',
+        'Arthur Pereira',
+        'Laura Oliveira',
+        'Heitor Marques',
+        'Manuela Pereira',
+        'Bernardo Nascimento',
+        'Valentina Saito',
+        'Davi Sousa',
+        'Sophia Reis',
+        'Théo Reis do Nascimento',
+        'Isabella Domingues de Oliveira',
+        'Lorenzo Joaquim',
+        'Heloísa Guilherme',
+        'Gabriel Domingues',
+        'Luiza Benício',
+        'Pedro Lucca',
+        'Júlia Gabriel',
+        'Benjamin Henrique',
+        'Lorena Henrique',
+        'Matheus Henrique',
+        'Lívia Henrique',
+        'Lucas Vicente',
+        ];
         $rowsNumber = 10;
         $data = [];
         for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
             $row = [
                 'order_no' => 'aud-' . mt_rand(1000000, 9999999),
                 'price' => mt_rand(30, 250),
-                'name' => Faker::randomString(mt_rand(5, 10)),
+                'name' => $names[array_rand($names)],
                 'date' => Faker::randomDateTime()->format('d/m/Y h:m'),
                 'plan' => Faker::randomInArray(['7 dias grátis', 'Mensal', 'Trimestral', 'Semestral', 'Anual']),
-                'status' => Faker::randomInArray(['Sucesso', 'Pendente', 'Cancelado']),
+                'status' => Faker::randomInArray(['Sucesso', 'Pendente', 'Cancelado', 'Estorno']),
             ];
 
             $data[] = $row;
         }
 
-        return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+        return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
   
     public function subscription(){
@@ -121,37 +147,39 @@ class ReportController extends Controller
         'Lucas Vicente',
         ];
         $emails = [
-        'Helena@Domingues',
-        'Miguel@Santos',
-        'Alice@Rodrigues',
-        'Arthur@Pereira',
-        'Laura@Oliveira',
-        'Heitor@Marques',
-        'Manuela@Pereira',
-        'Bernardo@Nascimento',
-        'Valentina@Saito',
-        'Davi@Sousa',
-        'Sophia@Reis',
-        'Théo@Reis@do@Nascimento',
-        'Isabella@Domingues@de@Oliveira',
-        'Lorenzo@Joaquim',
-        'Heloísa@Guilherme',
-        'Gabriel@Domingues',
-        'Luiza@Benício',
-        'Pedro@Lucca',
-        'Júlia@Gabriel',
-        'Benjamin@Henrique',
-        'Lorena@Henrique',
-        'Matheus@Henrique',
-        'Lívia@Henrique',
-        'Lucas@Vicente'];
+            'grant.geo@yahoo.com',
+            'robert.jerde@yahoo.com',
+            'brakus.jany@hotmail.com',
+            'brussel@hotmail.com',
+            'hegmann.twila@medhurst.com',
+            'trinity69@gmail.com',
+            'ilene.armstrong@yahoo.com',
+            'raoul10@gmail.com',
+            'pgerhold@king.com',
+            'abigail22@yahoo.com',
+            'fiona30@pouros.com',
+            'reanna.cole@little.com',
+            'collins.lionel@gmail.com',
+            'hosea08@yahoo.com',
+            'owisozk@wolff.biz',
+            'uriel24@hagenes.com',
+            'cdibbert@gislason.com',
+            'lincoln79@stamm.com',
+            'wilton.huels@jones.info',
+            'domenic.shanahan@runolfsson.com',
+            'elisabeth.hickle@gmail.com',
+            'marcellus17@nolan.com',
+            'koepp.name@hotmail.com',
+            'sebert@yahoo.com',
+            'hgleason@gmail.com'
+        ];
 
         $rowsNumber = 10;
         $data = [];
         for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
             $row = [
                 'name' => $names[array_rand($names)],
-                'email' => strtolower($emails[array_rand($emails)] . '.com.br'),
+                'email' => $emails[array_rand($emails)],
                 'date' => Faker::randomDateTime()->format('d/m/Y h:m'),
                 'plan' => Faker::randomInArray(['7 dias grátis', 'Mensal', 'Trimestral', 'Semestral', 'Anual']),
                 'status' => 'Sucesso'
@@ -160,6 +188,78 @@ class ReportController extends Controller
             $data[] = $row;
         }
 
-        return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+        return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
+    public function cancel(){
+        $names = [
+        'Helena Domingues',
+        'Miguel Santos',
+        'Alice Rodrigues',
+        'Arthur Pereira',
+        'Laura Oliveira',
+        'Heitor Marques',
+        'Manuela Pereira',
+        'Bernardo Nascimento',
+        'Valentina Saito',
+        'Davi Sousa',
+        'Sophia Reis',
+        'Théo Reis do Nascimento',
+        'Isabella Domingues de Oliveira',
+        'Lorenzo Joaquim',
+        'Heloísa Guilherme',
+        'Gabriel Domingues',
+        'Luiza Benício',
+        'Pedro Lucca',
+        'Júlia Gabriel',
+        'Benjamin Henrique',
+        'Lorena Henrique',
+        'Matheus Henrique',
+        'Lívia Henrique',
+        'Lucas Vicente',
+        ];
+        $emails = [
+            'grant.geo@yahoo.com',
+            'robert.jerde@yahoo.com',
+            'brakus.jany@hotmail.com',
+            'brussel@hotmail.com',
+            'hegmann.twila@medhurst.com',
+            'trinity69@gmail.com',
+            'ilene.armstrong@yahoo.com',
+            'raoul10@gmail.com',
+            'pgerhold@king.com',
+            'abigail22@yahoo.com',
+            'fiona30@pouros.com',
+            'reanna.cole@little.com',
+            'collins.lionel@gmail.com',
+            'hosea08@yahoo.com',
+            'owisozk@wolff.biz',
+            'uriel24@hagenes.com',
+            'cdibbert@gislason.com',
+            'lincoln79@stamm.com',
+            'wilton.huels@jones.info',
+            'domenic.shanahan@runolfsson.com',
+            'elisabeth.hickle@gmail.com',
+            'marcellus17@nolan.com',
+            'koepp.name@hotmail.com',
+            'sebert@yahoo.com',
+            'hgleason@gmail.com'
+        ];
+
+        $rowsNumber = 10;
+        $data = [];
+        for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
+            $row = [
+                'name' => $names[array_rand($names)],
+                'email' => $emails[array_rand($emails)],
+                'date' => Faker::randomDateTime()->format('d/m/Y h:m'),
+                'plan' => Faker::randomInArray(['7 dias grátis', 'Mensal', 'Trimestral', 'Semestral', 'Anual']),
+                'status' => 'Sucesso'
+            ];
+
+            $data[] = $row;
+        }
+
+        return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
+    }
+
 }

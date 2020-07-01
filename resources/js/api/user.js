@@ -8,14 +8,14 @@ class UserResource extends Resource {
 
   permissions(id) {
     return request({
-      url: '/' + this.uri + '/' + id + '/permissions',
+      url: '/v1/bw/' + this.uri + '/' + id + '/permissions',
       method: 'get',
     });
   }
 
   updatePermission(id, permissions) {
     return request({
-      url: '/' + this.uri + '/' + id + '/permissions',
+      url: '/v1/bw/' + this.uri + '/' + id + '/permissions',
       method: 'put',
       data: permissions,
     });

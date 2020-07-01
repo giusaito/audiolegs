@@ -92,4 +92,74 @@ class ReportController extends Controller
 
         return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
     }
+  
+    public function subscription(){
+        $names = [
+        'Helena Domingues',
+        'Miguel Santos',
+        'Alice Rodrigues',
+        'Arthur Pereira',
+        'Laura Oliveira',
+        'Heitor Marques',
+        'Manuela Pereira',
+        'Bernardo Nascimento',
+        'Valentina Saito',
+        'Davi Sousa',
+        'Sophia Reis',
+        'Théo Reis do Nascimento',
+        'Isabella Domingues de Oliveira',
+        'Lorenzo Joaquim',
+        'Heloísa Guilherme',
+        'Gabriel Domingues',
+        'Luiza Benício',
+        'Pedro Lucca',
+        'Júlia Gabriel',
+        'Benjamin Henrique',
+        'Lorena Henrique',
+        'Matheus Henrique',
+        'Lívia Henrique',
+        'Lucas Vicente',
+        ];
+        $emails = [
+        'Helena@Domingues',
+        'Miguel@Santos',
+        'Alice@Rodrigues',
+        'Arthur@Pereira',
+        'Laura@Oliveira',
+        'Heitor@Marques',
+        'Manuela@Pereira',
+        'Bernardo@Nascimento',
+        'Valentina@Saito',
+        'Davi@Sousa',
+        'Sophia@Reis',
+        'Théo@Reis@do@Nascimento',
+        'Isabella@Domingues@de@Oliveira',
+        'Lorenzo@Joaquim',
+        'Heloísa@Guilherme',
+        'Gabriel@Domingues',
+        'Luiza@Benício',
+        'Pedro@Lucca',
+        'Júlia@Gabriel',
+        'Benjamin@Henrique',
+        'Lorena@Henrique',
+        'Matheus@Henrique',
+        'Lívia@Henrique',
+        'Lucas@Vicente'];
+
+        $rowsNumber = 10;
+        $data = [];
+        for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
+            $row = [
+                'name' => $names[array_rand($names)],
+                'email' => strtolower($emails[array_rand($emails)] . '.com.br'),
+                'date' => Faker::randomDateTime()->format('d/m/Y h:m'),
+                'plan' => Faker::randomInArray(['7 dias grátis', 'Mensal', 'Trimestral', 'Semestral', 'Anual']),
+                'status' => 'Sucesso'
+            ];
+
+            $data[] = $row;
+        }
+
+        return response()->json(new JsonResponse(['data' => $data, 'total' => mt_rand(1, 100)]));
+    }
 }

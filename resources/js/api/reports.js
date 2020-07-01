@@ -31,3 +31,19 @@ export function fetchTransactions(query) {
     params: query,
   });
 }
+
+export function fetchSubscriptions(query) {
+  return request({
+    url: '/v1/bw/relatorios/assinaturas',
+    method: 'get',
+    params: query,
+  });
+}
+
+export function fetchCancels(query) {
+  return request({
+    url: '/v1/bw/relatorios/cancelamento',
+    method: 'get',
+    params: query,
+  });
+}

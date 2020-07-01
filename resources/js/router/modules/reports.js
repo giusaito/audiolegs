@@ -22,6 +22,18 @@ const reportsRoutes = {
       meta: { title: 'SubsOrCancel' },
     },
     {
+      path: 'assinaturas',
+      component: () => import('@/views/reports/Subscriptions'),
+      name: 'Assinaturas',
+      meta: { title: 'Subscriptions' },
+    },
+    {
+      path: 'cancelamento',
+      component: () => import('@/views/reports/Cancels'),
+      name: 'Cancelamentos',
+      meta: { title: 'PlanCancels' },
+    },
+    {
       path: 'hora-acessada',
       component: () => import('@/views/reports/AcessHour'),
       name: 'Horários mais acessados',

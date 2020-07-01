@@ -43,7 +43,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Ações" width="350">
+      <el-table-column align="center" label="Ações" width="450">
         <template slot-scope="scope">
           <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
           <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.university_id, scope.row.plan_id)">
@@ -56,13 +56,16 @@
           <!-- <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Remover
           </el-button> -->
+          <el-button v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+            Remover
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
 
-    <el-dialog :visible.sync="dialogPermissionVisible" :title="'Edit Permissions - ' + currentUser.name">
+    <el-dialog :visible.sync="dialogPermissionVisible" :title="'Editar Permissões - ' + currentUser.name">
       <div v-if="currentUser.name" v-loading="dialogPermissionLoading" class="form-container">
         <div class="permissions-container">
           <div class="block">
@@ -74,7 +77,7 @@
           </div>
           <div class="block">
             <el-form :model="currentUser" label-width="80px" label-position="top">
-              <el-form-item label="Permissions">
+              <el-form-item label="Permissões">
                 <el-tree ref="otherPermissions" :data="normalizedOtherPermissions" :default-checked-keys="permissionKeys(userOtherPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
               </el-form-item>
             </el-form>
@@ -147,7 +150,7 @@
 
     <el-dialog :title="title" :visible.sync="dialogPasswordVisible">
       <div class="form-container">
-        <el-form ref="passwordForm" :rules="rules" :model="passwordUser" label-position="left" label-width="150px" style="max-width: 500px;">
+        <el-form ref="passwordForm" :rules="rules2" :model="passwordUser" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item label="Senha" prop="password">
             <el-input v-model="passwordUser.password" show-password />
           </el-form-item>
@@ -187,6 +190,13 @@ export default {
   data() {
     var validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.newUser.password) {
+        callback(new Error('As senhas não combinam'));
+      } else {
+        callback();
+      }
+    };
+    var validateConfirmPassword2 = (rule, value, callback) => {
+      if (value !== this.passwordUser.password) {
         callback(new Error('As senhas não combinam'));
       } else {
         callback();
@@ -238,6 +248,10 @@ export default {
         plano: [{ required: true, message: 'Planos obrigatório', trigger: 'blur' }],
         password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
         confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
+      },
+      rules2: {
+        password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
+        confirmPassword: [{ validator: validateConfirmPassword2, trigger: 'blur' }],
       },
       permissionProps: {
         children: 'children',
@@ -432,10 +446,11 @@ export default {
       this.dialogPasswordVisible = true;
       this.title = 'Alterar senha do cliente ' + nome;
       this.botao = 'Alterar';
-      // this.passwordUser = {
-
-      // }
-      // alert(id);
+      this.passwordUser = {
+        id: id,
+        name: nome,
+      };
+      console.log(this.passwordUser);
     },
     handleDelete(id, name) {
       this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
@@ -479,7 +494,31 @@ export default {
     handleSubmitPassword() {
       this.$refs['passwordForm'].validate((valid) => {
         if (valid) {
-          console.log(this.passwordUser);
+          // console.log(this.passwordUser);
+          clienteResource
+            .updatePassword(this.passwordUser.id, this.passwordUser).then(response => {
+              this.$message({
+                type: 'success',
+                message: 'A senha do cliente ' + this.passwordUser.name + ' foi atualizado com sucesso',
+                duration: 5 * 1000,
+              });
+              this.passwordUser = {
+                id: '',
+                name: '',
+                password: '',
+              };
+
+              this.getList();
+            }).catch(() => {
+              this.$message({
+                type: 'error',
+                message: 'Ocorreu um erro ao tentar atualizar o cliente ' + this.newUser.name + ' por favor, tente novamente mais tarde',
+                duration: 5 * 1000,
+              });
+            }).finally(() => {
+              console.log('fim');
+              this.dialogFormVisible = false;
+            });
         }
       });
     },

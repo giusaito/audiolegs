@@ -23,6 +23,8 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('users/{user}', 'UserController@show')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::post('users', 'UserController@store');
     Route::get('user/profile/edit/', 'UserController@edit');
+    
+    Route::put('users/{user}/password', 'UserController@updatepass');
     Route::put('users/{user}', 'UserController@update');
     Route::delete('users/{user}', 'UserController@destroy')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::get('users/{user}/permissions', 'UserController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
@@ -39,6 +41,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('clientes/{user}', 'UserController@show')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::post('clientes', 'UserController@store');
     Route::get('cliente/profile/edit/', 'UserController@edit');
+    Route::put('clientes/{user}/password', 'UserController@updatepass');
     Route::put('clientes/{user}', 'UserController@update');
     Route::delete('clientes/{user}', 'UserController@destroy')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::get('clientes/{user}/permissions', 'UserController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);

@@ -8,6 +8,8 @@ export default {
     coupons: 'Cupons',
     log_util: 'Logs administrativo',
     log_frontend: 'Logs de utilização',
+    Subscriptions: 'Assinaturas',
+    PlanCancels: 'Cancelamentos',
     AcessLaws: 'Leis mais acessadas',
     SubsOrCancel: 'Assinatura/cancelamento',
     AcessHours: 'Horários mais acessados',

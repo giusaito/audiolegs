@@ -41,6 +41,8 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     {
       Route::get('leis-acessadas', 'ReportController@reportLaws')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
       Route::get('assinaturas-cancelamentos', 'ReportController@subsOrCancel')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+      Route::get('assinaturas', 'ReportController@subscription')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+      Route::get('cancelamento', 'ReportController@cancel')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
       Route::get('hora-acessada', 'ReportController@acessHour')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
       Route::get('transacoes', 'ReportController@transactions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });

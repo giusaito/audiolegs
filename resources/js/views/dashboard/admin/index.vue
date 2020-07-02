@@ -5,7 +5,7 @@
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
     <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-      <p class="text-center">Usuário/Assinatura</p>
+      <p class="text-center">Assinatura / Cancelamento</p>
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
@@ -19,13 +19,18 @@
         <div class="chart-wrapper">
           <p class="text-center">5 leis mais acessadas</p>
           <pie-chart />
-          <small class="right">Ver todos</small>
+          <router-link :to="'/relatorios/leis-mais-acessadas'" class="bw-btn bw-btn-all">
+            Veja mais
+          </router-link>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <p class="text-center">Leis mais acessadas</p>
+          <p class="text-center">Usuários ativos em cada plano</p>
           <bar-chart />
+          <router-link :to="'/relatorios/planos-usuarios'" class="bw-btn bw-btn-all">
+            Veja mais
+          </router-link>
         </div>
       </el-col>
     </el-row>
@@ -34,7 +39,10 @@
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <p class="text-center">Horário mais acessado do dia</p>
-          <hourChat />
+          <PieChartHour />
+          <router-link :to="'/relatorios/hora-acessada'" class="bw-btn bw-btn-all">
+            Veja mais
+          </router-link>
         </div>
       </el-col>
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
@@ -57,7 +65,7 @@ import LineChart from './components/LineChart';
 // import RaddarChart from './components/RaddarChart';
 import PieChart from './components/PieChart';
 import BarChart from './components/BarChart';
-import HourChat from './components/HourAccessBarChart';
+import PieChartHour from './components/PieChartHourAcess';
 import TransactionTable from './components/TransactionTable';
 // import TodoList from './components/TodoList';
 // import BoxCard from './components/BoxCard';
@@ -90,7 +98,7 @@ export default {
     // RaddarChart,
     PieChart,
     BarChart,
-    HourChat,
+    PieChartHour,
     TransactionTable,
     // TodoList,
     // BoxCard,
@@ -120,5 +128,30 @@ export default {
 }
 .text-center {
   text-align: center !important;
+}
+.bw-btn {
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #FFFFFF;
+  border: 1px solid #DCDFE6;
+  border-color: #DCDFE6;
+  color: #606266;
+  -webkit-appearance: none;
+  text-align: center;
+  box-sizing: border-box;
+  outline: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  padding: 3px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.bw-btn-all {
+  color: #FFFFFF !important;
+  background-color: #dbb200 !important;
+  border-color: #dbb200 !important;
 }
 </style>

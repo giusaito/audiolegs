@@ -21,7 +21,6 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Validator;
 
 /**
@@ -61,7 +60,7 @@ class UserController extends Controller
 
         if (!empty($keyword)) {
             $userQuery->where('name', 'LIKE', '%' . $keyword . '%');
-            $userQuery->orWhere('email', 'LIKE', '%' . $keyword . '%');
+            $userQuery->where('email', 'LIKE', '%' . $keyword . '%');
         }
 
         if (!empty($university)) {
@@ -98,6 +97,7 @@ class UserController extends Controller
         $userQuery->whereHas('roles', function($q) {
           $q->whereNotIn('id',[1,2,3]);
         });
+        // dd($userQuery);
 
         if (!empty($role)) {
             $userQuery->whereHas('roles', function($q) use ($role) { $q->where('name', $role); });
@@ -105,7 +105,7 @@ class UserController extends Controller
 
         if (!empty($keyword)) {
             $userQuery->where('name', 'LIKE', '%' . $keyword . '%');
-            $userQuery->orWhere('email', 'LIKE', '%' . $keyword . '%');
+            $userQuery->where('email', 'LIKE', '%' . $keyword . '%');
         }
 
         if (!empty($university)) {
@@ -120,7 +120,7 @@ class UserController extends Controller
             $userQuery->where('city_id', $city);
         }
 
-        return UserResource::collection($userQuery->orderBy('id', 'DESC')->paginate($limit));
+        return UserResource::collection($userQuery->paginate($limit));
     }
 
     /**
@@ -131,88 +131,32 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $params = $request->all();
-        if($params['role'] == 'user'){
-            $validator =  $validator = Validator::make($request->all(), [
-                'name'                 => 'required|min:3',
-                'email'                => 'required|email|unique:users|min:3|max:60',
-                'estado'               => 'required',
-                'cidade'               => 'required',
-                'plano'                => 'required',
-                'password'             => 'required|min:6',
-                'confirmPassword'      => 'same:password',
-            ],
-            [
-                'name.required' => 'Por favor, preencha com o nome do usuário',
-                'name.min' => 'O nome do usuário deve ter no mínimo 3 caracteres',
-                'email.required' => 'Por favor, preencha com o email do usuário',
-                'email.email' => 'E-mail inválido',
-                'email.unique' => 'E-mail já em uso por outro usuário',
-                'email.min' => 'O email deve ter no mínimo 3 caracteres',
-                'email.max' => 'O email deve ter no máximo 60 caracteres',
-                'estado.required' => 'Por favor, selecione o estado do usuário',
-                'cidade.required' => 'Por favor, selecione a cidade do usuário',
-                'plano' => 'Por favor, selecione o plano do usuário',
-                'password.required' => 'Por favor, preencha com a senha',
-                'password.min' => 'A senha deve ter no mínimo 6 caracteres',
-                'password.same' => 'As senhas não coincidem',
-            ]);
-        } else {
-            $validator =  $validator = Validator::make($request->all(), [
-                'name'                 => 'required|min:3',
-                'email'                => 'required|email|unique:users|min:3|max:60',
-                'estado'               => 'required',
-                'cidade'               => 'required',
-                'password'             => 'required|min:6',
-                'confirmPassword'      => 'same:password',
-            ],
-            [
-                'name.required' => 'Por favor, preencha com o nome do usuário',
-                'name.min' => 'O nome do usuário deve ter no mínimo 3 caracteres',
-                'email.required' => 'Por favor, preencha com o email do usuário',
-                'email.email' => 'E-mail inválido',
-                'email.unique' => 'E-mail já em uso por outro usuário',
-                'email.min' => 'O email deve ter no mínimo 3 caracteres',
-                'email.max' => 'O email deve ter no máximo 60 caracteres',
-                'estado.required' => 'Por favor, selecione o estado do usuário',
-                'cidade.required' => 'Por favor, selecione a cidade do usuário',
-                'password.required' => 'Por favor, preencha com a senha',
-                'password.min' => 'A senha deve ter no mínimo 6 caracteres',
-                'password.same' => 'As senhas não coincidem',
-            ]);
-        }
+        $validator = Validator::make(
+            $request->all(),
+            array_merge(
+                $this->getValidationRules(),
+                [
+                    'password' => ['required', 'min:6'],
+                    'confirmPassword' => 'same:password',
+                ]
+            )
+        );
+
         if ($validator->fails()) {
-            return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar o Usuário! Por favor, verifique os campos e tente novamente'], 403);
+            return response()->json(['errors' => $validator->errors()], 403);
         } else {
             $params = $request->all();
-            if($params['role'] == 'user'){
-                $user = User::create([
-                    'name'            => $params['name'],
-                    'email'           => $params['email'],
-                    'university_id'   => $params['instituicao'],
-                    'state_id'        => $params['estado'],
-                    'city_id'         => $params['cidade'],
-                    'plan_id'         => $params['plano'],
-                    'password'        => Hash::make($params['password']),
-                ]);
-            }else {
-                $user = User::create([
-                    'name'            => $params['name'],
-                    'email'           => $params['email'],
-                    'state_id'        => $params['estado'],
-                    'city_id'         => $params['cidade'],
-                    'password'        => Hash::make($params['password']),
-                ]);
-            }
+            $user = User::create([
+                'name' => $params['name'],
+                'email' => $params['email'],
+                'universidade_id' => 1,
+                'state_id' => 18,
+                'city_id' => 3994,
+                'password' => Hash::make($params['password']),
+            ]);
             $role = Role::findByName($params['role']);
             $user->syncRoles($role);
-            $exists = \Storage::disk('local')->exists('storage_users.txt');
-            if($exists){
-                $contents = \Storage::disk('local')->get('storage_users.txt');
-                $file = Storage::put( 'storage_users.txt', $contents."\n".'name: '.$params['name'].' | email: '.$params['email'].' | cidade: '.$params['cidade'].'/'.$params['estado'].' | senha: '.$params['password']);
-            }else {
-                $file = Storage::put( 'storage_users.txt', 'name: '.$params['name'].' | email: '.$params['email'].' | cidade: '.$params['cidade'].'/'.$params['estado'].' | senha: '.$params['password']);
-            }
+
             return new UserResource($user);
         }
     }
@@ -245,96 +189,65 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $params = $request->all();
-        if($params['role'] == 'user'){
-            $validator =  $validator = Validator::make($request->all(), [
-                'name'                 => 'required|min:3',
-                'email'                => 'required|email|unique:users',
-                'email'                => 'required|min:3|max:60|email|unique:users,email,'.$user->id,
-                'estado'               => 'required',
-                'cidade'               => 'required',
-                'plano'                => 'required',
-            ],
-            [
-                'name.required' => 'Por favor, preencha com o nome do usuário',
-                'name.min' => 'O nome do usuário deve ter no mínimo 3 caracteres',
-                'email.required' => 'Por favor, preencha com o email do usuário',
-                'email.email' => 'E-mail inválido',
-                'email.unique' => 'E-mail já em uso por outro usuário',
-                'email.min' => 'O email deve ter no mínimo 3 caracteres',
-                'email.max' => 'O email deve ter no máximo 60 caracteres',
-                'estado.required' => 'Por favor, selecione o estado do usuário',
-                'cidade.required' => 'Por favor, selecione a cidade do usuário',
-                'plano' => 'Por favor, selecione o plano do usuário',
-                'password.required' => 'Por favor, preencha com a senha',
-                'password.min' => 'A senha deve ter no mínimo 6 caracteres',
-                'password.same' => 'As senhas não coincidem',
-            ]);
-        }else {
-            $validator =  $validator = Validator::make($request->all(), [
-                'name'                 => 'required|min:3',
-                'email'                => 'required|email|unique:users',
-                'email'                => 'required|min:3|max:60|email|unique:users,email,'.$user->id,
-                'estado'               => 'required',
-                'cidade'               => 'required',
-            ],
-            [
-                'name.required' => 'Por favor, preencha com o nome do usuário',
-                'name.min' => 'O nome do usuário deve ter no mínimo 3 caracteres',
-                'email.required' => 'Por favor, preencha com o email do usuário',
-                'email.email' => 'E-mail inválido',
-                'email.unique' => 'E-mail já em uso por outro usuário',
-                'email.min' => 'O email deve ter no mínimo 3 caracteres',
-                'email.max' => 'O email deve ter no máximo 60 caracteres',
-                'estado.required' => 'Por favor, selecione o estado do usuário',
-                'cidade.required' => 'Por favor, selecione a cidade do usuário',
-                'password.required' => 'Por favor, preencha com a senha',
-                'password.min' => 'A senha deve ter no mínimo 6 caracteres',
-                'password.same' => 'As senhas não coincidem',
-            ]);
-        }
-        if ($validator->fails()) {
-            return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar o Usuário! Por favor, verifique os campos e tente novamente'], 403);
-        } else {
-            if($params['role'] == 'user'){
-                $user = User::findOrFail($user->id);
-                $user->name            = $params['name'];
-                $user->email           = $params['email'];
-                $user->state_id        = $params['estado'];
-                $user->city_id         = $params['cidade'];
-                $user->plan_id         = $params['plano'];
-            }else {
-                $user = User::findOrFail($user->id);
-                $user->name            = $params['name'];
-                $user->email           = $params['email'];
-                $user->state_id        = $params['estado'];
-                $user->city_id         = $params['cidade'];
-                $role = Role::findByName($params['role']);
-                $user->syncRoles($role);
-            }
-            $user->save();
-        }
-    }
 
-    public function updatepass(Request $request, User $user)
-    {
-        $validator =  $validator = Validator::make($request->all(), [
-            'password'             => 'required|min:6',
-            'confirmPassword'      => 'same:password',
-        ],
-        [
-            'password.required' => 'Por favor, preencha com a senha',
-            'password.min' => 'A senha deve ter no mínimo 6 caracteres',
-            'password.same' => 'As senhas não coincidem',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar o Usuário! Por favor, verifique os campos e tente novamente'], 403);
-        } else {
-            $params = $request->all();
-            $user = User::findOrFail($user->id);
-            $user->password = Hash::make($params['password']);
-            $user->save();
-        }
+        // dd($request['user']);
+        $id = Auth::user()->id;
+        $user = User::with(['userProfile'])->findOrFail($id);
+        $user->update($request->all());
+
+
+        $user->userProfile()->update([
+            'nickname' => $request['user_profile']['nickname'],
+            'cep' => $request['user_profile']['cep'],
+            'address' => $request['user_profile']['address'],
+            'number_address' => $request['user_profile']['number_address'],
+            'cpf' => $request['user_profile']['cpf'],
+            'rg' => $request['user_profile']['rg'],
+            'whatsapp' => $request['user_profile']['whatsapp'],
+            'telephone' => $request['user_profile']['telephone'],
+            'path' => $request['user_profile']['path'],
+            'photo' => $request['user_profile']['photo'],
+            'biography' => $request['user_profile']['biography'],
+            'linkedin' => $request['user_profile']['linkedin'],
+            'facebook' => $request['user_profile']['facebook'],
+            'instagram' => $request['user_profile']['instagram'],
+            'twitter' => $request['user_profile']['twitter'],
+            'youtube' => $request['user_profile']['youtube']
+            ]
+       );
+
+
+        // // dd($request->all());
+        // if ($user === null) {
+        //     return response()->json(['error' => 'User not found'], 404);
+        // }
+        // if ($user->isAdmin()) {
+        //     return response()->json(['error' => 'Admin can not be modified'], 403);
+        // }
+
+        // $currentUser = Auth::user();
+        // if (!$currentUser->isAdmin()
+        //     && $currentUser->id !== $user->id
+        //     && !$currentUser->hasPermission(\App\Laravue\Acl::PERMISSION_USER_MANAGE)
+        // ) {
+        //     return response()->json(['error' => 'Permission denied'], 403);
+        // }
+
+        // $validator = Validator::make($request->all(), $this->getValidationRules(false));
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => $validator->errors()], 403);
+        // } else {
+        //     $email = $request->get('email');
+        //     $found = User::where('email', $email)->first();
+        //     if ($found && $found->id !== $user->id) {
+        //         return response()->json(['error' => 'Email has been taken'], 403);
+        //     }
+
+        //     $user->name = $request->get('name');
+        //     $user->email = $email;
+        //     $user->save();
+        //     return new UserResource($user);
+        // }
     }
 
     /**
@@ -424,15 +337,18 @@ class UserController extends Controller
         ];
     }
 
-    public function userImport(Request $request){
-        $coluna1 = $request[0]['column'];
-        $coluna2 = $request[1]['column'];
-        $coluna3 = $request[2]['column'];
+      public function userImport(Request $request){
+        $coluna1 = $request[1]['column'];
+        $coluna2 = $request[2]['column'];
+        $coluna3 = $request[3]['column'];
         $coluna4 = "password";
-        $data1 = $request[0]['data'];
-        $data2 = $request[1]['data'];
-        $data3 = $request[2]['data'];
+        $coluna5 = 'plan_id';
+
+        $data1 = $request[1]['data'];
+        $data2 = $request[2]['data'];
+        $data3 = $request[3]['data'];
         $data4 = Hash::make('AUDIOLEGIS');
+        $data5 = $request[0]['plan_id'];
 
         $field = [];
 
@@ -442,11 +358,12 @@ class UserController extends Controller
           $field[$key][$coluna2] = $data2[$key];
           $field[$key][$coluna3] = $data3[$key];
           $field[$key][$coluna4] = $data4;
+          $field[$key][$coluna5] = $data5;
           $i++;
         }
 
       $ignoreEmpty = array_map('array_filter', $field);
-      $users = User::insertOrIgnore($ignoreEmpty);
+      $users = User::insertGetId($ignoreEmpty);
 
       return response()->json($users . ' cadastrados no banco');
     }

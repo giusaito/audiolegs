@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="320" src="https://i.imgur.com/wCrPYUQ.png">
+  <img width="350" src="https://i.imgur.com/byxpeGg.png">
 </p>
 <p align="center">
   <a href="https://laravel.com">

@@ -103,16 +103,16 @@ export default {
           },
         },
         legend: {
-          data: ['Usuário', 'Assinatura'],
+          data: ['Assinatura', 'Cancelamento'],
         },
         series: [
           {
-            name: 'Usuário',
+            name: 'Assinatura',
             itemStyle: {
               normal: {
-                color: '#FF005A',
+                color: '#3888fa',
                 lineStyle: {
-                  color: '#FF005A',
+                  color: '#3888fa',
                   width: 2,
                 },
               },
@@ -124,14 +124,14 @@ export default {
             animationEasing: 'cubicInOut',
           },
           {
-            name: 'Assinatura',
+            name: 'Cancelamento',
             smooth: true,
             type: 'line',
             itemStyle: {
               normal: {
-                color: '#3888fa',
+                color: '#FF005A',
                 lineStyle: {
-                  color: '#3888fa',
+                  color: '#FF005A',
                   width: 2,
                 },
                 areaStyle: {

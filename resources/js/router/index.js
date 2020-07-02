@@ -23,6 +23,7 @@ import adminRoutes from './modules/admin';
 // import excelRoutes from './modules/excel';
 // import permissionRoutes from './modules/permission';
 import plansRoutes from './modules/plans';
+import reportsRoutes from './modules/reports';
 
 /**
  * Sub-menu only appear when children.length>=1
@@ -130,6 +131,7 @@ export const constantRoutes = [
     }],
   },
   plansRoutes,
+  reportsRoutes,
   {
     path: '/atividades/logs',
     component: Layout,

@@ -1,22 +1,22 @@
 <template>
-  <div class="app-container">
+  <div v-loading.fullscreen.lock="fullscreenLoading" class="app-container">
     <div class="plans-choose">
       <h2 class="step"><small>1</small> Escolha o Plano:</h2>
       <div class="plans">
-        <div v-for="plano in planos" :key="plano.id" v-loading="listLoading" class="box-plan el-card box-card is-always-shadow" :plano="plano.id">
+        <div v-for="plano in planos" :key="plano.id" class="box-plan el-card box-card is-always-shadow" :plano="plano.id">
           <div class="el-card__header">{{ plano.name }}</div>
           <div class="el-card__body">
             <el-switch
               v-model="planos[planChoose(planos, plano.id)].value"
               active-color="#13ce66"
-              :disabled="disabledPlan"
+              :disabled="plano.id == idActivePlan ? false : disabledPlan"
               @change="activePlan(planos, plano.id)"
             />
           </div>
         </div>
       </div>
     </div>
-    <xls-csv-parser :columns="columns" :help="help" @on-validate="onValidate" />
+    <xls-csv-parser v-show="activeShow" :columns="columns" :help="help" @on-validate="onValidate" />
     <!-- <pre>{{ JSON.stringify(results, null, 2) }}</pre> -->
     <simplert
       ref="simplert"
@@ -40,7 +40,10 @@ export default {
   },
   data() {
     return {
+      fullscreenLoading: false,
       disabledPlan: false,
+      activeShow: false,
+      idActivePlan: null,
       columns: [
         { name: 'Nome', value: 'name', isOptional: true },
         { name: 'E-mail', value: 'email', isOptional: true },
@@ -74,7 +77,8 @@ export default {
       for (i in uniqueObject) {
         newArray.push(uniqueObject[i]);
       }
-      // console.log(newArray);
+      newArray.unshift({ 'plan_id': this.idActivePlan });
+
       const sucessoModal = {
         title: 'Sucesso!',
         message: 'Usuários importados com sucesso',
@@ -87,43 +91,35 @@ export default {
         type: 'info',
         onClose: this.onClose,
       };
+      this.fullscreenLoading = true;
       var refsModal = this.$refs;
       request({
         url: '/v1/bw/usuario/importar-usuario',
         method: 'post',
         data: newArray,
       }).then(function(response) {
-        // alert('Usuários importados com sucesso');
         refsModal.simplert.openSimplert(sucessoModal);
-        console.log(response);
       }).catch(function(error) {
         if (error) {
-          console.log(error.stack);
+          // console.log(error.stack);
         }
         refsModal.simplert.openSimplert(falhaModal);
-        // console.log(error);
       });
       this.results = results;
+      this.fullscreenLoading = false;
     },
     async getPlans() {
-      this.listLoading = true;
       const { data } = await PlanResource.list({});
       this.total = data.total;
       this.planos = data.data;
-      this.listLoading = false;
     },
     planChoose(list, id) {
-      // alert(id);
       return list.findIndex((e) => e.id === id);
     },
     activePlan(list, id){
+      this.activeShow = !this.activeShow;
       this.disabledPlan = !this.disabledPlan;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].id !== id){
-          // this.planChoose = true;
-          console.log(list[i].id);
-        }
-      }
+      this.idActivePlan = id;
       return true;
     },
   },
@@ -234,5 +230,44 @@ export default {
         flex-basis: 100%;
       }
     }
+  }
+  .btn-primary {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #dcdfe6;
+    color: #606266;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    transition: .1s;
+    font-weight: 500;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #409eff;
+    border-color: #409eff;
+    margin-left: 15px;
+    &:hover {
+      background: #66b1ff;
+      border-color: #66b1ff;
+      color: #fff;
+    }
+    &:active {
+      background: #3a8ee6;
+      border-color: #3a8ee6;
+      color: #fff;
+    }
+  }
+  #validate-columns {
+    margin-top: 15px;
   }
 </style>

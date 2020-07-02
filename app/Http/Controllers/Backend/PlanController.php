@@ -167,14 +167,4 @@ class PlanController extends Controller
             return 'erro';
         }
     }
-
-    public function getList(){
-        $planos = Plan::orderBy('id', 'DESC')->get();
-
-        $response = [
-            'data' => $planos
-        ];
-
-        return response()->json($response);
-    }
 }

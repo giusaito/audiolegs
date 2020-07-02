@@ -277,5 +277,4 @@ class ReportController extends Controller
 
         return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
-
 }

@@ -3,7 +3,7 @@ import request from '@/utils/request';
 const baseUrlApi = 'v1/bw/planos';
 export function fetchPlans(query) {
   return request({
-    url: baseUrlApi + '/listar',
+    url: baseUrlApi + '/lista',
     method: 'get',
     params: query,
   });

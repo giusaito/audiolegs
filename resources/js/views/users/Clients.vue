@@ -1,0 +1,717 @@
+<template>
+  <div class="app-container">
+    <h1>Clientes</h1>
+    <div class="filter-container">
+      <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        Procurar
+      </el-button>
+      <!-- <el-select v-model="query.universities" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
+      <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
+      </el-select>
+      <el-select v-model="query.estado" placeholder="Estado" clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
+      </el-select>
+      <el-select v-model="query.cidade" placeholder="Cidade" filterable clearable style="width: 120px" class="filter-item" @change="handleFilter">
+        <el-option v-for="cidade in cidades" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
+      </el-select>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
+        Adicionar
+      </el-button>
+      <!-- <el-button v-waves :loading="downloading" class="filter-item" type="primary" icon="el-icon-download" @click= "handleDownload">
+        {{ $t('table.export') }}
+      </el-button> -->
+    </div>
+
+    <el-table v-loading="loading" :data="list" :default-sort="{prop: 'id', order: 'descending'}">
+      <el-table-column align="center" label="ID" width="80" prop="id" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Nome" prop="nome" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Email" prop="email" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.email }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Cidade" prop="cidade" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.city.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Estado" prop="estado" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.state.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Cadastro" width="200" prop="cadastro" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.created_at | format_date }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Ações" width="450">
+        <template slot-scope="scope">
+          <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.university_id, scope.row.plan_id)">
+            Editar
+          </el-button>
+          <!-- </router-link> -->
+          <el-button type="warning" size="small" icon="el-icon-unlock" @click="handleChangePassword(scope.row.id, scope.row.name);">
+            Alterar Senha
+          </el-button>
+          <!-- <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+            Remover
+          </el-button> -->
+          <el-button v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+            Remover
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
+
+    <el-dialog :visible.sync="dialogPermissionVisible" :title="'Editar Permissões - ' + currentUser.name">
+      <div v-if="currentUser.name" v-loading="dialogPermissionLoading" class="form-container">
+        <div class="permissions-container">
+          <div class="block">
+            <el-form :model="currentUser" label-width="80px" label-position="top">
+              <el-form-item label="Menus">
+                <el-tree ref="menuPermissions" :data="normalizedMenuPermissions" :default-checked-keys="permissionKeys(userMenuPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="block">
+            <el-form :model="currentUser" label-width="80px" label-position="top">
+              <el-form-item label="Permissões">
+                <el-tree ref="otherPermissions" :data="normalizedOtherPermissions" :default-checked-keys="permissionKeys(userOtherPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="clear-left" />
+        </div>
+        <div style="text-align:right;">
+          <el-button type="danger" @click="dialogPermissionVisible=false">
+            {{ $t('permission.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="confirmPermission">
+            {{ $t('permission.confirm') }}
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="dialogFormVisible">
+      <div v-loading="userCreating" class="form-container">
+        <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
+          <!-- <el-form-item label="Papel" prop="role">
+            <el-select v-model="newUser.role" class="filter-item" placeholder="Por favor selecione o papel">
+              <el-option v-for="item in roles" :key="item" :label="item.label | uppercaseFirst" :value="item.value" />
+            </el-select>
+          </el-form-item> -->
+          <input type="hidden" name="role" value="user">
+          <el-form-item label="Nome" prop="name">
+            <el-input v-model="newUser.name" />
+          </el-form-item>
+          <el-form-item label="Email" prop="email">
+            <el-input v-model="newUser.email" />
+          </el-form-item>
+          <el-form-item label="Estado" prop="estado">
+            <el-select v-model="newUser.estado" placeholder="Estado" class="filter-item">
+              <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Cidade" prop="cidade">
+            <el-select v-model="newUser.cidade" placeholder="Cidade" class="filter-item" :loading="loadingCities">
+              <el-option v-for="cidade in citylist" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Instituição" prop="instituicao">
+            <el-select v-model="newUser.instituicao" clearable placeholder="---" class="filter-item">
+              <el-option v-for="instituicao in universidades" :key="instituicao.id" :label="instituicao.fantasy_name | uppercaseFirst" :value="instituicao.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Planos" prop="plano">
+            <el-select v-model="newUser.plano" placeholder="Planos" class="filter-item">
+              <el-option v-for="plano in planos" :key="plano.id" :label="plano.name | uppercaseFirst" :value="plano.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="!newUser.id" label="Senha" prop="password">
+            <el-input v-model="newUser.password" show-password />
+          </el-form-item>
+          <el-form-item v-if="!newUser.id" label="Confirmar senha" prop="confirmPassword">
+            <el-input v-model="newUser.confirmPassword" show-password />
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">
+            Cancelar
+          </el-button>
+          <el-button type="primary" @click="handleSubmit()">
+            {{ botao }}
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="dialogPasswordVisible">
+      <div class="form-container">
+        <el-form ref="passwordForm" :rules="rules2" :model="passwordUser" label-position="left" label-width="150px" style="max-width: 500px;">
+          <el-form-item label="Senha" prop="password">
+            <el-input v-model="passwordUser.password" show-password />
+          </el-form-item>
+          <el-form-item label="Confirmar senha" prop="confirmPassword">
+            <el-input v-model="passwordUser.confirmPassword" show-password />
+          </el-form-item>
+          <el-button type="primary" @click="handleSubmitPassword()">
+            {{ botao }}
+          </el-button>
+        </el-form>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
+import ClienteResource from '@/api/clientes';
+import Resource from '@/api/resource';
+import waves from '@/directive/waves'; // Waves directive
+import permission from '@/directive/permission'; // Permission directive
+import checkPermission from '@/utils/permission'; // Permission checking
+import { fetchUniversities } from '@/api/universities';
+import { fetchCities } from '@/api/cities';
+import { fetchStates } from '@/api/states';
+import { fetchPlans } from '@/api/plans';
+import moment from 'moment';
+// import { getToken } from '@/utils/auth';
+// import axios from 'axios';
+
+const clienteResource = new ClienteResource();
+const permissionResource = new Resource('permissions');
+
+export default {
+  name: 'ClientList',
+  components: { Pagination },
+  directives: { waves, permission },
+  filters: {
+    format_date(value){
+      if (value) {
+        moment.locale('pt-br');
+        return moment(String(value)).format('lll');
+      }
+    },
+  },
+  data() {
+    var validateConfirmPassword = (rule, value, callback) => {
+      if (value !== this.newUser.password) {
+        callback(new Error('As senhas não combinam'));
+      } else {
+        callback();
+      }
+    };
+    var validateConfirmPassword2 = (rule, value, callback) => {
+      if (value !== this.passwordUser.password) {
+        callback(new Error('As senhas não combinam'));
+      } else {
+        callback();
+      }
+    };
+    return {
+      list: null,
+      loadingCities: false,
+      total: 0,
+      loading: true,
+      downloading: false,
+      userCreating: false,
+      universidades: [],
+      cidades: [],
+      estados: [],
+      planos: [],
+      query: {
+        page: 1,
+        limit: 15,
+        keyword: '',
+        role: '',
+      },
+      roles: [{
+        'label': 'Usuário',
+        'value': 'user',
+      }],
+      nonAdminRoles: ['editor'],
+      newUser: {},
+      passwordUser: {},
+      dialogFormVisible: false,
+      dialogPasswordVisible: false,
+      dialogPermissionVisible: false,
+      dialogPermissionLoading: false,
+      currentUserId: 0,
+      currentUser: {
+        name: '',
+        permissions: [],
+        rolePermissions: [],
+      },
+      rules: {
+        role: [{ required: true, message: 'Permissão obrigatória', trigger: 'change' }],
+        name: [{ required: true, message: 'Nome obrigatório', trigger: 'blur' }],
+        email: [
+          { required: true, message: 'Email obrigatório', trigger: 'blur' },
+          { type: 'email', message: 'Insira um email válido', trigger: ['blur', 'change'] },
+        ],
+        estado: [{ required: true, message: 'Estado obrigatório', trigger: 'blur' }],
+        cidade: [{ required: true, message: 'Cidade obrigatório', trigger: 'blur' }],
+        plano: [{ required: true, message: 'Planos obrigatório', trigger: 'blur' }],
+        password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
+        confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
+      },
+      rules2: {
+        password: [{ required: true, message: 'Senha obrigatória', trigger: 'blur' }],
+        confirmPassword: [{ validator: validateConfirmPassword2, trigger: 'blur' }],
+      },
+      permissionProps: {
+        children: 'children',
+        label: 'name',
+        disabled: 'disabled',
+      },
+      permissions: [],
+      menuPermissions: [],
+      otherPermissions: [],
+      title: 'Adicionar Cliente',
+      botao: 'Adicionar',
+      // configsCities: {
+      //   orderBy: 'name',
+      //   order: 'asc',
+      //   filter: ''
+      // }
+    };
+  },
+  computed: {
+    citylist() {
+      let resultData = this.cidades;
+      if (this.newUser.estado) {
+        resultData = resultData.filter(cidade => cidade.state_id === this.newUser.estado);
+      }
+      return resultData;
+    },
+    normalizedMenuPermissions() {
+      let tmp = [];
+      this.currentUser.permissions.role.forEach(permission => {
+        tmp.push({
+          id: permission.id,
+          name: permission.name,
+          disabled: true,
+        });
+      });
+      const rolePermissions = {
+        id: -1, // Just a faked ID
+        name: 'Inherited from role',
+        disabled: true,
+        children: this.classifyPermissions(tmp).menu,
+      };
+
+      tmp = this.menuPermissions.filter(permission => !this.currentUser.permissions.role.find(p => p.id === permission.id));
+      const userPermissions = {
+        id: 0, // Faked ID
+        name: 'Extra menus',
+        children: tmp,
+        disabled: tmp.length === 0,
+      };
+
+      return [rolePermissions, userPermissions];
+    },
+    normalizedOtherPermissions() {
+      let tmp = [];
+      this.currentUser.permissions.role.forEach(permission => {
+        tmp.push({
+          id: permission.id,
+          name: permission.name,
+          disabled: true,
+        });
+      });
+      const rolePermissions = {
+        id: -1,
+        name: 'Inherited from role',
+        disabled: true,
+        children: this.classifyPermissions(tmp).other,
+      };
+
+      tmp = this.otherPermissions.filter(permission => !this.currentUser.permissions.role.find(p => p.id === permission.id));
+      const userPermissions = {
+        id: 0,
+        name: 'Extra permissions',
+        children: tmp,
+        disabled: tmp.length === 0,
+      };
+
+      return [rolePermissions, userPermissions];
+    },
+    userMenuPermissions() {
+      return this.classifyPermissions(this.userPermissions).menu;
+    },
+    userOtherPermissions() {
+      return this.classifyPermissions(this.userPermissions).other;
+    },
+    userPermissions() {
+      return this.currentUser.permissions.role.concat(this.currentUser.permissions.user);
+    },
+  },
+  // watch: {
+  //   citylist: {
+  //     deep: true,
+  //     handler: function() {
+  //       this.loadingCities = true;
+  //     },
+  //   },
+  // },
+  created() {
+    this.resetNewUser();
+    this.getList();
+    this.getUniversities();
+    this.getStates();
+    this.getCities();
+    this.getPlans();
+    if (checkPermission(['manage permission'])) {
+      this.getPermissions();
+    }
+  },
+  methods: {
+    checkPermission,
+    async getPermissions() {
+      const { data } = await permissionResource.list({});
+      const { all, menu, other } = this.classifyPermissions(data);
+      this.permissions = all;
+      this.menuPermissions = menu;
+      this.otherPermissions = other;
+    },
+
+    async getList() {
+      const { limit, page } = this.query;
+      this.loading = true;
+      const { data, meta } = await clienteResource.list(this.query);
+      this.list = data;
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
+      this.total = meta.total;
+      this.loading = false;
+    },
+    async getUniversities() {
+      this.listLoading = true;
+      const { data } = await fetchUniversities(this.query);
+      this.listLoading = false;
+      this.universidades = data;
+    },
+    async getStates() {
+      this.listLoading = true;
+      const { data } = await fetchStates(this.query);
+      this.listLoading = false;
+      this.estados = data;
+      // console.log(this.estados);
+    },
+    async getCities() {
+      this.listLoading = true;
+      const { data } = await fetchCities(this.query);
+      this.listLoading = false;
+      this.cidades = data;
+      // console.log(this.cidades);
+    },
+    async getPlans() {
+      this.listLoading = true;
+      console.log(this.query);
+      const { data } = await fetchPlans(this.query);
+      console.log(data);
+      this.listLoading = false;
+      this.planos = data;
+    },
+    handleFilter() {
+      this.query.page = 1;
+      this.getList();
+      this.getUniversities();
+      this.getStates();
+      this.getCities();
+      this.getPlans();
+    },
+    handleCreate() {
+      this.resetNewUser();
+      this.dialogFormVisible = true;
+      this.title = 'Adicionar Cliente';
+      this.botao = 'Adicionar';
+      this.$nextTick(() => {
+        this.$refs['userForm'].clearValidate();
+      });
+    },
+    handleEdit(id, nome, email, estado, cidade, instituicao, plan_id){
+      // scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.university_id, scope.row.plan_id
+      // alert(getToken());
+      this.dialogFormVisible = true;
+      this.title = 'Editando o cliente ' + nome;
+      this.botao = 'Editar';
+      this.newUser = {
+        id: id,
+        name: nome,
+        email: email,
+        estado: estado,
+        cidade: cidade,
+        instituicao: instituicao,
+        plano: plan_id,
+        role: 'user',
+      };
+    },
+    handleChangePassword(id, nome){
+      this.dialogPasswordVisible = true;
+      this.title = 'Alterar senha do cliente ' + nome;
+      this.botao = 'Alterar';
+      this.passwordUser = {
+        id: id,
+        name: nome,
+      };
+      console.log(this.passwordUser);
+    },
+    handleDelete(id, name) {
+      this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
+        confirmButtonText: 'Remover',
+        cancelButtonText: 'Cancelar',
+        type: 'warning',
+      }).then(() => {
+        clienteResource.destroy(id).then(response => {
+          this.$message({
+            type: 'success',
+            message: 'Usuário removido com sucesso',
+          });
+          this.handleFilter();
+        }).catch(error => {
+          console.log(error);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Operação cancelada',
+        });
+      });
+    },
+    async handleEditPermissions(id) {
+      this.currentUserId = id;
+      this.dialogPermissionLoading = true;
+      this.dialogPermissionVisible = true;
+      const found = this.list.find(user => user.id === id);
+      const { data } = await clienteResource.permissions(id);
+      this.currentUser = {
+        id: found.id,
+        name: found.name,
+        permissions: data,
+      };
+      this.dialogPermissionLoading = false;
+      this.$nextTick(() => {
+        this.$refs.menuPermissions.setCheckedKeys(this.permissionKeys(this.userMenuPermissions));
+        this.$refs.otherPermissions.setCheckedKeys(this.permissionKeys(this.userOtherPermissions));
+      });
+    },
+    handleSubmitPassword() {
+      this.$refs['passwordForm'].validate((valid) => {
+        if (valid) {
+          // console.log(this.passwordUser);
+          clienteResource
+            .updatePassword(this.passwordUser.id, this.passwordUser).then(response => {
+              this.$message({
+                type: 'success',
+                message: 'A senha do cliente ' + this.passwordUser.name + ' foi atualizado com sucesso',
+                duration: 5 * 1000,
+              });
+              this.passwordUser = {
+                id: '',
+                name: '',
+                password: '',
+              };
+
+              this.getList();
+            }).catch(() => {
+              this.$message({
+                type: 'error',
+                message: 'Ocorreu um erro ao tentar atualizar o cliente ' + this.newUser.name + ' por favor, tente novamente mais tarde',
+                duration: 5 * 1000,
+              });
+            }).finally(() => {
+              console.log('fim');
+              this.dialogFormVisible = false;
+            });
+        }
+      });
+    },
+    handleSubmit() {
+      this.$refs['userForm'].validate((valid) => {
+        if (valid) {
+          if (this.newUser.id !== undefined){
+            // alert('editar');
+            clienteResource
+              .update(this.newUser.id, this.newUser).then(response => {
+                this.$message({
+                  type: 'success',
+                  message: 'O cliente ' + this.newUser.name + ' foi atualizado com sucesso',
+                  duration: 5 * 1000,
+                });
+                this.newUser = {
+                  id: '',
+                  name: '',
+                  email: '',
+                  role: '',
+                  estado: '',
+                  cidade: '',
+                  instituicao: '',
+                  plano: '',
+                };
+
+                this.getList();
+              }).catch(() => {
+                this.$message({
+                  type: 'error',
+                  message: 'Ocorreu um erro ao tentar atualizar o cliente ' + this.newUser.name + ' por favor, tente novamente mais tarde',
+                  duration: 5 * 1000,
+                });
+              }).finally(() => {
+                console.log('fim');
+                this.dialogFormVisible = false;
+              });
+          } else {
+            this.newUser.roles = [this.newUser.role];
+            this.userCreating = true;
+            clienteResource
+              .store(this.newUser)
+              .then(response => {
+                this.$message({
+                  message: 'Usuário ' + this.newUser.name + '(' + this.newUser.email + ') foi criado com sucesso',
+                  type: 'success',
+                  duration: 5 * 1000,
+                });
+                this.resetNewUser();
+                this.dialogFormVisible = false;
+                this.handleFilter();
+              })
+              .catch(error => {
+                console.log('ops' + error);
+              })
+              .finally(() => {
+                this.userCreating = false;
+              });
+          }
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    resetNewUser() {
+      this.newUser = {
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        estado: '',
+        cidade: '',
+        instituicao: '',
+        plano: '',
+        role: 'user',
+      };
+    },
+    handleDownload() {
+      this.downloading = true;
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['id', 'user_id', 'name', 'email', 'role'];
+        const filterVal = ['index', 'id', 'name', 'email', 'role'];
+        const data = this.formatJson(filterVal, this.list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'user-list',
+        });
+        this.downloading = false;
+      });
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+    permissionKeys(permissions) {
+      return permissions.map(permssion => permssion.id);
+    },
+    classifyPermissions(permissions) {
+      const all = []; const menu = []; const other = [];
+      permissions.forEach(permission => {
+        const permissionName = permission.name;
+        all.push(permission);
+        if (permissionName.startsWith('view menu')) {
+          menu.push(this.normalizeMenuPermission(permission));
+        } else {
+          other.push(this.normalizePermission(permission));
+        }
+      });
+      return { all, menu, other };
+    },
+
+    normalizeMenuPermission(permission) {
+      return { id: permission.id, name: this.$options.filters.uppercaseFirst(permission.name.substring(10)), disabled: permission.disabled || false };
+    },
+
+    normalizePermission(permission) {
+      const disabled = permission.disabled || permission.name === 'manage permission';
+      return { id: permission.id, name: this.$options.filters.uppercaseFirst(permission.name), disabled: disabled };
+    },
+
+    confirmPermission() {
+      const checkedMenu = this.$refs.menuPermissions.getCheckedKeys();
+      const checkedOther = this.$refs.otherPermissions.getCheckedKeys();
+      const checkedPermissions = checkedMenu.concat(checkedOther);
+      this.dialogPermissionLoading = true;
+
+      clienteResource.updatePermission(this.currentUserId, { permissions: checkedPermissions }).then(response => {
+        this.$message({
+          message: 'Permissions has been updated successfully',
+          type: 'success',
+          duration: 5 * 1000,
+        });
+        this.dialogPermissionLoading = false;
+        this.dialogPermissionVisible = false;
+      });
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+.edit-input {
+  padding-right: 100px;
+}
+.cancel-btn {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+.dialog-footer {
+  text-align: left;
+  padding-top: 0;
+  margin-left: 150px;
+}
+.app-container {
+  flex: 1;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+  .block {
+    float: left;
+    min-width: 250px;
+  }
+  .clear-left {
+    clear: left;
+  }
+}
+</style>

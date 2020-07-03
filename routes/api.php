@@ -23,6 +23,8 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('users/{user}', 'UserController@show')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::post('users', 'UserController@store');
     Route::get('user/profile/edit/', 'UserController@edit');
+    
+    Route::put('users/{user}/password', 'UserController@updatepass');
     Route::put('users/{user}', 'UserController@update');
     Route::delete('users/{user}', 'UserController@destroy')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::get('users/{user}/permissions', 'UserController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
@@ -33,7 +35,17 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
 
     Route::post('/usuario/importar-usuario', 'UserController@userImport')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
+
+
     Route::get('clientes', 'UserController@visitors')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+    Route::get('clientes/{user}', 'UserController@show')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+    Route::post('clientes', 'UserController@store');
+    Route::get('cliente/profile/edit/', 'UserController@edit');
+    Route::put('clientes/{user}/password', 'UserController@updatepass');
+    Route::put('clientes/{user}', 'UserController@update');
+    Route::delete('clientes/{user}', 'UserController@destroy')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
+    Route::get('clientes/{user}/permissions', 'UserController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::put('clientes/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
     Route::group(['namespace' => 'Backend'], function()
     {
@@ -43,6 +55,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     });
     // Rota de planos backend
     Route::get('planos/all/{voucher}', 'PlanController@all')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::get('planos/lista', 'PlanController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Fim rota de planos backend
 
@@ -51,13 +64,12 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     Route::get('cidades/lista', 'CityController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::get('estados/lista', 'StateController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    // Rota de planos backend
 
     // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::get('cupons/buscar-chave', 'VoucherController@getChave')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::post('cupons/plano', 'VoucherController@savePlan')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('cupons', 'VoucherController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    // Fim rota de planos backend
+    // Fim rota de cupons backend
     });
 });
 

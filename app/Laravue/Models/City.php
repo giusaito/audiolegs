@@ -12,4 +12,7 @@ class City extends Model
     public function state(){
     	return $this->belongsTo('App\Laravue\Models\State');
     }
+    public function user(){
+        return $this->hasOne('App\Laravue\Models\User');
+    }
 }

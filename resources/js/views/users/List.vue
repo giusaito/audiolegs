@@ -1,17 +1,15 @@
 <template>
   <div class="app-container">
+    <h1>Administradores</h1>
     <div class="filter-container">
       <el-input v-model="query.keyword" placeholder="Pesquisar" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Procurar
       </el-button>
       <el-select v-model="query.role" placeholder="Papel" clearable style="width: 90px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
+        <el-option v-for="role in roles" :key="role.id" :label="role.name | uppercaseFirst" :value="role.name" />
       </el-select>
       <!-- <el-select v-model="query.universities" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter"> -->
-      <el-select v-model="query.universidade" placeholder="Instituição" clearable style="width: 120px" class="filter-item" @change="handleFilter">
-        <el-option v-for="university in universidades" :key="university.id" :label="university.fantasy_name | uppercaseFirst" :value="university.id" />
-      </el-select>
       <el-select v-model="query.estado" placeholder="Estado" clearable style="width: 120px" class="filter-item" @change="handleFilter">
         <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
       </el-select>
@@ -26,51 +24,69 @@
       </el-button> -->
     </div>
 
-    <el-table v-loading="loading" :data="list">
-      <el-table-column align="center" label="ID" width="80">
+    <el-table v-loading="loading" :data="list" :default-sort="{prop: 'papel', order: 'ascending'}">
+      <el-table-column align="center" label="ID" width="80" prop="id" sortable>
         <template slot-scope="scope">
-          <span>{{ scope.row.index }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Nome">
+      <el-table-column align="center" label="Nome" prop="nome" sortable>
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Email">
+      <el-table-column align="center" label="Email" prop="email" sortable>
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Papel" width="120">
+      <el-table-column align="center" label="Cidade" prop="cidade" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.city.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Estado" prop="estado" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.state.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Nível" width="120" prop="papel" sortable>
         <template slot-scope="scope">
           <span>{{ scope.row.roles.join(', ') }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Cadastro" width="200" prop="cadastro" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.created_at | format_date }}</span>
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="Ações" width="350">
         <template slot-scope="scope">
           <!-- <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id"> -->
-          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
+          <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.roles.join(', '))">
             Editar
           </el-button>
           <!-- </router-link> -->
           <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
-            Papel
+            Nível
           </el-button>
-          <!-- <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+          <el-button v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Remover
-          </el-button> -->
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
 
-    <el-dialog :visible.sync="dialogPermissionVisible" :title="'Edit Permissions - ' + currentUser.name">
+    <el-dialog :visible.sync="dialogPermissionVisible" :title="'Editar Permissões - ' + currentUser.name">
       <div v-if="currentUser.name" v-loading="dialogPermissionLoading" class="form-container">
         <div class="permissions-container">
           <div class="block">
@@ -82,7 +98,7 @@
           </div>
           <div class="block">
             <el-form :model="currentUser" label-width="80px" label-position="top">
-              <el-form-item label="Permissions">
+              <el-form-item label="Permissões">
                 <el-tree ref="otherPermissions" :data="normalizedOtherPermissions" :default-checked-keys="permissionKeys(userOtherPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
               </el-form-item>
             </el-form>
@@ -100,12 +116,13 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="'Adicionar usuário'" :visible.sync="dialogFormVisible">
+    <el-dialog :title="title" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
         <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item label="Papel" prop="role">
             <el-select v-model="newUser.role" class="filter-item" placeholder="Por favor selecione o papel">
-              <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" />
+              <!-- <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" /> -->
+              <el-option v-for="role in roles" :key="role.id" :label="role.name | uppercaseFirst" :value="role.name" />
             </el-select>
           </el-form-item>
           <el-form-item label="Nome" prop="name">
@@ -114,10 +131,20 @@
           <el-form-item label="Email" prop="email">
             <el-input v-model="newUser.email" />
           </el-form-item>
-          <el-form-item label="Senha" prop="password">
+          <el-form-item label="Estado" prop="estado">
+            <el-select v-model="newUser.estado" placeholder="Estado" class="filter-item">
+              <el-option v-for="estado in estados" :key="estado.id" :label="estado.title | uppercaseFirst" :value="estado.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Cidade" prop="cidade">
+            <el-select v-model="newUser.cidade" placeholder="Cidade" class="filter-item" :loading="loadingCities">
+              <el-option v-for="cidade in citylist" :key="cidade.id" :label="cidade.title | uppercaseFirst" :value="cidade.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="!newUser.id" label="Senha" prop="password">
             <el-input v-model="newUser.password" show-password />
           </el-form-item>
-          <el-form-item label="Confirmar senha" prop="confirmPassword">
+          <el-form-item v-if="!newUser.id" label="Confirmar senha" prop="confirmPassword">
             <el-input v-model="newUser.confirmPassword" show-password />
           </el-form-item>
         </el-form>
@@ -125,8 +152,8 @@
           <el-button @click="dialogFormVisible = false">
             Cancelar
           </el-button>
-          <el-button type="primary" @click="createUser()">
-            Adicionar
+          <el-button type="primary" @click="handleSubmit()">
+            {{ botao }}
           </el-button>
         </div>
       </div>
@@ -144,6 +171,8 @@ import checkPermission from '@/utils/permission'; // Permission checking
 import { fetchUniversities } from '@/api/universities';
 import { fetchCities } from '@/api/cities';
 import { fetchStates } from '@/api/states';
+import { fetchRoles } from '@/api/role';
+import moment from 'moment';
 
 const userResource = new UserResource();
 const permissionResource = new Resource('permissions');
@@ -152,6 +181,14 @@ export default {
   name: 'UserList',
   components: { Pagination },
   directives: { waves, permission },
+  filters: {
+    format_date(value){
+      if (value) {
+        moment.locale('pt-br');
+        return moment(String(value)).format('lll');
+      }
+    },
+  },
   data() {
     var validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.newUser.password) {
@@ -162,6 +199,7 @@ export default {
     };
     return {
       list: null,
+      loadingCities: false,
       total: 0,
       loading: true,
       downloading: false,
@@ -169,13 +207,14 @@ export default {
       universidades: [],
       cidades: [],
       estados: [],
+      roles: [],
       query: {
         page: 1,
         limit: 15,
         keyword: '',
         role: '',
       },
-      roles: ['admin', 'editor'],
+      // roles: ['admin', 'editor'],
       nonAdminRoles: ['editor'],
       newUser: {},
       dialogFormVisible: false,
@@ -205,9 +244,18 @@ export default {
       permissions: [],
       menuPermissions: [],
       otherPermissions: [],
+      title: 'Adicionar Administrador',
+      botao: 'Adicionar',
     };
   },
   computed: {
+    citylist() {
+      let resultData = this.cidades;
+      if (this.newUser.estado) {
+        resultData = resultData.filter(cidade => cidade.state_id === this.newUser.estado);
+      }
+      return resultData;
+    },
     normalizedMenuPermissions() {
       let tmp = [];
       this.currentUser.permissions.role.forEach(permission => {
@@ -276,6 +324,7 @@ export default {
     this.getUniversities();
     this.getStates();
     this.getCities();
+    this.getRoles();
     if (checkPermission(['manage permission'])) {
       this.getPermissions();
     }
@@ -321,12 +370,20 @@ export default {
       this.cidades = data;
       console.log(this.cidades);
     },
+    async getRoles() {
+      this.listLoading = true;
+      const { data } = await fetchRoles(this.query);
+      this.listLoading = false;
+      this.roles = data;
+      console.log(this.roles);
+    },
     handleFilter() {
       this.query.page = 1;
       this.getList();
       this.getUniversities();
       this.getStates();
       this.getCities();
+      this.getRoles();
     },
     handleCreate() {
       this.resetNewUser();
@@ -334,6 +391,21 @@ export default {
       this.$nextTick(() => {
         this.$refs['userForm'].clearValidate();
       });
+    },
+    handleEdit(id, nome, email, estado, cidade, role){
+      // scope.row.id, scope.row.name, scope.row.email, scope.row.state_id, scope.row.city_id, scope.row.university_id, scope.row.plan_id
+      // alert(getToken());
+      this.dialogFormVisible = true;
+      this.title = 'Editando o administrador ' + nome;
+      this.botao = 'Editar';
+      this.newUser = {
+        id: id,
+        name: nome,
+        email: email,
+        estado: estado,
+        cidade: cidade,
+        role: role,
+      };
     },
     handleDelete(id, name) {
       this.$confirm('Tem certeza que deseja remover pernanentemente o usuário ' + name + '. ?', 'Warning', {
@@ -374,29 +446,59 @@ export default {
         this.$refs.otherPermissions.setCheckedKeys(this.permissionKeys(this.userOtherPermissions));
       });
     },
-    createUser() {
+    handleSubmit() {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
-          this.newUser.roles = [this.newUser.role];
-          this.userCreating = true;
-          userResource
-            .store(this.newUser)
-            .then(response => {
-              this.$message({
-                message: 'Usuário ' + this.newUser.name + '(' + this.newUser.email + ') foi criado com sucesso',
-                type: 'success',
-                duration: 5 * 1000,
+          if (this.newUser.id !== undefined){
+            userResource
+              .update(this.newUser.id, this.newUser).then(response => {
+                this.$message({
+                  type: 'success',
+                  message: 'O usuário ' + this.newUser.name + ' foi atualizado com sucesso',
+                  duration: 5 * 1000,
+                });
+                this.newUser = {
+                  id: '',
+                  name: '',
+                  email: '',
+                  role: '',
+                  estado: '',
+                  cidade: '',
+                };
+
+                this.getList();
+              }).catch(() => {
+                this.$message({
+                  type: 'error',
+                  message: 'Ocorreu um erro ao tentar atualizar o usuário ' + this.newUser.name + ' por favor, tente novamente mais tarde',
+                  duration: 5 * 1000,
+                });
+              }).finally(() => {
+                console.log('fim');
+                this.dialogFormVisible = false;
               });
-              this.resetNewUser();
-              this.dialogFormVisible = false;
-              this.handleFilter();
-            })
-            .catch(error => {
-              console.log('ops' + error);
-            })
-            .finally(() => {
-              this.userCreating = false;
-            });
+          } else {
+            this.newUser.roles = [this.newUser.role];
+            this.userCreating = true;
+            userResource
+              .store(this.newUser)
+              .then(response => {
+                this.$message({
+                  message: 'Usuário ' + this.newUser.name + '(' + this.newUser.email + ') foi criado com sucesso',
+                  type: 'success',
+                  duration: 5 * 1000,
+                });
+                this.resetNewUser();
+                this.dialogFormVisible = false;
+                this.handleFilter();
+              })
+              .catch(error => {
+                console.log('ops' + error);
+              })
+              .finally(() => {
+                this.userCreating = false;
+              });
+          }
         } else {
           console.log('error submit!!');
           return false;

@@ -29,7 +29,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password'
+        'name', 'email', 'password', 'university_id', 'state_id', 'city_id', 'plan_id'
     ];
 
 
@@ -110,6 +110,12 @@ class User extends Authenticatable
 
     public function userProfile(){
         return $this->hasOne('App\Laravue\Models\UserProfile');
+    }
+    public function city(){
+    	return $this->belongsTo('App\Laravue\Models\City');
+    }
+    public function state(){
+    	return $this->belongsTo('App\Laravue\Models\State');
     }
 
     public function getDescriptionForEvent(string $eventName): string

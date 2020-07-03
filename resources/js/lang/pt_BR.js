@@ -74,6 +74,7 @@ export default {
     externalLink: 'Link externo',
     elementUi: 'Element UI',
     administrator: 'Administrador',
+    administrators: 'Administradores',
     users: 'Usuários',
     visitors: 'Clientes',
     userProfile: 'Meu perfil',

@@ -12,4 +12,7 @@ class State extends Model
     public function cities(){
     	return $this->hasMany('App\Laravue\Models\City');
     }
+    public function user(){
+        return $this->hasOne('App\Laravue\Models\User');
+    }
 }

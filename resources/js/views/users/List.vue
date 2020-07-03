@@ -43,9 +43,27 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Papel" width="120" prop="papel" sortable>
+      <el-table-column align="center" label="Cidade" prop="cidade" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.city.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Estado" prop="estado" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.state.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Nível" width="120" prop="papel" sortable>
         <template slot-scope="scope">
           <span>{{ scope.row.roles.join(', ') }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Cadastro" width="200" prop="cadastro" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.created_at | format_date }}</span>
         </template>
       </el-table-column>
 
@@ -57,7 +75,7 @@
           </el-button>
           <!-- </router-link> -->
           <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
-            Papel
+            Nível
           </el-button>
           <el-button v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Remover
@@ -154,6 +172,7 @@ import { fetchUniversities } from '@/api/universities';
 import { fetchCities } from '@/api/cities';
 import { fetchStates } from '@/api/states';
 import { fetchRoles } from '@/api/role';
+import moment from 'moment';
 
 const userResource = new UserResource();
 const permissionResource = new Resource('permissions');
@@ -162,6 +181,14 @@ export default {
   name: 'UserList',
   components: { Pagination },
   directives: { waves, permission },
+  filters: {
+    format_date(value){
+      if (value) {
+        moment.locale('pt-br');
+        return moment(String(value)).format('lll');
+      }
+    },
+  },
   data() {
     var validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.newUser.password) {

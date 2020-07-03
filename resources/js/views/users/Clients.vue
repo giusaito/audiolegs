@@ -24,22 +24,40 @@
       </el-button> -->
     </div>
 
-    <el-table v-loading="loading" :data="list">
-      <el-table-column align="center" label="ID" width="80">
+    <el-table v-loading="loading" :data="list" :default-sort="{prop: 'id', order: 'descending'}">
+      <el-table-column align="center" label="ID" width="80" prop="id" sortable>
         <template slot-scope="scope">
-          <span>{{ scope.row.index }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Nome">
+      <el-table-column align="center" label="Nome" prop="nome" sortable>
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Email">
+      <el-table-column align="center" label="Email" prop="email" sortable>
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Cidade" prop="cidade" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.city.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Estado" prop="estado" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.state.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Cadastro" width="200" prop="cadastro" sortable>
+        <template slot-scope="scope">
+          <span>{{ scope.row.created_at | format_date }}</span>
         </template>
       </el-table-column>
 
@@ -177,6 +195,7 @@ import { fetchUniversities } from '@/api/universities';
 import { fetchCities } from '@/api/cities';
 import { fetchStates } from '@/api/states';
 import { fetchPlans } from '@/api/plans';
+import moment from 'moment';
 // import { getToken } from '@/utils/auth';
 // import axios from 'axios';
 
@@ -187,6 +206,14 @@ export default {
   name: 'ClientList',
   components: { Pagination },
   directives: { waves, permission },
+  filters: {
+    format_date(value){
+      if (value) {
+        moment.locale('pt-br');
+        return moment(String(value)).format('lll');
+      }
+    },
+  },
   data() {
     var validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.newUser.password) {

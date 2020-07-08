@@ -55,7 +55,7 @@
       </el-table-column>
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-    <el-dialog :title="formTitle " :visible.sync="dialogFormVisible">
+    <el-dialog :title="formTitle" :close-on-click-modal="false" :visible.sync="dialogFormVisible">
       <div v-loading="planoEditing" class="form-container">
         <el-form ref="currentPlan" :model="currentPlan" :rules="rules" label-position="left" label-width="150px" style="max-width: 500px;">
           <el-form-item label="Nome" prop="name">

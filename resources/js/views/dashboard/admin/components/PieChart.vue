@@ -61,7 +61,7 @@ export default {
         calculable: true,
         series: [
           {
-            name: '10 Mais Acessadas',
+            name: '5 Mais Acessadas',
             type: 'pie',
             roseType: 'radius',
             radius: [15, 95],

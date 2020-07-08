@@ -66,7 +66,7 @@ export default {
         },
         xAxis: [{
           type: 'category',
-          data: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+          data: ['7 dias', 'Mensal', 'Trimestral', 'Semestral', 'Anual'],
           axisTick: {
             alignWithLabel: true,
           },
@@ -78,11 +78,11 @@ export default {
           },
         }],
         series: [{
-          name: 'Horário mais acessado',
+          name: 'Usuários ativos no plano',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
-          data: [19, 21, 1, 6, 12, 17, 21],
+          data: [500, 890, 640, 198, 489, 598, 301],
           animationDuration,
         }],
       });

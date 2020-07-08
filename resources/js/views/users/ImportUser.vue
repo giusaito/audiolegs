@@ -1,9 +1,9 @@
 <template>
-  <div class="app-container">
+  <div v-loading.fullscreen.lock="fullscreenLoading" class="app-container">
     <div class="plans-choose">
       <h2 class="step"><small>1</small> Escolha o Plano:</h2>
       <div class="plans">
-        <div v-for="plano in planos" :key="plano.id" v-loading="listLoading" class="box-plan el-card box-card is-always-shadow" :plano="plano.id">
+        <div v-for="plano in planos" :key="plano.id" class="box-plan el-card box-card is-always-shadow" :plano="plano.id">
           <div class="el-card__header">{{ plano.name }}</div>
           <div class="el-card__body">
             <el-switch
@@ -40,6 +40,7 @@ export default {
   },
   data() {
     return {
+      fullscreenLoading: false,
       disabledPlan: false,
       activeShow: false,
       idActivePlan: null,
@@ -64,7 +65,6 @@ export default {
   },
   methods: {
     onValidate(results) {
-      console.log(results);
       const newArray = [];
       const uniqueObject = {};
       let objTitle = '';
@@ -73,12 +73,11 @@ export default {
       for (i in results) {
         objTitle = results[i]['column'];
         uniqueObject[objTitle] = results[i];
-        uniqueObject['plano_id'] = this.idActivePlan;
       }
       for (i in uniqueObject) {
         newArray.push(uniqueObject[i]);
-        // newArray.push({'plano_id' : this.idActivePlan});
       }
+      newArray.unshift({ 'plan_id': this.idActivePlan });
 
       const sucessoModal = {
         title: 'Sucesso!',
@@ -92,49 +91,35 @@ export default {
         type: 'info',
         onClose: this.onClose,
       };
+      this.fullscreenLoading = true;
       var refsModal = this.$refs;
       request({
         url: '/v1/bw/usuario/importar-usuario',
         method: 'post',
         data: newArray,
       }).then(function(response) {
-        // alert('Usuários importados com sucesso');
         refsModal.simplert.openSimplert(sucessoModal);
-        console.log(response);
       }).catch(function(error) {
         if (error) {
-          console.log(error.stack);
+          // console.log(error.stack);
         }
         refsModal.simplert.openSimplert(falhaModal);
-        // console.log(error);
       });
       this.results = results;
+      this.fullscreenLoading = false;
     },
     async getPlans() {
-      this.listLoading = true;
       const { data } = await PlanResource.list({});
       this.total = data.total;
       this.planos = data.data;
-      this.listLoading = false;
     },
     planChoose(list, id) {
-      // alert(id);
       return list.findIndex((e) => e.id === id);
     },
     activePlan(list, id){
       this.activeShow = !this.activeShow;
       this.disabledPlan = !this.disabledPlan;
       this.idActivePlan = id;
-      console.log(this.idActivePlan);
-
-      // this.disabledPlan = !this.disabledPlan;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].id !== id){
-          // this.disabledPlan = !this.disabledPlan;
-          // console.log(this.disabledPlan);
-          // console.log(list[i].id);
-        }
-      }
       return true;
     },
   },

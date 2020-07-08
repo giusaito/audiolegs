@@ -19,16 +19,16 @@
         <div class="chart-wrapper">
           <p class="text-center">5 leis mais acessadas</p>
           <pie-chart />
-          <router-link :to="'/leis-mais-acessadas'" class="bw-btn bw-btn-all">
+          <router-link :to="'/relatorios/leis-mais-acessadas'" class="bw-btn bw-btn-all">
             Veja mais
           </router-link>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <p class="text-center">Leis mais acessadas</p>
+          <p class="text-center">Usuários ativos em cada plano</p>
           <bar-chart />
-          <router-link :to="'/perfil/editar'" class="bw-btn bw-btn-all">
+          <router-link :to="'/relatorios/planos-usuarios'" class="bw-btn bw-btn-all">
             Veja mais
           </router-link>
         </div>
@@ -39,8 +39,8 @@
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <p class="text-center">Horário mais acessado do dia</p>
-          <hourChat />
-          <router-link :to="'/perfil/editar'" class="bw-btn bw-btn-all">
+          <PieChartHour />
+          <router-link :to="'/relatorios/hora-acessada'" class="bw-btn bw-btn-all">
             Veja mais
           </router-link>
         </div>
@@ -65,7 +65,7 @@ import LineChart from './components/LineChart';
 // import RaddarChart from './components/RaddarChart';
 import PieChart from './components/PieChart';
 import BarChart from './components/BarChart';
-import HourChat from './components/HourAccessBarChart';
+import PieChartHour from './components/PieChartHourAcess';
 import TransactionTable from './components/TransactionTable';
 // import TodoList from './components/TodoList';
 // import BoxCard from './components/BoxCard';
@@ -98,7 +98,7 @@ export default {
     // RaddarChart,
     PieChart,
     BarChart,
-    HourChat,
+    PieChartHour,
     TransactionTable,
     // TodoList,
     // BoxCard,
@@ -145,7 +145,7 @@ export default {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  padding: 5px;
+  padding: 3px;
   border-radius: 6px;
   margin-bottom: 10px;
 }

@@ -49,23 +49,33 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
 
     Route::group(['namespace' => 'Backend'], function()
     {
-    // Rota de planos backend
-    Route::get('planos/all/{voucher}', 'PlanController@all')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::get('planos/lista', 'PlanController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    // Fim rota de planos backend
+        // Rota de planos backend
+        Route::get('planos/all/{voucher}', 'PlanController@all')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('planos/lista', 'PlanController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::apiResource('planos', 'PlanController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        // Fim rota de planos backend
 
-    Route::get('atividades', 'ActivityController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::get('universidades/lista', 'UniversityController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::get('cidades/lista', 'CityController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::get('estados/lista', 'StateController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('atividades', 'ActivityController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('universidades/lista', 'UniversityController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('cidades/lista', 'CityController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('estados/lista', 'StateController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
 
-    // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::get('cupons/buscar-chave', 'VoucherController@getChave')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::post('cupons/plano', 'VoucherController@savePlan')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::apiResource('cupons', 'VoucherController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
-    // Fim rota de cupons backend
+        // Route::get('cupons', 'VoucherController@index')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('cupons/buscar-chave', 'VoucherController@getChave')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::post('cupons/plano', 'VoucherController@savePlan')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::apiResource('cupons', 'VoucherController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        // Fim rota de cupons backend
+
+        // Rota de controle-de-leis backend
+        Route::group(['namespace' => 'Laws'], function()
+        {
+            Route::apiResource('controle-de-leis/arquivos-das-leis', 'FileController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+            Route::apiResource('controle-de-leis/controle-de-playlists', 'PlaylistController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        });
+        Route::get('controle-de-leis/lista', 'ControlOfLawsController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::apiResource('controle-de-leis', 'ControlOfLawsController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        // Fim rota de controle-de-leis backend
     });
 });
 

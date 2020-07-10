@@ -16,22 +16,11 @@ class CreateLawFilesTable extends Migration
         Schema::create('laws', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
+            $table->enum('type', ['file', 'folder'])->default('folder');
+            $table->string('path',100);
+            $table->bigInteger('size')->unsigned();
             $table->nestedSet();
             $table->timestamps();
-        });
-        Schema::create('law_files', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('law_id')->unsigned();
-            $table->string('name', 100);
-            $table->text('description');
-            $table->string('path', 255);
-            $table->string('type', 255);
-            $table->timestamps();
-
-            $table->foreign('law_id')
-            ->references('id')
-            ->on('laws')
-            ->onDelete('cascade');
         });
     }
 
@@ -43,6 +32,5 @@ class CreateLawFilesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('laws');
-        Schema::dropIfExists('law_files');
     }
 }

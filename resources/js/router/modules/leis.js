@@ -10,10 +10,10 @@ const controleDeLeisRoutes = {
   },
   children: [
     {
-      path: 'arquivos-das-leis',
-      component: () => import('@/views/laws/Files'),
-      name: 'Arquivos das Leis',
-      meta: { title: 'Arquivos das Leis' },
+      path: 'leis',
+      component: () => import('@/views/laws/Laws'),
+      name: 'Leis',
+      meta: { title: 'Leis' },
     },
     {
       path: 'controle-de-playlists',

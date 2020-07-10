@@ -15,15 +15,17 @@ class CreateLawFilesTable extends Migration
     {
         Schema::create('laws', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
+            $table->string('name', 100);
+            $table->nestedSet();
             $table->timestamps();
         });
         Schema::create('law_files', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('law_id')->unsigned();
-            $table->text('name', 255);
-            $table->enum('type', ['FILE', 'FOLDER'])->default('FILE');
-            $table->nestedSet();
+            $table->string('name', 100);
+            $table->text('description');
+            $table->string('path', 255);
+            $table->string('type', 255);
             $table->timestamps();
 
             $table->foreign('law_id')

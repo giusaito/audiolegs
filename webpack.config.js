@@ -20,6 +20,9 @@ if (report) {
   }));
 }
 module.exports = {
+  node: {
+    fs: "empty"
+  },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {

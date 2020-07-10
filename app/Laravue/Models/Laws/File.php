@@ -1,5 +1,4 @@
 <?php
-use Kalnoy\Nestedset\NodeTrait;
 namespace App\Laravue\Models\Laws;
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +12,7 @@ class File extends Model
 	protected $table = 'laws_files';
 	protected $fillable = ['*'];
 	   
-	public function law(){
-    	return $this->belongsTo('App\Laravue\Models\Laws\Law');
+	public function folder(){
+    	return $this->belongsTo('App\Laravue\Models\Laws\Folder');
     }
 }

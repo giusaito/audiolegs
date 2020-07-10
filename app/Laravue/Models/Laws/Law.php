@@ -1,5 +1,5 @@
 <?php
-
+use Kalnoy\Nestedset\NodeTrait;
 namespace App\Laravue\Models\Laws;
 
 use Illuminate\Database\Eloquent\Model;
@@ -9,10 +9,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Law extends Model
 {
+	use NodeTrait;
 	protected $table = 'laws';
-   	protected $fillable = ['*'];
-
-    public function files(){
+	protected $fillable = ['*'];
+	   
+	public function files(){
     	return $this->hasMany('App\Laravue\Models\Laws\File');
     }
 }

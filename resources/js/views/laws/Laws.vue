@@ -5,10 +5,17 @@
     </el-button-group>
 
     <div id="list" v-loading="listLoading">
+      <div id="breadcrumb">
+        <ul>
+          <li v-for="breadcrumbsUrl in breadcrumbsUrls" :key="breadcrumbsUrl.id">
+            <a href="files"><span class="folderName">{{ breadcrumbsUrl.split('/')[breadcrumbsUrl.split('/').length-1] }}</span></a>
+          </li>
+        </ul>
+      </div>
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
-          <a :href="'leis/'+lei.name" :title="'leis/'+lei.name" :class="leisClass(lei.type)">
+          <div :title="lei.path" :class="leisClass(lei.type)" @click="executeActionClick(lei.id, lei.type, lei.path)">
             <span v-if="lei.type === 'folder' && lei.children.length === 0" class="icon folder" />
             <span v-if="lei.type === 'folder' && lei.children.length > 0" class="icon folder full" />
             <span v-if="lei.type === 'file'" class="icon file" :class="'f-'+(lei.name.split('.')[lei.name.split('.').length-1])">.{{ lei.name.split('.')[lei.name.split('.').length-1] }}</span>
@@ -17,7 +24,7 @@
               <span v-if="lei.type === 'folder'">{{ lei.children.length }} <span v-if="lei.children.length > 1">itens</span><span v-else>item</span></span>
               <span v-if="lei.type === 'file'">{{ formatBytes(lei.size) }}</span>
             </span>
-          </a>
+          </div>
         </li>
       </ul>
     </div>
@@ -53,6 +60,7 @@ export default {
       currentFolder: {},
       leis: [],
       formTitle: '',
+      breadcrumbsUrls: [],
       folderEditing: false,
       listLoading: true,
       rules: {
@@ -109,6 +117,27 @@ export default {
         this.leis = response.data.data;
         this.listLoading = false;
       }).catch(error => console.log(error));
+    },
+    executeActionClick(id, tipo, nextDir) {
+      if (tipo === 'folder') {
+        const findDataById = (id) => {
+          /* eslint-disable */
+          const [key, lei] = Object.entries(this.leis).find(([key, lei]) => lei.id === id);
+          /* eslint-enable */
+          return lei.children;
+        };
+        this.breadcrumbsUrls = this.generateBreadcrumbs(nextDir);
+        this.leis = findDataById(id);
+      } else {
+        alert('file');
+      }
+    },
+    generateBreadcrumbs(nextDir){
+      var path = nextDir.split('/').slice(0);
+      for (var i = 1; i < path.length; i++) {
+        path[i] = path[i - 1] + '/' + path[i];
+      }
+      return path;
     },
     handleSubmit(formName) {
       this.$refs[formName].validate((valid) => {
@@ -401,5 +430,40 @@ export default {
 .icon.file.f-saas:after,
 .icon.file.f-scss:after {
 	border-bottom-color: #30837c;
+}
+#breadcrumb {
+	color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 35px;
+  background: #ffffff;
+  border-bottom: 1px solid #ccc;
+  margin-top: 30px;
+}
+
+#breadcrumb a:link, #breadcrumb a:visited {
+	color: #000;
+	text-decoration: none;
+}
+
+#breadcrumb a:hover {
+	text-decoration: underline;
+}
+#breadcrumb ul {
+  display: flex;
+  margin:0;
+  padding:0;
+}
+#breadcrumb ul li {
+  list-style:none;
+}
+
+#breadcrumb ul li:not(:last-child):after {
+  content:"→";
+	color:  #6a6a72;
+	font-size: 14px;
+	font-weight: 700;
+  line-height: 20px;
+  margin:0 5px;
 }
 </style>

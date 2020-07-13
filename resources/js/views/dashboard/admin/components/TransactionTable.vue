@@ -1,34 +1,35 @@
 <template>
-  <el-table
-    v-loading="loading"
-    :data="list"
-    style="width: 100%;padding-top: 15px;"
-  >
-    <el-table-column label="Id do pedido #" min-width="200">
-      <template slot-scope="scope">
-        {{ scope.row && scope.row.order_no | orderNoFilter }}
+  <el-table v-loading="listLoading" :data="list" style="width: 100%" :default-sort="{prop: 'date', order: 'descending'}">
+    <el-table-column align="center" label="Data" prop="date" sortable>
+      <template slot-scope="{row}">
+        <span>{{ row.date }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Nome" width="195" align="center">
-      <template slot-scope="scope">
-        {{ scope.row && scope.row.name }}
+    <el-table-column align="center" label="Ordem nº" prop="order_no" sortable>
+      <template slot-scope="{row}">
+        <span>{{ row.order_no }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Valor" width="195" align="center">
-      <template slot-scope="scope">
-        R$ {{ scope.row && scope.row.price | toThousandFilter }}
+    <el-table-column align="center" label="Nome" prop="name" sortable>
+      <template slot-scope="{row}">
+        <span>{{ row.name }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Data" width="195" align="center">
-      <template slot-scope="scope">
-        {{ scope.row && scope.row.date }}
+    <el-table-column align="center" label="Valor" prop="price" sortable>
+      <template slot-scope="{row}">
+        <span>{{ row.price }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column align="center" label="Status" prop="status" sortable>
+      <template slot-scope="{row}">
+        <span>{{ row.status }}</span>
       </template>
     </el-table-column>
   </el-table>
 </template>
 
 <script>
-import { fetchList } from '@/api/order';
+import { fetchTransactions } from '@/api/reports';
 
 export default {
   filters: {
@@ -50,13 +51,15 @@ export default {
     };
   },
   created() {
-    this.fetchData();
+    this.getLaws();
   },
   methods: {
-    async fetchData() {
-      const { data } = await fetchList();
-      this.list = data.items.slice(0, 8);
-      this.loading = false;
+    async getLaws() {
+      this.listLoading = true;
+      const { data } = await fetchTransactions(this.listQuery);
+      this.total = data.total;
+      this.list = data.data;
+      this.listLoading = false;
     },
   },
 };

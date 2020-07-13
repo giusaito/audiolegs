@@ -71,5 +71,5 @@ if (mix.inProduction()) {
     });
 }
 
-mix.browserSync("http://localhost:8080");
+mix.browserSync("http://localhost:8000");
 // mix.browserSync("audiolegis.leo");

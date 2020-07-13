@@ -45,8 +45,13 @@
           </router-link>
         </div>
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
-        <transaction-table />
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:-30px;">
+        <el-card class="box-card-component">
+          <transaction-table />
+          <router-link :to="'/relatorios/transacoes'" class="bw-btn bw-btn-all" style="margin-top:10px;">
+            Veja mais
+          </router-link>
+        </el-card>
       </el-col>
       <!-- <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
         <todo-list />

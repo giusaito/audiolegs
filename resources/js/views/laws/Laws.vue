@@ -2,6 +2,7 @@
   <div class="app-container">
     <el-button-group>
       <el-button type="primary" icon="el-icon-plus" @click="createFolder">Nova Pasta</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="createFile">Arquivo(s)</el-button>
     </el-button-group>
 
     <div id="list" v-loading="listLoading">
@@ -22,7 +23,7 @@
       </ul>
     </div>
 
-    <el-dialog :title="formTitle " :visible.sync="dialogActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+    <el-dialog :title="folderDialogTitle " :visible.sync="dialogFolderActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="folderEditing" class="form-container">
         <el-form ref="currentLaw" :model="currentLaw" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
           <el-form-item ref="nome_input" label="Nome" prop="nome">
@@ -39,21 +40,32 @@
         </div>
       </div>
     </el-dialog>
+
+    <el-dialog :title="fileDialogTitle " :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+      <div v-loading="fileEditing" class="form-container">
+        <dropzone id="myVueDropzone" url="https://httpbin.org/post" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import { getToken } from '@/utils/auth';
+import Dropzone from '@/components/Dropzone';
 export default {
   name: 'Files',
+  components: { Dropzone },
   data() {
     return {
-      dialogActionVisible: false,
+      dialogFolderActionVisible: false,
+      dialogFileActionVisible: false,
       currentLaw: {},
       leis: [],
-      formTitle: '',
+      folderDialogTitle: '',
+      fileDialogTitle: '',
       folderEditing: false,
+      fileEditing: false,
       listLoading: true,
       currentPath: 'leis/',
       currentId: null,
@@ -71,14 +83,24 @@ export default {
   },
   methods: {
     createFolder() {
-      this.dialogActionVisible = true;
-      this.formTitle = 'Adicionar nova pasta';
+      this.dialogFolderActionVisible = true;
+      this.folderDialogTitle = 'Adicionar nova pasta';
       this.currentLaw = {
         nome: '',
         path: this.currentPath,
         type: 'folder',
         parent_id: this.currentId,
       };
+    },
+    createFile() {
+      this.dialogFileActionVisible = true;
+      this.folderDialogTitle = 'Adicionar áudios';
+      // this.currentLaw = {
+      //   nome: '',
+      //   path: this.currentPath,
+      //   type: 'folder',
+      //   parent_id: this.currentId,
+      // };
     },
     leisClass(tipo) {
       var $class = '';
@@ -168,12 +190,18 @@ export default {
               },
             }).then((response) => {
               console.log(response);
-              this.dialogActionVisible = false;
+              this.dialogFolderActionVisible = false;
               this.getList(response.data);
             }).catch(error => console.log(error));
           }
         }
       });
+    },
+    dropzoneS(file) {
+      this.$message({ message: 'Upload success', type: 'success' });
+    },
+    dropzoneR(file) {
+      this.$message({ message: 'Delete success', type: 'success' });
     },
   },
 };

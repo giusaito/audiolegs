@@ -1,5 +1,5 @@
 <template>
-  <div :id="id" :ref="id" :action="url" class="dropzone">
+  <div :id="id" :ref="id" :action="url" :path="path" :parent="parent" class="dropzone">
     <input type="file" name="file">
   </div>
 </template>
@@ -7,6 +7,7 @@
 <script>
 import Dropzone from 'dropzone';
 import 'dropzone/dist/dropzone.css';
+import { getToken } from '@/utils/auth';
 
 Dropzone.autoDiscover = false;
 
@@ -18,6 +19,14 @@ export default {
     },
     url: {
       type: String,
+      required: true,
+    },
+    path: {
+      type: String,
+      required: true,
+    },
+    parent: {
+      type: Number,
       required: true,
     },
     clickable: {
@@ -117,6 +126,9 @@ export default {
         '<div class="dz-error-mark"><i class="material-icons">error</i></div>' +
         '</div>' +
         '</div>',
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+      },
       init() {
         const val = vm.defaultImg;
         if (!val) {
@@ -149,6 +161,9 @@ export default {
       },
       sending: (file, xhr, formData) => {
         vm.initOnce = false;
+        formData.append('type', 'file');
+        formData.append('path', this.path);
+        formData.append('parent_id', this.parent);
       },
     });
 

@@ -48,10 +48,9 @@
         </div>
       </div>
     </el-dialog>
-
     <el-dialog :title="fileDialogTitle " :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="fileEditing" class="form-container">
-        <dropzone id="myVueDropzone" url="https://httpbin.org/post" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" />
+        <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" />
       </div>
     </el-dialog>
   </div>
@@ -244,14 +243,17 @@ export default {
             }).then((response) => {
               console.log(response);
               this.dialogFolderActionVisible = false;
-              this.getList(response.data);
+              this.getList(this.currentId);
             }).catch(error => console.log(error));
           }
         }
       });
     },
     dropzoneS(file) {
-      this.$message({ message: 'Upload success', type: 'success' });
+      console.log(file);
+      this.$message({ message: 'Áudio(s) enviado(s) com sucesso!', type: 'success' });
+      this.getList(this.currentId);
+      this.dialogFileActionVisible = false;
     },
     dropzoneR(file) {
       this.$message({ message: 'Delete success', type: 'success' });

@@ -1,21 +1,23 @@
 <template>
   <div class="app-container">
     <el-button-group>
-      <el-button type="primary" icon="el-icon-plus" @click="createFolder">Nova Pasta</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="createFolder">Pasta</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="createFile">Arquivo(s)</el-button>
     </el-button-group>
 
     <div id="list" v-loading="listLoading">
       <div id="breadcrumb">
         <ul>
-          <li v-for="breadcrumbsUrl in breadcrumbsUrls" :key="breadcrumbsUrl.id">
-            <a href="files"><span class="folderName">{{ breadcrumbsUrl.split('/')[breadcrumbsUrl.split('/').length-1] }}</span></a>
+          <li v-for="(breadcrumbsUrl, index) in breadcrumbsUrls" :id="'item-' + breadcrumbsUrl.id" :key="index">
+            <!-- <span @click="openAction(lei.id, lei.type, lei.path, lei.name)"><span class="folderName">{{ breadcrumbsUrl.split('/')[breadcrumbsUrl.split('/').length-1] }}</span></span> -->
+            <span @click="openAction(breadcrumbsUrl.id, breadcrumbsUrl.type, breadcrumbsUrl.path, breadcrumbsUrl.name, true)"><span class="folderName">{{ breadcrumbsUrl.name }}</span></span>
           </li>
         </ul>
       </div>
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
-          <div :title="lei.path" :class="leisClass(lei.type)" @click="executeActionClick(lei.id, lei.type, lei.path)">
+          <div :title="lei.path" :class="leisClass(lei.type)" @click="openAction(lei.id, lei.type, lei.path, lei.name)">
             <span v-if="lei.type === 'folder' && lei.children.length === 0" class="icon folder" />
             <span v-if="lei.type === 'folder' && lei.children.length > 0" class="icon folder full" />
             <span v-if="lei.type === 'file'" class="icon file" :class="'f-'+(lei.name.split('.')[lei.name.split('.').length-1])">.{{ lei.name.split('.')[lei.name.split('.').length-1] }}</span>
@@ -29,21 +31,27 @@
       </ul>
     </div>
 
-    <el-dialog :title="formTitle " :visible.sync="dialogActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+    <el-dialog :title="folderDialogTitle " :visible.sync="dialogFolderActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="folderEditing" class="form-container">
-        <el-form ref="currentFolder" :model="currentFolder" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
+        <el-form ref="currentLaw" :model="currentLaw" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
           <el-form-item ref="nome_input" label="Nome" prop="nome">
-            <el-input v-model="currentFolder.nome" />
+            <el-input v-model="currentLaw.nome" />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button>
             Cancelar
           </el-button>
-          <el-button type="primary" @click="handleSubmit('currentFolder')">
+          <el-button type="primary" @click="handleSubmit('currentLaw')">
             Adicionar
           </el-button>
         </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="fileDialogTitle " :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+      <div v-loading="fileEditing" class="form-container">
+        <dropzone id="myVueDropzone" url="https://httpbin.org/post" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" />
       </div>
     </el-dialog>
   </div>
@@ -52,17 +60,29 @@
 <script>
 import axios from 'axios';
 import { getToken } from '@/utils/auth';
+import Dropzone from '@/components/Dropzone';
 export default {
   name: 'Files',
+  components: { Dropzone },
   data() {
     return {
-      dialogActionVisible: false,
-      currentFolder: {},
+      dialogFolderActionVisible: false,
+      dialogFileActionVisible: false,
+      currentLaw: {},
       leis: [],
-      formTitle: '',
-      breadcrumbsUrls: [],
+      folderDialogTitle: '',
+      fileDialogTitle: '',
       folderEditing: false,
+      fileEditing: false,
       listLoading: true,
+      currentPath: 'leis/',
+      currentId: null,
+      breadcrumbsUrls: [{
+        id: 0,
+        type: 'folder',
+        path: '/leis',
+        name: 'leis',
+      }],
       rules: {
         nome: [
           { required: true, message: 'Por favor, preencha o nome da pasta', trigger: 'change' },
@@ -76,11 +96,24 @@ export default {
   },
   methods: {
     createFolder() {
-      this.dialogActionVisible = true;
-      this.formTitle = 'Adicionar nova pasta';
-      this.currentFolder = {
+      this.dialogFolderActionVisible = true;
+      this.folderDialogTitle = 'Adicionar nova pasta';
+      this.currentLaw = {
         nome: '',
+        path: this.currentPath,
+        type: 'folder',
+        parent_id: this.currentId,
       };
+    },
+    createFile() {
+      this.dialogFileActionVisible = true;
+      this.folderDialogTitle = 'Adicionar áudios';
+      // this.currentLaw = {
+      //   nome: '',
+      //   path: this.currentPath,
+      //   type: 'folder',
+      //   parent_id: this.currentId,
+      // };
     },
     leisClass(tipo) {
       var $class = '';
@@ -90,6 +123,60 @@ export default {
         $class = 'files';
       }
       return $class;
+    },
+    generateBreadcrumbs(nextDir){
+      var path = nextDir.split('/').slice(0);
+      for (var i = 1; i < path.length; i++) {
+        path[i] = path[i - 1] + '/' + path[i];
+      }
+      return path;
+    },
+    openAction(id, type, path, name, close = null) {
+      if (type === 'folder') {
+        // this.breadcrumbsUrls.push(path);
+        // this.breadcrumbsUrls = this.generateBreadcrumbs(path);
+        // alert(this.breadcrumbsUrls.includes(name));
+        this.breadcrumbsUrls.push({ id, type, path, name });
+
+        if (close) {
+          var finded = false;
+          this.breadcrumbsUrls.forEach((value, index) => {
+            if (value.id === id) {
+              finded = true;
+            }
+            if (finded) {
+              this.breadcrumbsUrls.splice(this.breadcrumbsUrls.indexOf(index), 1);
+            }
+          });
+        }
+
+        if (path === '/leis') {
+          this.breadcrumbsUrls = [{
+            id: 0,
+            type: 'folder',
+            path: '/leis',
+            name: 'leis',
+          }];
+        }
+        // alert(this.breadcrumbsUrls.index);
+        console.log(this.breadcrumbsUrls);
+        this.currentPath = path;
+        this.currentId = id;
+        this.listLoading = true;
+        axios({
+          method: 'get',
+          url: `api/v1/bw/controle-de-leis/lista/` + id,
+          headers: {
+            'Authorization': 'Bearer ' + getToken(),
+          },
+        }).then((response) => {
+          console.log(response.data.data);
+          this.leis = response.data.data;
+          this.listLoading = false;
+        }).catch(error => console.log(error));
+      } else {
+        alert('arquivo');
+      }
     },
     formatBytes(bytes, decimals = 2) {
       if (bytes === 0) {
@@ -104,11 +191,15 @@ export default {
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     },
-    async getList() {
+    async getList(id = null) {
       this.listLoading = true;
+      var urlList = `api/v1/bw/controle-de-leis/lista`;
+      if (id) {
+        urlList = `api/v1/bw/controle-de-leis/lista/` + id;
+      }
       axios({
         method: 'get',
-        url: `api/v1/bw/controle-de-leis/lista`,
+        url: urlList,
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
@@ -118,31 +209,24 @@ export default {
         this.listLoading = false;
       }).catch(error => console.log(error));
     },
-    executeActionClick(id, tipo, nextDir) {
-      if (tipo === 'folder') {
-        const findDataById = (id) => {
-          /* eslint-disable */
-          const [key, lei] = Object.entries(this.leis).find(([key, lei]) => lei.id === id);
-          /* eslint-enable */
-          return lei.children;
-        };
-        this.breadcrumbsUrls = this.generateBreadcrumbs(nextDir);
-        this.leis = findDataById(id);
-      } else {
-        alert('file');
-      }
-    },
-    generateBreadcrumbs(nextDir){
-      var path = nextDir.split('/').slice(0);
-      for (var i = 1; i < path.length; i++) {
-        path[i] = path[i - 1] + '/' + path[i];
-      }
-      return path;
-    },
+    // executeActionClick(id, tipo, nextDir) {
+    //   if (tipo === 'folder') {
+    //     const findDataById = (id) => {
+    //       /* eslint-disable */
+    //       const [key, lei] = Object.entries(this.leis).find(([key, lei]) => lei.id === id);
+    //       /* eslint-enable */
+    //       return lei.children;
+    //     };
+    //     this.breadcrumbsUrls = this.generateBreadcrumbs(nextDir);
+    //     this.leis = findDataById(id);
+    //   } else {
+    //     alert('file');
+    //   }
+    // },
     handleSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if (this.currentFolder.id !== undefined){
+          if (this.currentLaw.id !== undefined){
             alert('edit');
           } else {
             axios({
@@ -152,14 +236,25 @@ export default {
                 'Authorization': 'Bearer ' + getToken(),
               },
               data: {
-                nome: this.currentFolder.nome,
+                name: this.currentLaw.nome,
+                path: this.currentLaw.path,
+                type: this.currentLaw.type,
+                parent_id: this.currentLaw.parent_id,
               },
             }).then((response) => {
               console.log(response);
+              this.dialogFolderActionVisible = false;
+              this.getList(response.data);
             }).catch(error => console.log(error));
           }
         }
       });
+    },
+    dropzoneS(file) {
+      this.$message({ message: 'Upload success', type: 'success' });
+    },
+    dropzoneR(file) {
+      this.$message({ message: 'Delete success', type: 'success' });
     },
   },
 };

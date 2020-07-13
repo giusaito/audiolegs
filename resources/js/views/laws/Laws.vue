@@ -8,7 +8,7 @@
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
-          <a :href="'leis/'+lei.name" :title="'leis/'+lei.name" :class="leisClass(lei.type)">
+          <div :title="lei.path" :class="leisClass(lei.type)" @click="openAction(lei.id, lei.type, lei.path)">
             <span v-if="lei.type === 'folder' && lei.children.length === 0" class="icon folder" />
             <span v-if="lei.type === 'folder' && lei.children.length > 0" class="icon folder full" />
             <span v-if="lei.type === 'file'" class="icon file" :class="'f-'+(lei.name.split('.')[lei.name.split('.').length-1])">.{{ lei.name.split('.')[lei.name.split('.').length-1] }}</span>
@@ -17,23 +17,23 @@
               <span v-if="lei.type === 'folder'">{{ lei.children.length }} <span v-if="lei.children.length > 1">itens</span><span v-else>item</span></span>
               <span v-if="lei.type === 'file'">{{ formatBytes(lei.size) }}</span>
             </span>
-          </a>
+          </div>
         </li>
       </ul>
     </div>
 
     <el-dialog :title="formTitle " :visible.sync="dialogActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="folderEditing" class="form-container">
-        <el-form ref="currentFolder" :model="currentFolder" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
+        <el-form ref="currentLaw" :model="currentLaw" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
           <el-form-item ref="nome_input" label="Nome" prop="nome">
-            <el-input v-model="currentFolder.nome" />
+            <el-input v-model="currentLaw.nome" />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button>
             Cancelar
           </el-button>
-          <el-button type="primary" @click="handleSubmit('currentFolder')">
+          <el-button type="primary" @click="handleSubmit('currentLaw')">
             Adicionar
           </el-button>
         </div>
@@ -50,11 +50,14 @@ export default {
   data() {
     return {
       dialogActionVisible: false,
-      currentFolder: {},
+      currentLaw: {},
       leis: [],
       formTitle: '',
       folderEditing: false,
       listLoading: true,
+      currentPath: 'leis/',
+      currentId: null,
+      breadcrumbsUrls: [],
       rules: {
         nome: [
           { required: true, message: 'Por favor, preencha o nome da pasta', trigger: 'change' },
@@ -70,8 +73,11 @@ export default {
     createFolder() {
       this.dialogActionVisible = true;
       this.formTitle = 'Adicionar nova pasta';
-      this.currentFolder = {
+      this.currentLaw = {
         nome: '',
+        path: this.currentPath,
+        type: 'folder',
+        parent_id: this.currentId,
       };
     },
     leisClass(tipo) {
@@ -82,6 +88,34 @@ export default {
         $class = 'files';
       }
       return $class;
+    },
+    generateBreadcrumbs(nextDir){
+      var path = nextDir.split('/').slice(0);
+      for (var i = 1; i < path.length; i++) {
+        path[i] = path[i - 1] + '/' + path[i];
+      }
+      return path;
+    },
+    openAction(id, type, path) {
+      if (type === 'folder') {
+        this.breadcrumbsUrls.push(path);
+        this.currentPath = path;
+        this.currentId = id;
+        this.listLoading = true;
+        axios({
+          method: 'get',
+          url: `api/v1/bw/controle-de-leis/lista/` + id,
+          headers: {
+            'Authorization': 'Bearer ' + getToken(),
+          },
+        }).then((response) => {
+          console.log(response.data.data);
+          this.leis = response.data.data;
+          this.listLoading = false;
+        }).catch(error => console.log(error));
+      } else {
+        alert('arquivo');
+      }
     },
     formatBytes(bytes, decimals = 2) {
       if (bytes === 0) {
@@ -96,11 +130,15 @@ export default {
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     },
-    async getList() {
+    async getList(id = null) {
       this.listLoading = true;
+      var urlList = `api/v1/bw/controle-de-leis/lista`;
+      if (id) {
+        urlList = `api/v1/bw/controle-de-leis/lista/` + id;
+      }
       axios({
         method: 'get',
-        url: `api/v1/bw/controle-de-leis/lista`,
+        url: urlList,
         headers: {
           'Authorization': 'Bearer ' + getToken(),
         },
@@ -113,7 +151,7 @@ export default {
     handleSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if (this.currentFolder.id !== undefined){
+          if (this.currentLaw.id !== undefined){
             alert('edit');
           } else {
             axios({
@@ -123,10 +161,15 @@ export default {
                 'Authorization': 'Bearer ' + getToken(),
               },
               data: {
-                nome: this.currentFolder.nome,
+                name: this.currentLaw.nome,
+                path: this.currentLaw.path,
+                type: this.currentLaw.type,
+                parent_id: this.currentLaw.parent_id,
               },
             }).then((response) => {
               console.log(response);
+              this.dialogActionVisible = false;
+              this.getList(response.data);
             }).catch(error => console.log(error));
           }
         }

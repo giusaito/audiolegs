@@ -11,5 +11,6 @@ class Law extends Model
 {
 	use NodeTrait;
 	protected $table = 'laws';
-	protected $fillable = ['*'];
+	protected $guarded = [''];
+	// protected $fillable = ['*'];
 }

@@ -8,7 +8,7 @@
       <p class="text-center">Assinatura / Cancelamento</p>
       <line-chart :chart-data="lineChartData" />
     </el-row>
-    
+
     <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
       <p class="text-center">Usuários / Planos</p>
       <user-line-chart :chart-data="userChartData" />
@@ -38,7 +38,7 @@
           </router-link>
         </div>
       </el-col> -->
-       <el-col :xs="24" :sm="24" :lg="12">
+      <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <p class="text-center">Horário mais acessado do dia</p>
           <PieChartHour />
@@ -104,7 +104,7 @@ const userChartData = {
   planUser: {
     planOne: [500, 205, 209, 260, 268, 280, 275],
     planTwo: [400, 190, 82, 121, 60, 10, 19],
-    planThree: [300, 162, 85, 356, 90, 70, 190]
+    planThree: [300, 162, 85, 356, 90, 70, 190],
   },
 };
 

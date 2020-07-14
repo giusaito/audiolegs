@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { fetchFiveTransactions } from '@/api/reports';
+import { fetchTransactions } from '@/api/reports';
 
 export default {
   filters: {
@@ -56,7 +56,7 @@ export default {
   methods: {
     async getLaws() {
       this.listLoading = true;
-      const { data } = await fetchFiveTransactions(this.listQuery);
+      const { data } = await fetchTransactions(this.listQuery);
       this.total = data.total;
       this.list = data.data;
       this.listLoading = false;

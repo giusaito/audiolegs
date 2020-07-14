@@ -1,5 +1,5 @@
 <template>
-  <div :id="id" :ref="id" :action="url" class="dropzone">
+  <div :id="id" :ref="id" :action="url" :path="path" :parent="parent" class="dropzone">
     <input type="file" name="file">
   </div>
 </template>
@@ -7,6 +7,7 @@
 <script>
 import Dropzone from 'dropzone';
 import 'dropzone/dist/dropzone.css';
+import { getToken } from '@/utils/auth';
 
 Dropzone.autoDiscover = false;
 
@@ -18,6 +19,14 @@ export default {
     },
     url: {
       type: String,
+      required: true,
+    },
+    path: {
+      type: String,
+      required: true,
+    },
+    parent: {
+      type: Number,
       required: true,
     },
     clickable: {
@@ -93,8 +102,9 @@ export default {
     const vm = this;
     this.dropzone = new Dropzone(element, {
       clickable: this.clickable,
-      thumbnailWidth: this.thumbnailWidth,
-      thumbnailHeight: this.thumbnailHeight,
+      // thumbnailWidth: this.thumbnailWidth,
+      // thumbnailHeight: this.thumbnailHeight,
+      thumbnail: false,
       maxFiles: this.maxFiles,
       maxFilesize: this.maxFilesize,
       dictRemoveFile: 'Remove',
@@ -105,10 +115,10 @@ export default {
         '<i style="margin-top: 3em;display: inline-block" class="material-icons">' + this.defaultMsg + '</i><br>Drop files here to upload',
       dictMaxFilesExceeded: 'Only one picture',
       previewTemplate:
-        '<div class="dz-preview dz-file-preview">' +
-        '<div class="dz-image" style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" >' +
-        '<img style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" data-dz-thumbnail />' +
-        '</div>' +
+        // '<div class="dz-preview dz-file-preview">' +
+        // '<div class="dz-image" style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" >' +
+        // '<img style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" data-dz-thumbnail />' +
+        // '</div>' +
         '<div class="dz-details">' +
         '<div class="dz-size"><span data-dz-size></span></div>' +
         '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>' +
@@ -117,6 +127,9 @@ export default {
         '<div class="dz-error-mark"><i class="material-icons">error</i></div>' +
         '</div>' +
         '</div>',
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+      },
       init() {
         const val = vm.defaultImg;
         if (!val) {
@@ -149,13 +162,15 @@ export default {
       },
       sending: (file, xhr, formData) => {
         vm.initOnce = false;
+        formData.append('type', 'file');
+        formData.append('path', this.path);
+        formData.append('parent_id', this.parent);
       },
     });
 
     if (this.couldPaste) {
       document.addEventListener('paste', this.pasteImg);
     }
-
     this.dropzone.on('success', file => {
       vm.$emit('dropzone-success', file, vm.dropzone.element);
     });
@@ -168,7 +183,7 @@ export default {
     this.dropzone.on('error', (file, error, xhr) => {
       vm.$emit('dropzone-error', file, error, xhr);
     });
-    this.dropzone.on('successmultiple', (file, error, xhr) => {
+    this.dropzone.on('queuecomplete', (file, error, xhr) => {
       vm.$emit('dropzone-successmultiple', file, error, xhr);
     });
   },

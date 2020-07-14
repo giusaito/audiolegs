@@ -66,7 +66,7 @@ export default {
         },
         xAxis: [{
           type: 'category',
-          data: ['7 dias', 'Mensal', 'Trimestral', 'Semestral', 'Anual'],
+          data: ['7 dias', 'Mensal', 'Fag', 'Unopar', 'Unipar'],
           axisTick: {
             alignWithLabel: true,
           },

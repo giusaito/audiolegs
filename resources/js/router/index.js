@@ -120,16 +120,6 @@ export const constantRoutes = [
       },
     ],
   },
-  {
-    path: '/importar-usuario',
-    component: Layout,
-    children: [{
-      path: 'index',
-      component: () => import('@/views/users/ImportUser'),
-      name: 'Importar Usuários',
-      meta: { title: 'Importar Usuários', icon: 'icon' },
-    }],
-  },
   plansRoutes,
   controleDeLeisRoutes,
   {

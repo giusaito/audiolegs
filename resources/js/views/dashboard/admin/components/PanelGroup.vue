@@ -11,7 +11,7 @@
               <div class="card-panel-text">
                 Usuários
               </div>
-              <count-to :start-val="0" :end-val="96000" :duration="2600" class="card-panel-num" />
+              <count-to :start-val="0" :end-val="92578" :duration="2600" class="card-panel-num" />
             </div>
           </div>
         </router-link>
@@ -28,7 +28,8 @@
               <div class="card-panel-text">
                 Assinaturas
               </div>
-              <count-to :start-val="0" :end-val="9280" :duration="3700" class="card-panel-num" />
+              <p class="bw-info">R$ 69.750,59</p>
+              <!-- <count-to :start-val="0" :end-val="9280" :duration="3700" class="card-panel-num" /> -->
             </div>
           </div>
         </router-link>
@@ -60,9 +61,10 @@
             </div>
             <div class="card-panel-description">
               <div class="card-panel-text">
-                Assinatura mês
+                Assinatura/mês
               </div>
-              <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+              <p class="bw-info">R$ 3.500,25</p>
+              <!-- <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" /> -->
             </div>
           </div>
         </router-link>
@@ -157,5 +159,9 @@ export default {
       }
     }
   }
+}
+.bw-info {
+  font-size: 20px;
+  margin-top: 0;
 }
 </style>

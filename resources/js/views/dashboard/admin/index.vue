@@ -9,6 +9,11 @@
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
+    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+      <p class="text-center">Usuários / Planos</p>
+      <user-line-chart :chart-data="userChartData" />
+    </el-row>
+
     <el-row :gutter="32">
       <!-- <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
@@ -24,7 +29,7 @@
           </router-link>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :lg="12">
+      <!-- <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <p class="text-center">Usuários ativos em cada plano</p>
           <bar-chart />
@@ -32,10 +37,7 @@
             Veja mais
           </router-link>
         </div>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="8">
+      </el-col> -->
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
           <p class="text-center">Horário mais acessado do dia</p>
@@ -45,8 +47,16 @@
           </router-link>
         </div>
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
-        <transaction-table />
+    </el-row>
+
+    <el-row :gutter="8">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:-30px;">
+        <el-card class="box-card-component">
+          <transaction-table />
+          <router-link :to="'/relatorios/transacoes'" class="bw-btn bw-btn-all" style="margin-top:10px;">
+            Veja mais
+          </router-link>
+        </el-card>
       </el-col>
       <!-- <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
         <todo-list />
@@ -62,6 +72,7 @@
 // import GithubCorner from '@/components/GithubCorner';
 import PanelGroup from './components/PanelGroup';
 import LineChart from './components/LineChart';
+import UserLineChart from './components/UserPlanLineChart';
 // import RaddarChart from './components/RaddarChart';
 import PieChart from './components/PieChart';
 import BarChart from './components/BarChart';
@@ -72,8 +83,8 @@ import TransactionTable from './components/TransactionTable';
 
 const lineChartData = {
   newVisitis: {
-    expectedData: [100, 120, 161, 134, 105, 160, 165],
-    actualData: [120, 82, 91, 154, 162, 140, 145],
+    expectedData: [300, 205, 209, 260, 268, 280, 275],
+    actualData: [120, 82, 91, 121, 60, 10, 19],
   },
   messages: {
     expectedData: [200, 192, 120, 144, 160, 130, 140],
@@ -89,12 +100,21 @@ const lineChartData = {
   },
 };
 
+const userChartData = {
+  planUser: {
+    planOne: [500, 205, 209, 260, 268, 280, 275],
+    planTwo: [400, 190, 82, 121, 60, 10, 19],
+    planThree: [300, 162, 85, 356, 90, 70, 190],
+  },
+};
+
 export default {
   name: 'DashboardAdmin',
   components: {
     // GithubCorner,
     PanelGroup,
     LineChart,
+    UserLineChart,
     // RaddarChart,
     PieChart,
     BarChart,
@@ -106,11 +126,15 @@ export default {
   data() {
     return {
       lineChartData: lineChartData.newVisitis,
+      userChartData: userChartData.planUser,
     };
   },
   methods: {
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type];
+    },
+    handleSetUserChartData(type) {
+      this.userChartData = userChartData[type];
     },
   },
 };

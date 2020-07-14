@@ -22,6 +22,12 @@ const adminRoutes = {
       hidden: true,
     },
     {
+      path: '/importar-usuario/index',
+      component: () => import('@/views/users/ImportUser'),
+      name: 'Importar Usuários',
+      meta: { title: 'Importar Usuários', icon: 'icon' },
+    },
+    {
       path: 'users',
       component: () => import('@/views/users/List'),
       name: 'UserList',

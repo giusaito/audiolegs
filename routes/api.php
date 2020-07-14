@@ -57,6 +57,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
       Route::get('cancelamento', 'ReportController@cancel')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
       Route::get('hora-acessada', 'ReportController@acessHour')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
       Route::get('transacoes', 'ReportController@transactions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+      Route::get('five-transacoes', 'ReportController@fiveTransactions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
       Route::get('planos-usuarios', 'ReportController@userPlan')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });
     // Rota de planos backend

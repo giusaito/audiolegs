@@ -75,7 +75,7 @@ import LineChart from './components/LineChart';
 import UserLineChart from './components/UserPlanLineChart';
 // import RaddarChart from './components/RaddarChart';
 import PieChart from './components/PieChart';
-import BarChart from './components/BarChart';
+// import BarChart from './components/BarChart';
 import PieChartHour from './components/PieChartHourAcess';
 import TransactionTable from './components/TransactionTable';
 // import TodoList from './components/TodoList';
@@ -117,7 +117,7 @@ export default {
     UserLineChart,
     // RaddarChart,
     PieChart,
-    BarChart,
+    // BarChart,
     PieChartHour,
     TransactionTable,
     // TodoList,

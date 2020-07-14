@@ -47,7 +47,7 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog :title="fileDialogTitle" :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+    <el-dialog :title="fileDialogTitle" width="30%" :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="fileEditing" class="form-container">
         <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" :max-files="10" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
       </div>
@@ -106,7 +106,7 @@ export default {
       folderEditing: false,
       fileEditing: false,
       listLoading: true,
-      currentPath: 'leis/',
+      currentPath: '/leis',
       currentId: null,
       breadcrumbsUrls: [{
         id: 0,
@@ -303,7 +303,7 @@ export default {
       // this.dialogFileActionVisible = false;
     },
     dropzoneA(file){
-      // this.dialogFileActionVisible = false;
+      this.dialogFileActionVisible = false;
     },
     dropzoneR(file) {
       // this.$message({ message: 'Delete success', type: 'success' });

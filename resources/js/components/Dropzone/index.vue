@@ -35,7 +35,7 @@ export default {
     },
     defaultMsg: {
       type: String,
-      default: 'Upload image',
+      default: 'Enviar áudio(s)',
     },
     acceptedFiles: {
       type: String,
@@ -112,7 +112,7 @@ export default {
       acceptedFiles: this.acceptedFiles,
       autoProcessQueue: this.autoProcessQueue,
       dictDefaultMessage:
-        '<i style="margin-top: 3em;display: inline-block" class="material-icons">' + this.defaultMsg + '</i><br>Drop files here to upload',
+        '<i style="margin-top: 3em;display: inline-block" class="material-icons">' + this.defaultMsg + '</i><br>Solte os arquivos aqui ou clique',
       dictMaxFilesExceeded: 'Only one picture',
       previewTemplate:
         // '<div class="dz-preview dz-file-preview">' +
@@ -320,5 +320,17 @@ i {
 .dropzone .dz-preview .dz-error-mark i {
   color: white;
   font-size: 5rem;
+}
+.dropzone {
+  background: white;
+  border-radius: 5px;
+  border: 2px dashed rgb(0, 135, 247);
+  border-image: none;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  background: url(/images/upload_audio_2.png) no-repeat;
+  background-size: 100%;
+  height: 500px;
 }
 </style>

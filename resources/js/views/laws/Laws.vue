@@ -47,9 +47,35 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog :title="fileDialogTitle " :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+    <el-dialog :title="fileDialogTitle" :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="fileEditing" class="form-container">
-        <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
+        <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" :max-files="10" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
+      </div>
+    </el-dialog>
+    <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+      <div class="audioDetails">
+        <transition name="slide-fade" mode="out-in">
+          <p :key="currentSong" class="title">{{ music.title }}</p>
+        </transition>
+        <transition name="slide-fade" mode="out-in">
+          <p :key="currentSong" class="description">{{ music.description }}</p>
+        </transition>
+      </div>
+      <div class="playerButtons">
+        <a class="button play" title="Play/Pause Song" @click="playAudio()">
+          <transition name="slide-fade" mode="out-in">
+            <i :key="1" class="zmdi" :class="[currentlyStopped ? 'zmdi-stop' : (currentlyPlaying ? 'zmdi-pause-circle' : 'zmdi-play-circle')]" />
+          </transition>
+        </a>
+        <div class="currentTimeContainer" style="text-align:center">
+          <span class="currentTime">{{ currentTime | fancyTimeFormat }}</span>
+          <span class="totalTime"> {{ trackDuration | fancyTimeFormat }}</span>
+          <!--<span style="color:black">({{ currentSong+1 }}/{{ music.length }})</span>-->
+        </div>
+
+        <div class="currentProgressBar">
+          <div class="currentProgress" :style="{ width: currentProgressBar + '%' }" />
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -62,14 +88,21 @@ import Dropzone from '@/components/Dropzone';
 export default {
   name: 'Files',
   components: { Dropzone },
+  filters: {
+    fancyTimeFormat: function(s) {
+      return (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
+    },
+  },
   data() {
     return {
       dialogFolderActionVisible: false,
       dialogFileActionVisible: false,
+      dialogAudioActionVisible: false,
       currentLaw: {},
       leis: [],
       folderDialogTitle: '',
       fileDialogTitle: '',
+      audioDialogTitle: '',
       folderEditing: false,
       fileEditing: false,
       listLoading: true,
@@ -87,10 +120,45 @@ export default {
           { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 50', trigger: 'change' },
         ],
       },
+
+      audio: '',
+      currentlyPlaying: false,
+      currentlyStopped: false,
+      currentTime: 0,
+      checkingCurrentPositionInTrack: '',
+      trackDuration: 0,
+      currentProgressBar: 0,
+      isPlaylistActive: false,
+      currentSong: 0,
+      music: {
+        // title: 'Service Bell',
+        // description: 'Daniel Simion',
+        // url: 'https://soundbible.com/mp3/service-bell_daniel_simion.mp3',
+        // image: 'https://source.unsplash.com/crs2vlkSe98/400x400',
+        title: '',
+        description: '',
+        url: '',
+      },
+      audioFile: '',
     };
+  },
+  watch: {
+    currentTime: function() {
+      this.currentTime = Math.round(this.currentTime);
+    },
+  },
+  mounted: function() {
+    this.changeSong();
+    this.audio.loop = false;
   },
   created() {
     this.getList();
+  },
+  beforeDestroy: function() {
+    this.audio.removeEventListener('ended', this.handleEnded);
+    this.audio.removeEventListener('loadedmetadata', this.handleEnded);
+
+    clearTimeout(this.checkingCurrentPositionInTrack);
   },
   methods: {
     createFolder() {
@@ -106,12 +174,6 @@ export default {
     createFile() {
       this.dialogFileActionVisible = true;
       this.folderDialogTitle = 'Adicionar áudios';
-      // this.currentLaw = {
-      //   nome: '',
-      //   path: this.currentPath,
-      //   type: 'folder',
-      //   parent_id: this.currentId,
-      // };
     },
     leisClass(tipo) {
       var $class = '';
@@ -169,7 +231,11 @@ export default {
           this.listLoading = false;
         }).catch(error => console.log(error));
       } else {
-        alert('arquivo');
+        this.dialogAudioActionVisible = true;
+        this.music.title = 'Service Bell';
+        this.music.description = 'Daniel Simion';
+        alert(path);
+        this.music.url = 'https://soundbible.com/mp3/service-bell_daniel_simion.mp3';
       }
     },
     formatBytes(bytes, decimals = 2) {
@@ -237,11 +303,90 @@ export default {
       // this.dialogFileActionVisible = false;
     },
     dropzoneA(file){
-      this.dialogFileActionVisible = false;
+      // this.dialogFileActionVisible = false;
     },
     dropzoneR(file) {
       // this.$message({ message: 'Delete success', type: 'success' });
     },
+
+    // PLAYER
+    changeSong: function(index) {
+      var wasPlaying = this.currentlyPlaying;
+      this.imageLoaded = false;
+      if (index !== undefined) {
+        this.stopAudio();
+        this.currentSong = index;
+      }
+      this.audioFile = this.music.url;
+      this.audio = new Audio(this.audioFile);
+      var localThis = this;
+      this.audio.addEventListener('loadedmetadata', function() {
+        localThis.trackDuration = Math.round(this.duration);
+      });
+      this.audio.addEventListener('ended', this.handleEnded);
+      if (wasPlaying) {
+        this.playAudio();
+      }
+    },
+    isCurrentSong: function(index) {
+      if (this.currentSong === index) {
+        return true;
+      }
+      return false;
+    },
+    getCurrentSong: function(currentSong) {
+      return this.music[currentSong].url;
+    },
+    playAudio: function() {
+      if (
+        this.currentlyStopped === true &&
+        this.currentSong + 1 === this.music.length
+      ) {
+        this.currentSong = 0;
+        this.changeSong();
+      }
+      if (!this.currentlyPlaying) {
+        this.getCurrentTimeEverySecond(true);
+        this.currentlyPlaying = true;
+        this.audio.play();
+      } else {
+        this.stopAudio();
+      }
+      this.currentlyStopped = false;
+    },
+    stopAudio: function() {
+      this.audio.pause();
+      this.currentlyPlaying = false;
+      this.pausedMusic();
+    },
+    handleEnded: function() {
+      if (this.currentSong + 1 === this.music.length) {
+        this.stopAudio();
+        this.currentlyPlaying = false;
+        this.currentlyStopped = true;
+      } else {
+        this.currentlyPlaying = false;
+        this.currentSong++;
+        this.changeSong();
+        this.playAudio();
+      }
+    },
+    getCurrentTimeEverySecond: function(startStop) {
+      var localThis = this;
+      this.checkingCurrentPositionInTrack = setTimeout(
+        function() {
+          localThis.currentTime = localThis.audio.currentTime;
+          localThis.currentProgressBar =
+            localThis.audio.currentTime / localThis.trackDuration * 100;
+          localThis.getCurrentTimeEverySecond(true);
+        }.bind(this),
+        1000
+      );
+    },
+    pausedMusic: function() {
+      clearTimeout(this.checkingCurrentPositionInTrack);
+    },
+    // /fim PLAYER
   },
 };
 </script>
@@ -546,5 +691,95 @@ export default {
 	font-weight: 700;
   line-height: 20px;
   margin:0 5px;
+}
+
+@import url("https://fonts.googleapis.com/css?family=Inconsolata:400,700");
+@import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css");
+
+.animated {
+  -webkit-animation-duration: 0.5s;
+          animation-duration: 0.5s;
+}
+.audioDetails {
+  text-align: center;
+  margin: 2rem 0;
+}
+.audioDetails p {
+  margin: 0px;
+}
+.audioDetails p.title {
+  font-size: 1rem;
+  color: black;
+}
+.audioDetails p.description {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: none;
+  color: rgba(0, 0, 0, 0.75);
+  -webkit-transition-delay: 100ms;
+          transition-delay: 100ms;
+}
+.playerButtons {
+  position: relative;
+  margin: 0 auto;
+  text-align: center;
+}
+.playerButtons .button {
+  font-size: 2rem;
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0.5rem;
+  margin: 0 0.25rem;
+  color: rgba(0, 0, 0, 0.75);
+  border-radius: 50%;
+  outline: 0;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+}
+.playerButtons .button.play {
+  font-size: 4rem;
+  margin: 0 1.5rem;
+}
+.playerButtons .button:active {
+  opacity: 0.75;
+  -webkit-transform: scale(0.75);
+          transform: scale(0.75);
+}
+.playerButtons .button.isDisabled {
+  color: rgba(0, 0, 0, 0.2);
+  cursor: initial;
+}
+.playerButtons .button.isDisabled:active {
+  -webkit-transform: none;
+          transform: none;
+}
+.currentTimeContainer {
+  width: 100%;
+  height: 1rem;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: justify;
+          justify-content: space-between;
+}
+.currentTimeContainer .currentTime,
+.currentTimeContainer .totalTime {
+  font-size: 0.5rem;
+  font-family: monospace;
+  color: rgba(0, 0, 0, 0.75);
+}
+.currentProgressBar {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0.75rem 0;
+}
+.currentProgressBar .currentProgress {
+  background-color: rgba(0, 0, 0, 0.75);
+  width: 0px;
+  height: 1px;
+  -webkit-transition: 100ms;
+  transition: 100ms;
 }
 </style>

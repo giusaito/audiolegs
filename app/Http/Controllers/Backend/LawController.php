@@ -39,7 +39,7 @@ class LawController extends Controller
                     'name' => $request->name,
                     'type' => $request->type,
                     'path' => $request->path,
-                    'size' => $request->size
+                    'size' => 0
                 ]);
                 Storage::makeDirectory($request->path);
             // SE FOR ÁUDIO
@@ -76,7 +76,7 @@ class LawController extends Controller
                 $image = $request->file('file');
                 $imageName = $image->getClientOriginalName();
                 $path = $image->move(Storage::disk('local')->path($request->path),$imageName);
-                
+                dd($request->path);
                 $file = Law::create([
                     'name' => $imageName,
                     'type' => $request->type,

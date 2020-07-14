@@ -9,3 +9,18 @@
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
+.dropzone .dz-details {
+  background: rgba(255,255,255,0.9) !important;
+  border-bottom: 1px solid #ccc !important;
+  padding: 10px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+.dropzone a.dz-remove {
+  background: #ff5959 !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+  padding: 5px 10px !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+}

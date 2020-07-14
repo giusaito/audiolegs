@@ -74,7 +74,7 @@ class ReportController extends Controller
     return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
     }
    
-   public function transactions(){
+   public function fiveTransactions($rowsNumber = 4){
     $names = [
         'Helena Domingues',
         'Miguel Santos',
@@ -101,7 +101,50 @@ class ReportController extends Controller
         'Lívia Henrique',
         'Lucas Vicente',
         ];
-        $rowsNumber = 10;
+        $data = [];
+        for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
+            $row = [
+                'order_no' => 'aud-' . mt_rand(1000000, 9999999),
+                'price' => mt_rand(30, 250),
+                'name' => $names[array_rand($names)],
+                'date' => Faker::randomDateTime()->format('d/m/Y h:m'),
+                'plan' => Faker::randomInArray(['7 dias grátis', 'Mensal', 'Trimestral', 'Semestral', 'Anual']),
+                'status' => Faker::randomInArray(['Sucesso', 'Pendente', 'Cancelado', 'Estorno']),
+            ];
+
+            $data[] = $row;
+        }
+
+        return response()->json(new JsonResponse(['data' => $data, 'total' => 1]));
+    }
+   
+     public function transactions($rowsNumber = 10){
+    $names = [
+        'Helena Domingues',
+        'Miguel Santos',
+        'Alice Rodrigues',
+        'Arthur Pereira',
+        'Laura Oliveira',
+        'Heitor Marques',
+        'Manuela Pereira',
+        'Bernardo Nascimento',
+        'Valentina Saito',
+        'Davi Sousa',
+        'Sophia Reis',
+        'Théo Reis do Nascimento',
+        'Isabella Domingues de Oliveira',
+        'Lorenzo Joaquim',
+        'Heloísa Guilherme',
+        'Gabriel Domingues',
+        'Luiza Benício',
+        'Pedro Lucca',
+        'Júlia Gabriel',
+        'Benjamin Henrique',
+        'Lorena Henrique',
+        'Matheus Henrique',
+        'Lívia Henrique',
+        'Lucas Vicente',
+        ];
         $data = [];
         for ($rowIndex = 0; $rowIndex < $rowsNumber; $rowIndex++) {
             $row = [

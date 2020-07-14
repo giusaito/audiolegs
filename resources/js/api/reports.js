@@ -32,6 +32,14 @@ export function fetchTransactions(query) {
   });
 }
 
+export function fetchFiveTransactions(query) {
+  return request({
+    url: '/v1/bw/relatorios/five-transacoes',
+    method: 'get',
+    params: query,
+  });
+}
+
 export function fetchSubscriptions(query) {
   return request({
     url: '/v1/bw/relatorios/assinaturas',

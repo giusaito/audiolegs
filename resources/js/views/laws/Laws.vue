@@ -9,7 +9,6 @@
       <div id="breadcrumb">
         <ul>
           <li v-for="(breadcrumbsUrl, index) in breadcrumbsUrls" :id="'item-' + breadcrumbsUrl.id" :key="index">
-            <!-- <span @click="openAction(lei.id, lei.type, lei.path, lei.name)"><span class="folderName">{{ breadcrumbsUrl.split('/')[breadcrumbsUrl.split('/').length-1] }}</span></span> -->
             <span @click="openAction(breadcrumbsUrl.id, breadcrumbsUrl.type, breadcrumbsUrl.path, breadcrumbsUrl.name, true)"><span class="folderName">{{ breadcrumbsUrl.name }}</span></span>
           </li>
         </ul>
@@ -50,7 +49,7 @@
     </el-dialog>
     <el-dialog :title="fileDialogTitle " :visible.sync="dialogFileActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="fileEditing" class="form-container">
-        <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" />
+        <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
       </div>
     </el-dialog>
   </div>
@@ -132,9 +131,6 @@ export default {
     },
     openAction(id, type, path, name, close = null) {
       if (type === 'folder') {
-        // this.breadcrumbsUrls.push(path);
-        // this.breadcrumbsUrls = this.generateBreadcrumbs(path);
-        // alert(this.breadcrumbsUrls.includes(name));
         this.breadcrumbsUrls.push({ id, type, path, name });
 
         if (close) {
@@ -157,7 +153,6 @@ export default {
             name: 'leis',
           }];
         }
-        // alert(this.breadcrumbsUrls.index);
         console.log(this.breadcrumbsUrls);
         this.currentPath = path;
         this.currentId = id;
@@ -208,20 +203,6 @@ export default {
         this.listLoading = false;
       }).catch(error => console.log(error));
     },
-    // executeActionClick(id, tipo, nextDir) {
-    //   if (tipo === 'folder') {
-    //     const findDataById = (id) => {
-    //       /* eslint-disable */
-    //       const [key, lei] = Object.entries(this.leis).find(([key, lei]) => lei.id === id);
-    //       /* eslint-enable */
-    //       return lei.children;
-    //     };
-    //     this.breadcrumbsUrls = this.generateBreadcrumbs(nextDir);
-    //     this.leis = findDataById(id);
-    //   } else {
-    //     alert('file');
-    //   }
-    // },
     handleSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -253,10 +234,13 @@ export default {
       console.log(file);
       this.$message({ message: 'Áudio(s) enviado(s) com sucesso!', type: 'success' });
       this.getList(this.currentId);
+      // this.dialogFileActionVisible = false;
+    },
+    dropzoneA(file){
       this.dialogFileActionVisible = false;
     },
     dropzoneR(file) {
-      this.$message({ message: 'Delete success', type: 'success' });
+      // this.$message({ message: 'Delete success', type: 'success' });
     },
   },
 };

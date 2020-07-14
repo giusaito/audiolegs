@@ -102,8 +102,9 @@ export default {
     const vm = this;
     this.dropzone = new Dropzone(element, {
       clickable: this.clickable,
-      thumbnailWidth: this.thumbnailWidth,
-      thumbnailHeight: this.thumbnailHeight,
+      // thumbnailWidth: this.thumbnailWidth,
+      // thumbnailHeight: this.thumbnailHeight,
+      thumbnail: false,
       maxFiles: this.maxFiles,
       maxFilesize: this.maxFilesize,
       dictRemoveFile: 'Remove',
@@ -114,10 +115,10 @@ export default {
         '<i style="margin-top: 3em;display: inline-block" class="material-icons">' + this.defaultMsg + '</i><br>Drop files here to upload',
       dictMaxFilesExceeded: 'Only one picture',
       previewTemplate:
-        '<div class="dz-preview dz-file-preview">' +
-        '<div class="dz-image" style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" >' +
-        '<img style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" data-dz-thumbnail />' +
-        '</div>' +
+        // '<div class="dz-preview dz-file-preview">' +
+        // '<div class="dz-image" style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" >' +
+        // '<img style="width:' + this.thumbnailWidth + 'px;height:' + this.thumbnailHeight + 'px" data-dz-thumbnail />' +
+        // '</div>' +
         '<div class="dz-details">' +
         '<div class="dz-size"><span data-dz-size></span></div>' +
         '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>' +
@@ -170,7 +171,6 @@ export default {
     if (this.couldPaste) {
       document.addEventListener('paste', this.pasteImg);
     }
-
     this.dropzone.on('success', file => {
       vm.$emit('dropzone-success', file, vm.dropzone.element);
     });
@@ -183,7 +183,7 @@ export default {
     this.dropzone.on('error', (file, error, xhr) => {
       vm.$emit('dropzone-error', file, error, xhr);
     });
-    this.dropzone.on('successmultiple', (file, error, xhr) => {
+    this.dropzone.on('queuecomplete', (file, error, xhr) => {
       vm.$emit('dropzone-successmultiple', file, error, xhr);
     });
   },

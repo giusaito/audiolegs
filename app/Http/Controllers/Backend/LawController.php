@@ -41,12 +41,12 @@ class LawController extends Controller
                     'path' => $request->path.'/'.$request->name,
                     'size' => 0
                 ]);
-                Storage::makeDirectory($request->path.'/'.$request->name);
+                Storage::makeDirectory('/public/'.$request->path.'/'.$request->name);
             // SE FOR ÁUDIO
             }else {
                 $audio = $request->file('file');
                 $audioName = $audio->getClientOriginalName();
-                $path = $audio->move(Storage::disk('local')->path($request->path),$audioName);
+                $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
                 $file = Law::create([
                     'name' => $audioName,
                     'type' => $request->type,
@@ -68,12 +68,12 @@ class LawController extends Controller
                     'parent_id' => $request->parent_id,
                     'size' => 0
                 ], $parent);
-                Storage::makeDirectory($request->path.'/'.$request->name);
+                Storage::makeDirectory('/public/'.$request->path.'/'.$request->name);
             // SE FOR ÁUDIO
             }else {
                 $audio = $request->file('file');
                 $audioName = $audio->getClientOriginalName();
-                $path = $audio->move(Storage::disk('local')->path($request->path),$audioName);
+                $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
                 $file = Law::create([
                     'name' => $audioName,
                     'type' => $request->type,

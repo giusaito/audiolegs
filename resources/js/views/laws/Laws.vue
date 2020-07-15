@@ -52,7 +52,7 @@
         <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" :max-files="10" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
       </div>
     </el-dialog>
-    <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
+    <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true" :before-close="handleCloseAudio">
       <div class="audioDetails">
         <transition name="slide-fade" mode="out-in">
           <p :key="currentSong" class="title">{{ music.title }}</p>
@@ -131,10 +131,6 @@ export default {
       isPlaylistActive: false,
       currentSong: 0,
       music: {
-        // title: 'Service Bell',
-        // description: 'Daniel Simion',
-        // url: 'https://soundbible.com/mp3/service-bell_daniel_simion.mp3',
-        // image: 'https://source.unsplash.com/crs2vlkSe98/400x400',
         title: '',
         description: '',
         url: '',
@@ -149,6 +145,7 @@ export default {
   },
   mounted: function() {
     this.changeSong();
+    this.audio.crossOrigin = 'anonymous';
     this.audio.loop = false;
   },
   created() {
@@ -233,9 +230,9 @@ export default {
       } else {
         this.dialogAudioActionVisible = true;
         this.music.title = 'Service Bell';
-        this.music.description = 'Daniel Simion';
-        alert(path);
-        this.music.url = 'https://soundbible.com/mp3/service-bell_daniel_simion.mp3';
+        this.music.description = name;
+        this.music.url = '/storage' + path + '/' + name;
+        this.changeSong();
       }
     },
     formatBytes(bytes, decimals = 2) {
@@ -345,6 +342,7 @@ export default {
         this.currentSong = 0;
         this.changeSong();
       }
+      console.log(this.audio);
       if (!this.currentlyPlaying) {
         this.getCurrentTimeEverySecond(true);
         this.currentlyPlaying = true;
@@ -385,6 +383,10 @@ export default {
     },
     pausedMusic: function() {
       clearTimeout(this.checkingCurrentPositionInTrack);
+    },
+    handleCloseAudio(done) {
+      this.stopAudio();
+      done();
     },
     // /fim PLAYER
   },

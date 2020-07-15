@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLawFilesTable extends Migration
+class CreateLawsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -19,6 +19,8 @@ class CreateLawFilesTable extends Migration
             $table->enum('type', ['file', 'folder'])->default('folder');
             $table->string('path',100);
             $table->bigInteger('size')->unsigned();
+            $table->string('audio_name', 255)->nullable();
+            $table->text('audio_description')->nullable();
             $table->nestedSet();
             $table->timestamps();
         });

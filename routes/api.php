@@ -69,6 +69,8 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
 
         // Rota de controle-de-leis backend
         Route::get('controle-de-leis/lista/{id?}', 'LawController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::get('controle-de-leis/item/{id}', 'LawController@getItem')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::post('controle-de-leis/audio-info', 'LawController@saveInfo')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
         Route::apiResource('controle-de-leis/leis', 'LawController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
         // Route::apiResource('controle-de-leis/controle-de-playlists', 'PlaylistController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
         // Route::get('controle-de-leis/lista', 'ControlOfLawsController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);

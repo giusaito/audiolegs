@@ -29,7 +29,6 @@ class LawController extends Controller
         return response()->json($response);
     }
     public function store(Request $request){
-        // dd($request);
         // SE FOR RAIZ (ROOT)
         $request->parent_id = intval($request->parent_id);
         if(!$request->parent_id){
@@ -87,5 +86,14 @@ class LawController extends Controller
         }
         // return $request->parent_id;
         //$response = Storage::makeDirectory($request->path.'/'.$request->nome);
+    }
+    public function getItem($id){
+        $item = Law::where('id',$id)->first();
+        return response()->json($item);
+    }
+    public function saveInfo(Request $request){
+        // dd($request->audio_name);
+        $item = Law::findOrFail($request->id);
+        $item->update($request->all());
     }
 }

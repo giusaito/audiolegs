@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-button-group>
       <el-button type="primary" icon="el-icon-plus" @click="createFolder">Pasta</el-button>
-      <el-button type="primary" icon="el-icon-plus" @click="createFile">Arquivo(s)</el-button>
+      <el-button v-if="currentPath !== '/leis'" type="primary" icon="el-icon-plus" @click="createFile">Arquivo(s)</el-button>
     </el-button-group>
 
     <div id="list" v-loading="listLoading">
@@ -55,10 +55,17 @@
     <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true" :before-close="handleCloseAudio">
       <div class="audioDetails">
         <transition name="slide-fade" mode="out-in">
-          <p :key="currentSong" class="title">{{ music.title }}</p>
+          <p :key="currentSong" class="title">
+            <!-- <vue-inline-text-editor :value="empty.title" @blur="onBlur" @close="onClose" @change="onChange" @open="onOpen" @update="onUpdate" /> -->
+            <!-- <vue-inline-text-editor :value="empty.title" @update="onUpdate" /> -->
+            <vue-inline-text-editor placeholder="Nome do áudio" :value.sync="newMusicInfo.title" @update="onUpdate('name', audioId)" />
+          </p>
         </transition>
         <transition name="slide-fade" mode="out-in">
-          <p :key="currentSong" class="description">{{ music.description }}</p>
+          <p :key="currentSong" class="description">
+            <!-- <vue-inline-text-editor :value="empty.description" @update="onUpdate" /> -->
+            <vue-inline-text-editor placeholder="Descrição do áudio" :value.sync="newMusicInfo.description" @update="onUpdate('description', audioId)" />
+          </p>
         </transition>
       </div>
       <div class="playerButtons">
@@ -85,9 +92,11 @@
 import axios from 'axios';
 import { getToken } from '@/utils/auth';
 import Dropzone from '@/components/Dropzone';
+// var VueInlineTextEditor = require('vue-inline-text-editor');
+import VueInlineTextEditor from 'vue-inline-text-editor';
 export default {
   name: 'Files',
-  components: { Dropzone },
+  components: { Dropzone, VueInlineTextEditor },
   filters: {
     fancyTimeFormat: function(s) {
       return (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
@@ -108,6 +117,7 @@ export default {
       listLoading: true,
       currentPath: '/leis',
       currentId: null,
+      audioId: null,
       breadcrumbsUrls: [{
         id: 0,
         type: 'folder',
@@ -134,6 +144,10 @@ export default {
         title: '',
         description: '',
         url: '',
+      },
+      newMusicInfo: {
+        title: '',
+        description: '',
       },
       audioFile: '',
     };
@@ -228,11 +242,22 @@ export default {
           this.listLoading = false;
         }).catch(error => console.log(error));
       } else {
-        this.dialogAudioActionVisible = true;
-        this.music.title = 'Service Bell';
-        this.music.description = name;
-        this.music.url = '/storage' + path + '/' + name;
-        this.changeSong();
+        axios({
+          method: 'get',
+          url: `api/v1/bw/controle-de-leis/item/` + id,
+          headers: {
+            'Authorization': 'Bearer ' + getToken(),
+          },
+        }).then((response) => {
+          this.audioId = response.data.id;
+          this.newMusicInfo.title = response.data.audio_name;
+          this.newMusicInfo.description = response.data.audio_description;
+          this.dialogAudioActionVisible = true;
+          this.music.url = '/storage' + response.data.path + '/' + response.data.name;
+          this.listLoading = false;
+
+          this.changeSong();
+        }).catch(error => console.log(error));
       }
     },
     formatBytes(bytes, decimals = 2) {
@@ -389,6 +414,48 @@ export default {
       done();
     },
     // /fim PLAYER
+
+    // onBlur: function() {
+    //   console.log('text blur:');
+    // },
+    // onClose: function() {
+    //   console.log('text close:');
+    // },
+    // onChange: function() {
+    //   console.log('text change:');
+    // },
+    // onOpen: function() {
+    //   console.log('text open:');
+    // },
+    onUpdate: function(field, id) {
+      // console.log(this.newMusicInfo);
+      // console.log(field);
+      var data = {};
+      if (field === 'name') {
+        data = {
+          id: id,
+          audio_name: this.newMusicInfo.title,
+        };
+      } else {
+        data = {
+          id: id,
+          audio_description: this.newMusicInfo.description,
+        };
+      }
+      // console.log(data);
+      axios({
+        method: 'post',
+        url: `api/v1/bw/controle-de-leis/audio-info`,
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+        data: data,
+      }).then((response) => {
+        console.log(response);
+        this.dialogFolderActionVisible = false;
+        this.getList(this.currentId);
+      }).catch(error => console.log(error));
+    },
   },
 };
 </script>

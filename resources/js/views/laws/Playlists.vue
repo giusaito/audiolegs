@@ -37,7 +37,6 @@ export default {
       this.formTitle = 'Adicionar nova playlist';
       this.btnInsertUpdate = 'Adicionar playlist';
       this.currentVoucher = {
-        chave: Str.random(10), // Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5), // this.randomString(12, '#AA')
         tipo_desconto: false,
         desconto: '',
         desconto_porcentagem: '',
@@ -45,66 +44,6 @@ export default {
         data_expiracao: '',
         statusSwitch: true,
       };
-    },
-    handleSubmit(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          if (this.currentVoucher.id !== undefined){
-            VoucherResource.update(this.currentVoucher.id, this.currentVoucher).then(response => {
-              this.$message({
-                type: 'success',
-                message: 'A playlist foi atualizada com sucesso',
-                duration: 5 * 1000,
-              });
-              this.currentVoucher = {
-                chave: '',
-                tipo_desconto: false,
-                desconto: '',
-                desconto_porcentagem: '',
-                quantidade_total: 0,
-                data_expiracao: '',
-                statusSwitch: true,
-              };
-
-              this.getList();
-            }).catch(() => {
-              this.$message({
-                type: 'error',
-                message: 'Ocorreu um erro ao tentar atualizar a playlist, por favor, tente novamente mais tarde',
-                duration: 5 * 1000,
-              });
-            }).finally(() => {
-              console.log('fim');
-              this.dialogVisible = false;
-            });
-          } else {
-            VoucherResource.store(this.currentVoucher).then(response => {
-              this.$message({
-                message: 'A playlist foi criada com sucesso.',
-                type: 'success',
-                duration: 5 * 1000,
-              });
-              this.currentVoucher = {
-                chave: '',
-                tipo_desconto: false,
-                desconto: '',
-                desconto_porcentagem: '',
-                quantidade_total: 0,
-                data_expiracao: '',
-                statusSwitch: true,
-              };
-              this.voucherFormVisible = false;
-              this.getList();
-            }).catch(err => {
-              console.log('quase');
-              console.log(err);
-            }).finally(() => {
-              console.log('fim');
-              this.dialogVisible = false;
-            });
-          }
-        }
-      });
     },
     handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.currentVoucher = this.cupons.find(category => category.id === id);

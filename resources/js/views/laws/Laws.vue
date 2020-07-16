@@ -16,7 +16,7 @@
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
-          <div :title="lei.path" :class="leisClass(lei.type)" @click="openAction(lei.id, lei.type, lei.path, lei.name)">
+          <div :title="lei.path" :class="leisClass(lei.type)" @click="openAction(lei.id, lei.type, lei.path, lei.name)" @contextmenu.prevent.stop="rightClick($event, lei)">
             <span v-if="lei.type === 'folder' && lei.children.length === 0" class="icon folder" />
             <span v-if="lei.type === 'folder' && lei.children.length > 0" class="icon folder full" />
             <span v-if="lei.type === 'file'" class="icon file" :class="'f-'+(lei.name.split('.')[lei.name.split('.').length-1])">.{{ lei.name.split('.')[lei.name.split('.').length-1] }}</span>
@@ -29,6 +29,13 @@
         </li>
       </ul>
     </div>
+
+    <vue-simple-context-menu
+      :ref="'vueSimpleContextMenu1'"
+      :element-id="'myFirstMenu'"
+      :options="optionsContext"
+      @option-clicked="optionRightClicked"
+    />
 
     <el-dialog :title="folderDialogTitle " :visible.sync="dialogFolderActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="folderEditing" class="form-container">
@@ -94,9 +101,10 @@ import { getToken } from '@/utils/auth';
 import Dropzone from '@/components/Dropzone';
 // var VueInlineTextEditor = require('vue-inline-text-editor');
 import VueInlineTextEditor from 'vue-inline-text-editor';
+import VueSimpleContextMenu from 'vue-simple-context-menu';
 export default {
   name: 'Files',
-  components: { Dropzone, VueInlineTextEditor },
+  components: { Dropzone, VueInlineTextEditor, VueSimpleContextMenu },
   filters: {
     fancyTimeFormat: function(s) {
       return (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
@@ -124,6 +132,20 @@ export default {
         path: '/leis',
         name: 'leis',
       }],
+      optionsContext: [
+        // {
+        //   name: 'Duplicate',
+        //   slug: 'duplicate',
+        // },
+        // {
+        //   name: 'Edit',
+        //   slug: 'edit',
+        // },
+        {
+          name: 'Excluir',
+          slug: 'delete',
+        },
+      ],
       rules: {
         nome: [
           { required: true, message: 'Por favor, preencha o nome da pasta', trigger: 'change' },
@@ -172,6 +194,12 @@ export default {
     clearTimeout(this.checkingCurrentPositionInTrack);
   },
   methods: {
+    rightClick(event, item) {
+      this.$refs.vueSimpleContextMenu1.showMenu(event, item);
+    },
+    optionRightClicked(event) {
+      window.alert(JSON.stringify(event));
+    },
     createFolder() {
       this.dialogFolderActionVisible = true;
       this.folderDialogTitle = 'Adicionar nova pasta';

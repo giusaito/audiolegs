@@ -7,9 +7,7 @@
       <el-dialog :title="formTitle" :visible.sync="dialogVisible" :close-on-click-modal="false">
         <div v-loading="loading" class="form-container">
           <el-row :gutter="20">
-            <el-col v-for="plano in playlists" :key="plano.id" :plano-atual="plano" :span="8">
-              
-            </el-col>
+            <el-col v-for="plano in playlists" :key="plano.id" :plano-atual="plano" :span="8" />
           </el-row>
         </div>
       </el-dialog>
@@ -30,9 +28,12 @@ export default {
       playlists: [],
     };
   },
+  mounted() {
+    this.getList();
+  },
   methods: {
     handleCreateForm() {
-      this.dialogVisible   = true;
+      this.dialogVisible = true;
       this.formTitle = 'Adicionar nova playlist';
       this.btnInsertUpdate = 'Adicionar playlist';
       this.currentVoucher = {
@@ -74,7 +75,7 @@ export default {
               });
             }).finally(() => {
               console.log('fim');
-              this.dialogVisible   = false;
+              this.dialogVisible = false;
             });
           } else {
             VoucherResource.store(this.currentVoucher).then(response => {
@@ -99,7 +100,7 @@ export default {
               console.log(err);
             }).finally(() => {
               console.log('fim');
-              this.dialogVisible   = false;
+              this.dialogVisible = false;
             });
           }
         }
@@ -107,7 +108,7 @@ export default {
     },
     handleEdit(id, chave, desconto, desconto_porcentagem, quantidade_total, quantidade_usado, data_inicio, data_fim, status){
       this.currentVoucher = this.cupons.find(category => category.id === id);
-      this.dialogVisible   = true;
+      this.dialogVisible = true;
       this.formTitle = 'Editar playlist ' + chave;
       this.btnInsertUpdate = 'Atualizar playlist';
 
@@ -167,9 +168,6 @@ export default {
         this.loading = false;
       }).catch(error => console.log(error));
     },
-  },
-  mounted() {
-    this.getList();
   },
 };
 </script>

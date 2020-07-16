@@ -1011,5 +1011,9 @@ aside a:hover {
 }
 
 .dz-error-mark {
-  diplay: none !important;
+  display: none !important;
+}
+
+.dropzone .dz-message .dz-button {
+  margin-top: -20px;
 }

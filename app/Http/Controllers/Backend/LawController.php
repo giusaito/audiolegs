@@ -29,7 +29,6 @@ class LawController extends Controller
         return response()->json($response);
     }
     public function store(Request $request){
-        // dd($request);
         // SE FOR RAIZ (ROOT)
         $request->parent_id = intval($request->parent_id);
         if(!$request->parent_id){
@@ -41,12 +40,12 @@ class LawController extends Controller
                     'path' => $request->path.'/'.$request->name,
                     'size' => 0
                 ]);
-                Storage::makeDirectory($request->path.'/'.$request->name);
+                Storage::makeDirectory('/public/'.$request->path.'/'.$request->name);
             // SE FOR ÁUDIO
             }else {
                 $audio = $request->file('file');
                 $audioName = $audio->getClientOriginalName();
-                $path = $audio->move(Storage::disk('local')->path($request->path),$audioName);
+                $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
                 $file = Law::create([
                     'name' => $audioName,
                     'type' => $request->type,
@@ -68,12 +67,12 @@ class LawController extends Controller
                     'parent_id' => $request->parent_id,
                     'size' => 0
                 ], $parent);
-                Storage::makeDirectory($request->path.'/'.$request->name);
+                Storage::makeDirectory('/public/'.$request->path.'/'.$request->name);
             // SE FOR ÁUDIO
             }else {
                 $audio = $request->file('file');
                 $audioName = $audio->getClientOriginalName();
-                $path = $audio->move(Storage::disk('local')->path($request->path),$audioName);
+                $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
                 $file = Law::create([
                     'name' => $audioName,
                     'type' => $request->type,
@@ -87,5 +86,14 @@ class LawController extends Controller
         }
         // return $request->parent_id;
         //$response = Storage::makeDirectory($request->path.'/'.$request->nome);
+    }
+    public function getItem($id){
+        $item = Law::where('id',$id)->first();
+        return response()->json($item);
+    }
+    public function saveInfo(Request $request){
+        // dd($request->audio_name);
+        $item = Law::findOrFail($request->id);
+        $item->update($request->all());
     }
 }

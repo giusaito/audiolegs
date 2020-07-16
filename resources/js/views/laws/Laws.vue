@@ -13,10 +13,17 @@
           </li>
         </ul>
       </div>
+      <el-alert
+        v-if="currentPath === '/leis'"
+        title="Atenção!"
+        type="warning"
+        description="Todas as pastas criadas neste diretório raiz serão consideradas leis"
+        show-icon
+      />
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
-          <div :title="lei.path" :class="leisClass(lei.type)" @click="openAction(lei.id, lei.type, lei.path, lei.name)" @contextmenu.prevent.stop="rightClick($event, lei)">
+          <div :title="lei.path" :class="leisClass(lei.type)" @click="openAction(lei.id, lei.type, lei.path, lei.name)">
             <span v-if="lei.type === 'folder' && lei.children.length === 0" class="icon folder" />
             <span v-if="lei.type === 'folder' && lei.children.length > 0" class="icon folder full" />
             <span v-if="lei.type === 'file'" class="icon file" :class="'f-'+(lei.name.split('.')[lei.name.split('.').length-1])">.{{ lei.name.split('.')[lei.name.split('.').length-1] }}</span>
@@ -26,16 +33,22 @@
               <span v-if="lei.type === 'file'">{{ formatBytes(lei.size) }}</span>
             </span>
           </div>
+          <!-- <span class="btn-delete"><i class="el-icon-delete-solid" /> Excluir</span> -->
+          <el-popconfirm
+            :title="'Você tem certeza que deseja excluir este item?'"
+            class="btn-delete"
+            confirm-button-text="Sim"
+            cancel-button-text="Não, obrigado"
+            icon="el-icon-info"
+            icon-color="red"
+            @onConfirm="excluir(lei)"
+          >
+            <!-- <el-button slot="reference" type="danger" size="mini"><i class="el-icon-delete-solid" /> Excluir</el-button> -->
+            <el-button slot="reference" type="info" icon="el-icon-delete" circle />
+          </el-popconfirm>
         </li>
       </ul>
     </div>
-
-    <vue-simple-context-menu
-      :ref="'vueSimpleContextMenu1'"
-      :element-id="'myFirstMenu'"
-      :options="optionsContext"
-      @option-clicked="optionRightClicked"
-    />
 
     <el-dialog :title="folderDialogTitle " :visible.sync="dialogFolderActionVisible" :close-on-click-modal="false" :destroy-on-close="true">
       <div v-loading="folderEditing" class="form-container">
@@ -101,10 +114,9 @@ import { getToken } from '@/utils/auth';
 import Dropzone from '@/components/Dropzone';
 // var VueInlineTextEditor = require('vue-inline-text-editor');
 import VueInlineTextEditor from 'vue-inline-text-editor';
-import VueSimpleContextMenu from 'vue-simple-context-menu';
 export default {
   name: 'Files',
-  components: { Dropzone, VueInlineTextEditor, VueSimpleContextMenu },
+  components: { Dropzone, VueInlineTextEditor },
   filters: {
     fancyTimeFormat: function(s) {
       return (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
@@ -132,20 +144,6 @@ export default {
         path: '/leis',
         name: 'leis',
       }],
-      optionsContext: [
-        // {
-        //   name: 'Duplicate',
-        //   slug: 'duplicate',
-        // },
-        // {
-        //   name: 'Edit',
-        //   slug: 'edit',
-        // },
-        {
-          name: 'Excluir',
-          slug: 'delete',
-        },
-      ],
       rules: {
         nome: [
           { required: true, message: 'Por favor, preencha o nome da pasta', trigger: 'change' },
@@ -194,11 +192,20 @@ export default {
     clearTimeout(this.checkingCurrentPositionInTrack);
   },
   methods: {
-    rightClick(event, item) {
-      this.$refs.vueSimpleContextMenu1.showMenu(event, item);
-    },
-    optionRightClicked(event) {
-      window.alert(JSON.stringify(event));
+    excluir(lei){
+      // alert(lei.name);
+      axios({
+        method: 'delete',
+        url: `api/v1/bw/controle-de-leis/leis/` + lei.id,
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+        data: {
+          lei: lei,
+        },
+      }).then((response) => {
+        this.getList(this.currentId);
+      }).catch(error => console.log(error));
     },
     createFolder() {
       this.dialogFolderActionVisible = true;

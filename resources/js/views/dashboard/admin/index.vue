@@ -13,6 +13,10 @@
       <p class="text-center">Usuários / Planos</p>
       <user-line-chart :chart-data="userChartData" />
     </el-row>
+    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+      <p class="text-center">Horario mais acessado</p>
+      <hourHeatMap />
+    </el-row>
 
     <el-row :gutter="32">
       <!-- <el-col :xs="24" :sm="24" :lg="8">
@@ -73,6 +77,7 @@
 import PanelGroup from './components/PanelGroup';
 import LineChart from './components/LineChart';
 import UserLineChart from './components/UserPlanLineChart';
+import hourHeatMap from './components/HourHeatMap';
 // import RaddarChart from './components/RaddarChart';
 import PieChart from './components/PieChart';
 // import BarChart from './components/BarChart';
@@ -115,6 +120,7 @@ export default {
     PanelGroup,
     LineChart,
     UserLineChart,
+    hourHeatMap,
     // RaddarChart,
     PieChart,
     // BarChart,

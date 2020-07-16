@@ -81,11 +81,8 @@ class LawController extends Controller
                     'size' => $path->getSize()
                 ], $parent);
                 return response()->json(['success'=>$audioName]);
-                //dd(Storage::disk('local')->path($request->path));
             }
         }
-        // return $request->parent_id;
-        //$response = Storage::makeDirectory($request->path.'/'.$request->nome);
     }
     public function getItem($id){
         $item = Law::where('id',$id)->first();
@@ -95,5 +92,11 @@ class LawController extends Controller
         // dd($request->audio_name);
         $item = Law::findOrFail($request->id);
         $item->update($request->all());
+    }
+    public function destroy(Request $request){
+        // 2, 11, 12, 13, 14
+        // dd(Law::findOrFail($request->lei['id']));
+        $lei = Law::findOrFail($request->lei['id'])->delete();
+        return response()->json($lei);
     }
 }

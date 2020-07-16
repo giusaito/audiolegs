@@ -13,6 +13,13 @@
           </li>
         </ul>
       </div>
+      <el-alert
+        v-if="currentPath === '/leis'"
+        title="Atenção!"
+        type="warning"
+        description="Todas as pastas criadas neste diretório raiz serão consideradas leis"
+        show-icon
+      />
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
@@ -26,6 +33,19 @@
               <span v-if="lei.type === 'file'">{{ formatBytes(lei.size) }}</span>
             </span>
           </div>
+          <!-- <span class="btn-delete"><i class="el-icon-delete-solid" /> Excluir</span> -->
+          <el-popconfirm
+            :title="'Você tem certeza que deseja excluir este item?'"
+            class="btn-delete"
+            confirm-button-text="Sim"
+            cancel-button-text="Não, obrigado"
+            icon="el-icon-info"
+            icon-color="red"
+            @onConfirm="excluir(lei)"
+          >
+            <!-- <el-button slot="reference" type="danger" size="mini"><i class="el-icon-delete-solid" /> Excluir</el-button> -->
+            <el-button slot="reference" type="info" icon="el-icon-delete" circle />
+          </el-popconfirm>
         </li>
       </ul>
     </div>
@@ -172,6 +192,21 @@ export default {
     clearTimeout(this.checkingCurrentPositionInTrack);
   },
   methods: {
+    excluir(lei){
+      // alert(lei.name);
+      axios({
+        method: 'delete',
+        url: `api/v1/bw/controle-de-leis/leis/` + lei.id,
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+        data: {
+          lei: lei,
+        },
+      }).then((response) => {
+        this.getList(this.currentId);
+      }).catch(error => console.log(error));
+    },
     createFolder() {
       this.dialogFolderActionVisible = true;
       this.folderDialogTitle = 'Adicionar nova pasta';

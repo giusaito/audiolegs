@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Backend;
-
+use App\Http\Controllers\Controller;
 use App\Laravue\Models\Playlist;
 use Illuminate\Http\Request;
 
@@ -14,7 +14,7 @@ class PlaylistController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**

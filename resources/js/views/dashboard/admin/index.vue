@@ -77,7 +77,7 @@
 import PanelGroup from './components/PanelGroup';
 import LineChart from './components/LineChart';
 import UserLineChart from './components/UserPlanLineChart';
-import hourHeatMap from './components/HourHeatMap';
+// import hourHeatMap from './components/HourHeatMap';
 // import RaddarChart from './components/RaddarChart';
 import PieChart from './components/PieChart';
 // import BarChart from './components/BarChart';
@@ -120,7 +120,7 @@ export default {
     PanelGroup,
     LineChart,
     UserLineChart,
-    hourHeatMap,
+    // hourHeatMap,
     // RaddarChart,
     PieChart,
     // BarChart,

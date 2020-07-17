@@ -17,9 +17,9 @@ class CreatePlaylistsTable extends Migration
             $table->id();
             $table->string('name', 100);
             $table->string('description', 255);
-            $table->string('path', 191);
-            $table->string('featured_image', 191);
+            $table->string('cover_image', 191);
             $table->enum('status', ['PUBLIC', 'PRIVATE'])->default('PUBLIC');
+            $table->enum('type', ['ADMIN', 'USER'])->default('USER');
             $table->bigInteger('author_id')->unsigned()->nullable();
             $table->nestedSet();
             $table->timestamps();

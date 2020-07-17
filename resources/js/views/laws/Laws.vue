@@ -72,18 +72,15 @@
         <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" :max-files="10" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
       </div>
     </el-dialog>
-    <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true" :before-close="handleCloseAudio">
+    <!-- <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true" :before-close="handleCloseAudio">
       <div class="audioDetails">
         <transition name="slide-fade" mode="out-in">
           <p :key="currentSong" class="title">
-            <!-- <vue-inline-text-editor :value="empty.title" @blur="onBlur" @close="onClose" @change="onChange" @open="onOpen" @update="onUpdate" /> -->
-            <!-- <vue-inline-text-editor :value="empty.title" @update="onUpdate" /> -->
             <vue-inline-text-editor placeholder="Nome do áudio" :value.sync="newMusicInfo.title" @update="onUpdate('name', audioId)" />
           </p>
         </transition>
         <transition name="slide-fade" mode="out-in">
           <p :key="currentSong" class="description">
-            <!-- <vue-inline-text-editor :value="empty.description" @update="onUpdate" /> -->
             <vue-inline-text-editor placeholder="Descrição do áudio" :value.sync="newMusicInfo.description" @update="onUpdate('description', audioId)" />
           </p>
         </transition>
@@ -97,14 +94,13 @@
         <div class="currentTimeContainer" style="text-align:center">
           <span class="currentTime">{{ currentTime | fancyTimeFormat }}</span>
           <span class="totalTime"> {{ trackDuration | fancyTimeFormat }}</span>
-          <!--<span style="color:black">({{ currentSong+1 }}/{{ music.length }})</span>-->
         </div>
 
         <div class="currentProgressBar">
           <div class="currentProgress" :style="{ width: currentProgressBar + '%' }" />
         </div>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -112,11 +108,10 @@
 import axios from 'axios';
 import { getToken } from '@/utils/auth';
 import Dropzone from '@/components/Dropzone';
-// var VueInlineTextEditor = require('vue-inline-text-editor');
-import VueInlineTextEditor from 'vue-inline-text-editor';
+// import VueInlineTextEditor from 'vue-inline-text-editor';
 export default {
   name: 'Files',
-  components: { Dropzone, VueInlineTextEditor },
+  components: { Dropzone },
   filters: {
     fancyTimeFormat: function(s) {
       return (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;

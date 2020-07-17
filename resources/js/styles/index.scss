@@ -242,3 +242,96 @@ aside {
   font-weight: 700;
   border-radius: 5px;
 }
+.el-drawer__body {
+  padding: 20px;
+  .el-form-item__label {
+    text-align: left;
+  }
+  .playlist_name {
+    input {
+      border-width: 1px;
+      border-style: solid;
+      border-color: #cbd4db;
+      border-radius: 4px;
+      padding: 0 7px;
+      width: calc(100% + 8px);
+      margin-left: -8px;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 32px;
+      min-height: 0;
+      padding-bottom: 4px;
+      padding-top: 4px;
+      border-color: transparent;
+      color:#9CA6AF;
+      &:hover {
+        border-color: #cbd4db;
+        transition: border-color 100ms;
+      }
+    }
+  }
+  textarea {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #cbd4db;
+    border-radius: 4px;
+    border-color: transparent;
+    color:#9CA6AF;
+    &:hover {
+      border-color: #cbd4db !important;
+      transition: border-color 100ms;
+    }
+  }
+}
+.drawer__content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 20px);
+}
+.drawer__content form {
+  flex: 1;
+}
+.drawer__footer {
+  display: flex;
+  background: #f6f8f9;
+  border-bottom: 1px solid transparent;
+  flex-shrink: 0;
+  margin: 0 -24px;
+  padding: 10px 24px;
+  button {
+    flex: 1;
+  }
+}
+.el-special-drawer__header {
+  margin: -20px -20px 10px -20px !important;
+  border-bottom: 1px solid #e8e8e8 !important;
+  padding: 10px 20px !important;
+  .el-tag {
+    cursor: pointer;
+  }
+}
+
+.cover-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.cover-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.cover-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px !important;
+  text-align: center;
+}
+.cover {
+  width: 178px;
+  height: 178px;
+  display: block;
+}

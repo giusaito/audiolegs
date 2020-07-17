@@ -79,7 +79,7 @@
       :visible.sync="drawer"
       :before-close="handleCloseAudio"
       size="40%"
-    >
+    >  
 
       <el-card class="box-card">
         <p><i class="el-icon-user-solid" /> Leonardo - <i class="el-icon-date" /> {{ newMusicInfo.created_at | format_date }}</p>

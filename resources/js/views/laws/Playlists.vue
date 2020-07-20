@@ -10,16 +10,30 @@
         <el-table-column
           prop="name"
           label="Playlist"
-          width="180"
+          width="380"
         />
         <el-table-column
           prop="author_id"
           label="Responsável"
-        />
+        >
+          <template slot-scope="scope">
+            {{ scope.row.user.name }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="status"
           label="Status"
-        />
+        >
+          <template slot-scope="scope">
+            <el-tag
+              :type="scope.row.status === 'PUBLIC' ? 'success' : 'warning'"
+              disable-transitions
+            >
+              <span v-if="scope.row.status === 'PUBLIC'">público</span>
+              <span v-if="scope.row.status === 'PRIVATE'">privado</span>
+            </el-tag>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <el-drawer
@@ -49,15 +63,17 @@
       <div class="drawer__content">
         <el-form :model="currentPlaylist">
           <el-form-item>
-            <el-input v-model="currentPlaylist.name" autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" />
+            <el-input v-model="currentPlaylist.name" autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" @input="playlists[playlists.length - 1].name = currentPlaylist.name" />
           </el-form-item>
           <el-form-item label="Capa" :label-width="formLabelWidth">
             <el-upload
+              ref="cover"
               class="cover-uploader"
               action="https://jsonplaceholder.typicode.com/posts/"
               :show-file-list="false"
               :on-success="handleCoverSuccess"
               :before-upload="beforeCoverUpload"
+              :auto-upload="false"
             >
               <img v-if="currentPlaylist.cover_image" :src="currentPlaylist.cover_image" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon" />
@@ -88,6 +104,7 @@ export default {
       direction: 'rtl',
       modal: false,
       appendToBody: true,
+      saved: true,
       title: '',
       // playlists: [{name:'oi',status:"dsafasd",author_id:2}],
       playlists: [],
@@ -106,6 +123,11 @@ export default {
       timer: null,
     };
   },
+  computed: {
+    lastItemOfPlaylist() {
+      return this.playlists.slice(-1)[0];
+    },
+  },
   mounted() {
     this.getList();
   },
@@ -113,40 +135,64 @@ export default {
     handleCreatePlaylist() {
       this.playlistDrawerTitle = 'Adicionar nova playlist';
       this.btnInsertUpdate = 'Adicionar playlist';
-      if (typeof this.playlists[this.playlists.length - 1] === 'undefined' || this.playlists[this.playlists.length - 1].name !== '') {
+      // if (typeof this.playlists[this.playlists.length - 1] === 'undefined' || this.playlists[this.playlists.length - 1].created_at !== '') {
+      if (this.saved) {
         this.playlists.push({
-          name: '',
+          name: 'Escreva o nome da Playlist',
           author_id: '',
-          status: '',
+          status: 'PUBLIC',
         });
+        this.currentPlaylist = {
+          name: '',
+          description: '',
+          cover_image: '',
+          status: '',
+          type: 'ADMIN',
+        };
+        this.saved = false;
       }
-      // console.log(this.playlists[this.playlists.length - 1].name === '');
       this.dialog = true;
-      // this.currentVoucher = {
-      //   tipo_desconto: false,
-      //   desconto: '',
-      //   desconto_porcentagem: '',
-      //   quantidade_total: 0,
-      //   data_expiracao: '',
-      //   statusSwitch: true,
-      // };
     },
     cancelForm() {
       this.loading = false;
       this.dialog = false;
+      this.saved = false;
       clearTimeout(this.timer);
     },
     handleFormSubmit(done){
       if (this.loading) {
         return;
       }
-      this.loading = true;
-      this.timer = setTimeout(() => {
-        done();
-        setTimeout(() => {
-          this.loading = false;
-        }, 400);
-      }, 2000);
+      if (Object.keys(this.currentPlaylist.name).length > 0) {
+        this.loading = true;
+        this.timer = setTimeout(() => {
+          axios({
+            method: 'post',
+            url: `api/v1/bw/playlist`,
+            headers: {
+              'Authorization': 'Bearer ' + getToken(),
+            },
+            data: this.currentPlaylist,
+          }).then((response) => {
+            // console.log(response);
+            // this.dialogFolderActionVisible = false;
+            // this.getList(this.currentId);
+            this.getList();
+            done();
+            setTimeout(() => {
+              console.log(this.currentPlaylist);
+              this.status = {
+                type: 'success',
+                label: 'Público',
+              };
+              this.loading = false;
+              this.saved = true;
+            }, 400);
+          }).catch(error => console.log(error));
+        }, 2000);
+      } else {
+        this.cancelForm();
+      }
     },
     handleCoverSuccess(res, file) {
       this.currentPlaylist.cover_image = URL.createObjectURL(file.raw);
@@ -165,22 +211,22 @@ export default {
     },
     toggleStatus(){
       if (this.status.type === 'success') {
-        // this.status.type = 'warning';
-        // this.status.label = 'Privado';
         this.status = { type: 'warning', label: 'Privado' };
+        this.currentPlaylist.status = 'PRIVATE';
+        this.playlists[this.playlists.length - 1].status = 'PRIVATE';
       } else {
-        // this.status.type = 'success';
-        // this.status.label = 'Público';
         this.status = { type: 'success', label: 'Público' };
+        this.currentPlaylist.status = 'PUBLIC';
+        this.playlists[this.playlists.length - 1].status = 'PUBLIC';
       }
     },
 
     async getList(id = null) {
       this.loading = true;
       // alert('list');
-      var urlList = `api/v1/bw/playlist`;
+      var urlList = `api/v1/bw/playlist/lista`;
       if (id) {
-        urlList = `api/v1/bw/playlist/` + id;
+        urlList = `api/v1/bw/playlist/lista/` + id;
       }
       axios({
         method: 'get',
@@ -189,8 +235,8 @@ export default {
           'Authorization': 'Bearer ' + getToken(),
         },
       }).then((response) => {
-        console.log(response.data);
-        // this.playlists = response.data;
+        console.log(response);
+        this.playlists = response.data.data;
         this.loading = false;
       }).catch(error => console.log(error));
     },

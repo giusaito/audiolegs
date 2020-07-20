@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Laravue\Models\Playlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Validator;
 
 class PlaylistController extends Controller
 {
@@ -15,6 +17,19 @@ class PlaylistController extends Controller
     public function index()
     {
         
+    }
+
+    public function getList($id = null){
+        if($id){
+            $playlists = Playlist::where('parent_id',$id)->orderBy('created_at', 'ASC')->get()->toTree();
+        } else {
+            $playlists = Playlist::with('user')->orderBy('created_at', 'ASC')->get()->toTree();
+        }
+        $response = [
+            'data' => $playlists
+        ];
+
+        return response()->json($response);
     }
 
     /**
@@ -35,7 +50,28 @@ class PlaylistController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator =  $validator = Validator::make($request->all(), [
+            'name'                  => 'required|unique:playlists|min:3|max:20',
+            'description'           => 'required',
+        ],
+        [
+            'name.required' => 'Por favor, preencha com o nome da playlist',
+            'name.unique' => 'Já existe um outra playlist com este nome',
+            'name.min' => 'Preencha no mínimo 3 caracteres para o nome da playlist',
+            'name.max' => 'Preencha no máximo 50 caracteres para o nome da playlist',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar a PLAYLIST! Por favor, verifique os campos e tente novamente'], 403);
+        } else {
+            $playlist = Playlist::firstOrCreate([
+                'name' => $request->name,
+                'description' => $request->description,
+                'cover_image' => 'adfasd.jpg',
+                'status' => $request->status,
+                'type' => $request->type,
+                'author_id' => Auth::user()->id,
+            ]);
+        }
     }
 
     /**

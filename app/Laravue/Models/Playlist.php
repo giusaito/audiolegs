@@ -13,4 +13,8 @@ class Playlist extends Model
     use NodeTrait;
 	protected $table = 'playlists';
 	protected $guarded = [''];
+
+	public function user(){
+    	return $this->belongsTo('App\Laravue\Models\User','author_id','id');
+    }
 }

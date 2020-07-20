@@ -16,17 +16,29 @@ class CreatePlaylistsTable extends Migration
         Schema::create('playlists', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
-            $table->string('description', 255);
-            $table->string('cover_image', 191);
+            $table->string('description', 255)->nullable();
+            $table->string('cover_image', 191)->nullable();
             $table->enum('status', ['PUBLIC', 'PRIVATE'])->default('PUBLIC');
             $table->enum('type', ['ADMIN', 'USER'])->default('USER');
             $table->bigInteger('author_id')->unsigned()->nullable();
-            $table->nestedSet();
             $table->timestamps();
 
             $table->foreign('author_id')
             ->references('id')
             ->on('users')
+            ->onDelete('cascade');
+        });
+        Schema::create('law_playlist', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('playlist_id')->unsigned();
+            $table->bigInteger('law_id')->unsigned();
+            $table->foreign('playlist_id')
+            ->references('id')
+            ->on('playlists')
+            ->onDelete('cascade');
+            $table->foreign('law_id')
+            ->references('id')
+            ->on('laws')
             ->onDelete('cascade');
         });
     }
@@ -39,5 +51,6 @@ class CreatePlaylistsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('playlists');
+        Schema::dropIfExists('playlist_law');
     }
 }

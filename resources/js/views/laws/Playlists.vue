@@ -6,7 +6,13 @@
       </el-button>
     </div>
     <div id="playlists">
-      <el-table :data="playlists" border style="width: 100%">
+      <el-table
+        :data="playlists"
+        border
+        style="width: 100%"
+        highlight-current-row
+        @current-change="handleEditPlaylist"
+      >
         <el-table-column
           prop="name"
           label="Playlist"
@@ -63,7 +69,8 @@
       <div class="drawer__content">
         <el-form :model="currentPlaylist">
           <el-form-item>
-            <el-input v-model="currentPlaylist.name" autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" @input="playlists[playlists.length - 1].name = currentPlaylist.name" />
+            <!-- <el-input autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" @input="playlists[playlists.length - 1].name = currentPlaylist.name" /> -->
+            <el-input v-model="currentPlaylist.name" autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" />
           </el-form-item>
           <el-form-item label="Capa" :label-width="formLabelWidth">
             <el-upload
@@ -112,7 +119,7 @@ export default {
         name: '',
         description: '',
         cover_image: '',
-        status: '',
+        status: 'PUBLIC',
         type: 'ADMIN',
       },
       status: {
@@ -121,6 +128,7 @@ export default {
       },
       formLabelWidth: '80px',
       timer: null,
+      currentPlaylistRow: null,
     };
   },
   computed: {
@@ -135,22 +143,34 @@ export default {
     handleCreatePlaylist() {
       this.playlistDrawerTitle = 'Adicionar nova playlist';
       this.btnInsertUpdate = 'Adicionar playlist';
-      // if (typeof this.playlists[this.playlists.length - 1] === 'undefined' || this.playlists[this.playlists.length - 1].created_at !== '') {
+      //  @input="playlists[playlists.length - 1].name = currentPlaylist.name"
+      // this.currentPlaylist.name = this.currentPlaylist.name;
       if (this.saved) {
         this.playlists.push({
           name: 'Escreva o nome da Playlist',
-          author_id: '',
+          user: {
+            name: '---',
+          },
           status: 'PUBLIC',
         });
         this.currentPlaylist = {
           name: '',
           description: '',
           cover_image: '',
-          status: '',
+          status: 'PUBLIC',
           type: 'ADMIN',
         };
         this.saved = false;
       }
+      this.dialog = true;
+    },
+    handleEditPlaylist(val) {
+      this.currentPlaylistRow = val;
+      console.log(this.currentPlaylistRow);
+
+      this.playlistDrawerTitle = 'Editar playlist';
+      this.btnInsertUpdate = 'Atualizar playlist';
+      this.currentPlaylist = this.currentPlaylistRow;
       this.dialog = true;
     },
     cancelForm() {
@@ -166,29 +186,55 @@ export default {
       if (Object.keys(this.currentPlaylist.name).length > 0) {
         this.loading = true;
         this.timer = setTimeout(() => {
-          axios({
-            method: 'post',
-            url: `api/v1/bw/playlist`,
-            headers: {
-              'Authorization': 'Bearer ' + getToken(),
-            },
-            data: this.currentPlaylist,
-          }).then((response) => {
-            // console.log(response);
-            // this.dialogFolderActionVisible = false;
-            // this.getList(this.currentId);
-            this.getList();
-            done();
-            setTimeout(() => {
-              console.log(this.currentPlaylist);
-              this.status = {
-                type: 'success',
-                label: 'Público',
-              };
-              this.loading = false;
-              this.saved = true;
-            }, 400);
-          }).catch(error => console.log(error));
+          if (this.currentPlaylist.id !== undefined){
+            axios({
+              method: 'put',
+              url: `api/v1/bw/playlist/` + this.currentPlaylist.id,
+              headers: {
+                'Authorization': 'Bearer ' + getToken(),
+              },
+              data: this.currentPlaylist,
+            }).then((response) => {
+              // console.log(response);
+              // this.dialogFolderActionVisible = false;
+              // this.getList(this.currentId);
+              this.getList();
+              done();
+              setTimeout(() => {
+                console.log(this.currentPlaylist);
+                this.status = {
+                  type: 'success',
+                  label: 'Público',
+                };
+                this.loading = false;
+                this.saved = true;
+              }, 400);
+            }).catch(error => console.log(error));
+          } else {
+            axios({
+              method: 'post',
+              url: `api/v1/bw/playlist`,
+              headers: {
+                'Authorization': 'Bearer ' + getToken(),
+              },
+              data: this.currentPlaylist,
+            }).then((response) => {
+              // console.log(response);
+              // this.dialogFolderActionVisible = false;
+              // this.getList(this.currentId);
+              this.getList();
+              done();
+              setTimeout(() => {
+                console.log(this.currentPlaylist);
+                this.status = {
+                  type: 'success',
+                  label: 'Público',
+                };
+                this.loading = false;
+                this.saved = true;
+              }, 400);
+            }).catch(error => console.log(error));
+          }
         }, 2000);
       } else {
         this.cancelForm();

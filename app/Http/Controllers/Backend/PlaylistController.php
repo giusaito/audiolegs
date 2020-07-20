@@ -19,12 +19,8 @@ class PlaylistController extends Controller
         
     }
 
-    public function getList($id = null){
-        if($id){
-            $playlists = Playlist::where('parent_id',$id)->orderBy('created_at', 'ASC')->get()->toTree();
-        } else {
-            $playlists = Playlist::with('user')->orderBy('created_at', 'ASC')->get()->toTree();
-        }
+    public function getList(){
+        $playlists = Playlist::with('user','audios')->orderBy('created_at', 'ASC')->get();
         $response = [
             'data' => $playlists
         ];
@@ -50,19 +46,19 @@ class PlaylistController extends Controller
      */
     public function store(Request $request)
     {
-        $validator =  $validator = Validator::make($request->all(), [
-            'name'                  => 'required|unique:playlists|min:3|max:20',
-            'description'           => 'required',
-        ],
-        [
-            'name.required' => 'Por favor, preencha com o nome da playlist',
-            'name.unique' => 'Já existe um outra playlist com este nome',
-            'name.min' => 'Preencha no mínimo 3 caracteres para o nome da playlist',
-            'name.max' => 'Preencha no máximo 50 caracteres para o nome da playlist',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar a PLAYLIST! Por favor, verifique os campos e tente novamente'], 403);
-        } else {
+        // $validator =  $validator = Validator::make($request->all(), [
+        //     'name'                  => 'required|unique:playlists|min:3|max:20',
+        //     'description'           => 'required',
+        // ],
+        // [
+        //     'name.required' => 'Por favor, preencha com o nome da playlist',
+        //     'name.unique' => 'Já existe um outra playlist com este nome',
+        //     'name.min' => 'Preencha no mínimo 3 caracteres para o nome da playlist',
+        //     'name.max' => 'Preencha no máximo 50 caracteres para o nome da playlist',
+        // ]);
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar a PLAYLIST! Por favor, verifique os campos e tente novamente'], 403);
+        // } else {
             $playlist = Playlist::firstOrCreate([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -71,7 +67,25 @@ class PlaylistController extends Controller
                 'type' => $request->type,
                 'author_id' => Auth::user()->id,
             ]);
-        }
+        // }
+    }
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Laravue\Models\Playlist  $playlist
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Playlist $playlist)
+    {
+        // dd($request->all());
+        // $playlist->update($request->all());
+        $playlist->name = $request->name;
+        $playlist->description = $request->description;
+        $playlist->cover_image = 'adfasd.jpg';
+        $playlist->status = $request->status;
+        $playlist->type = $request->type;
+        $playlist->update();
     }
 
     /**
@@ -92,18 +106,6 @@ class PlaylistController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(Playlist $playlist)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Laravue\Models\Playlist  $playlist
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Playlist $playlist)
     {
         //
     }

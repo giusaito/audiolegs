@@ -55,7 +55,7 @@
         <el-form ref="currentLaw" :model="currentLaw" :rules="rules" label-position="left" label-width="200px" style="max-width: 600px;">
           <el-form-item ref="nome_input" label="Nome" prop="nome">
             <el-input v-model="currentLaw.nome" />
-          </el-form-item>
+          </el-form-item>x
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button>
@@ -416,7 +416,7 @@ export default {
       }).catch(error => console.log(error));
     },
     handleSubmit(formName, currentLaw) {
-      console.log(this.currentLaw);git 
+      console.log(this.currentLaw); 
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.currentLaw.id !== undefined){

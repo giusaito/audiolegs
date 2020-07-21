@@ -84,7 +84,6 @@
       <el-card class="box-card">
         <p><i class="el-icon-user-solid" /> Leonardo - <i class="el-icon-date" /> {{ newMusicInfo.created_at | format_date }}</p>
         <p v-show="showInfoUpdated"><i class="el-icon-user-solid" /> Leonardo - <i class="el-icon-date" /> {{ newMusicInfo.updated_at | format_date }}</p>
-
         <div class="playerButtons">
           <a class="button play" title="Play/Pause Song" @click="playAudio()">
             <transition name="slide-fade" mode="out-in">
@@ -104,21 +103,21 @@
         <el-button type="danger" icon="el-icon-refresh"> Substituir áudio </el-button>
 
         <div class="audioDetails">
-          <el-form label-position="left" label-width="100px" :model="newMusicInfo">
-            <el-form-item label="Nome">
+          <el-form ref="currentForm" label-position="left" :rules="rules" label-width="100px" :model="newMusicInfo">
+            <el-form-item label="Nome" prop="title">
               <el-input v-model="newMusicInfo.title" />
             </el-form-item>
-            <el-form-item label="Descrição">
+            <el-form-item label="Descrição" prop="description">
               <el-input v-model="newMusicInfo.description" />
             </el-form-item>
-            <el-form-item label="Narrador">
+            <el-form-item label="Narrador" prop="narrator">
               <el-input v-model="newMusicInfo.narrator" />
             </el-form-item>
-            <el-form-item label="Texto da lei">
+            <el-form-item label="Texto da lei" prop="text">
               <el-input v-model="newMusicInfo.text" type="textarea" rows="10" />
             </el-form-item>
             <el-row>
-              <el-button type="primary" :loading="btnLoading">Atualizar</el-button>
+              <el-button type="primary" :loading="btnLoading" @click="handleSubmit('currentForm', newMusicInfo)">Atualizar</el-button>
               <el-button type="warning">Cancelar</el-button>
             </el-row>
           </el-form>
@@ -207,9 +206,21 @@ export default {
         name: 'leis',
       }],
       rules: {
-        nome: [
-          { required: true, message: 'Por favor, preencha o nome da pasta', trigger: 'change' },
+        title: [
+          { required: true, message: 'Por favor, preencha o título do áudio', trigger: 'change' },
           { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 50', trigger: 'change' },
+        ],
+        description: [
+          { required: true, message: 'Por favor, preencha uma descrição curta do áudio', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 191', trigger: 'change' },
+        ],
+        narrator: [
+          { required: true, message: 'Por favor, preencha o nome do narrador do áudio', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 191', trigger: 'change' },
+        ],
+        text: [
+          { required: true, message: 'Por favor, preencha o texto do áudio', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 20 caracteres', trigger: 'change' },
         ],
       },
 
@@ -234,6 +245,8 @@ export default {
         narrator: '',
         created_at: '',
         updated_at: '',
+        path: '',
+        audio: '',
       },
       audioFile: '',
     };
@@ -357,6 +370,8 @@ export default {
           this.newMusicInfo.text = response.data.audio_text;
           this.newMusicInfo.created_at = response.data.created_at;
           this.newMusicInfo.updated_at = response.data.updated_at;
+          this.newMusicInfo.path = response.data.path;
+          this.newMusicInfo.audio = response.data.name;
 
           if (response.data.updated_at > response.data.created_at){
             this.showInfoUpdated = true;
@@ -401,7 +416,8 @@ export default {
         this.listLoading = false;
       }).catch(error => console.log(error));
     },
-    handleSubmit(formName) {
+    handleSubmit(formName, currentLaw) {
+      console.log(formName);
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.currentLaw.id !== undefined){

@@ -29,6 +29,7 @@ class LawController extends Controller
         return response()->json($response);
     }
     public function store(Request $request){
+        dd($request->all());
         // SE FOR RAIZ (ROOT)
         $request->parent_id = intval($request->parent_id);
         if(!$request->parent_id){

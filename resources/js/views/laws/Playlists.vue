@@ -1,11 +1,14 @@
 <template>
   <div class="app-container">
+    <!-- FILTROS -->
     <div class="filter-container">
       <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="handleCreatePlaylist">
         Adicionar playlist
       </el-button>
     </div>
+    <!-- /fim FILTROS -->
     <div id="playlists">
+      <!-- LISTA DE PLAYLISTS -->
       <el-table
         :data="playlists"
         border
@@ -41,7 +44,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- /fim LISTA DE PLAYLISTS -->
     </div>
+    <!-- SIDEBAR -->
     <el-drawer
       ref="drawer"
       :with-header="false"
@@ -49,8 +54,9 @@
       :direction="direction"
       :modal="modal"
       :append-to-body="appendToBody"
-      :before-close="handleFormSubmit"
+      :before-close="cancelForm"
     >
+      <!-- HEADER SIDEBAR -->
       <header id="el-drawer__title" class="el-drawer__header el-special-drawer__header">
         <span role="heading" tabindex="0" title="" />
         <el-tag
@@ -66,10 +72,10 @@
           <i class="el-dialog__close el-icon el-icon-arrow-right" />
         </button>
       </header>
+      <!-- /fim HEADER SIDEBAR -->
       <div class="drawer__content">
         <el-form :model="currentPlaylist">
           <el-form-item>
-            <!-- <el-input autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" @input="playlists[playlists.length - 1].name = currentPlaylist.name" /> -->
             <el-input v-model="currentPlaylist.name" autocomplete="off" placeholder="Escreva o nome da Playlist" class="playlist_name" />
           </el-form-item>
           <el-form-item label="Capa" :label-width="formLabelWidth">
@@ -90,12 +96,15 @@
             <el-input v-model="currentPlaylist.description" type="textarea" placeholder="Sem descrição definida" />
           </el-form-item>
         </el-form>
+        <!-- RODAPÉ SIDEBAR -->
         <div class="drawer__footer">
           <el-button @click="cancelForm">Cancelar</el-button>
-          <el-button type="primary" :loading="loading" @click="$refs.drawer.closeDrawer()">{{ loading ? 'Salvando ...' : 'Enviar' }}</el-button>
+          <el-button type="primary" :loading="loading" @click="handleFormSubmit">{{ loading ? 'Salvando ...' : 'Enviar' }}</el-button>
         </div>
+        <!-- /fim RODAPÉ SIDEBAR -->
       </div>
     </el-drawer>
+    <!-- /fim SIDEBAR -->
   </div>
 </template>
 
@@ -111,9 +120,9 @@ export default {
       direction: 'rtl',
       modal: false,
       appendToBody: true,
-      saved: true,
-      title: '',
-      // playlists: [{name:'oi',status:"dsafasd",author_id:2}],
+      saved: false,
+      formLabelWidth: '80px',
+      timer: null,
       playlists: [],
       currentPlaylist: {
         name: '',
@@ -126,15 +135,8 @@ export default {
         type: 'success',
         label: 'Público',
       },
-      formLabelWidth: '80px',
-      timer: null,
-      currentPlaylistRow: null,
+      counter: 1,
     };
-  },
-  computed: {
-    lastItemOfPlaylist() {
-      return this.playlists.slice(-1)[0];
-    },
   },
   mounted() {
     this.getList();
@@ -143,101 +145,82 @@ export default {
     handleCreatePlaylist() {
       this.playlistDrawerTitle = 'Adicionar nova playlist';
       this.btnInsertUpdate = 'Adicionar playlist';
-      //  @input="playlists[playlists.length - 1].name = currentPlaylist.name"
-      // this.currentPlaylist.name = this.currentPlaylist.name;
-      if (this.saved) {
-        this.playlists.push({
-          name: 'Escreva o nome da Playlist',
-          user: {
-            name: '---',
-          },
-          status: 'PUBLIC',
-        });
-        this.currentPlaylist = {
-          name: '',
-          description: '',
-          cover_image: '',
-          status: 'PUBLIC',
-          type: 'ADMIN',
-        };
-        this.saved = false;
-      }
+      this.playlists.push({
+        id: this.counter++,
+        name: 'Escreva o nome da Playlist',
+        user: {
+          name: '---',
+        },
+        status: 'PUBLIC',
+      });
+      this.currentPlaylist = {
+        name: '',
+        description: '',
+        cover_image: '',
+        status: 'PUBLIC',
+        type: 'ADMIN',
+      };
       this.dialog = true;
+      this.saved = false;
     },
     handleEditPlaylist(val) {
-      this.currentPlaylistRow = val;
-      console.log(this.currentPlaylistRow);
-
       this.playlistDrawerTitle = 'Editar playlist';
-      this.btnInsertUpdate = 'Atualizar playlist';
-      this.currentPlaylist = this.currentPlaylistRow;
-      this.dialog = true;
-    },
-    cancelForm() {
-      this.loading = false;
-      this.dialog = false;
+      this.btnInsertUpdate = 'Editar playlist';
+      this.currentPlaylist = val;
       this.saved = false;
-      clearTimeout(this.timer);
+      this.dialog = true;
     },
     handleFormSubmit(done){
       if (this.loading) {
         return;
       }
-      if (Object.keys(this.currentPlaylist.name).length > 0) {
-        this.loading = true;
+      this.loading = true;
+
+      // EDITAR PLAYLIST
+      if (this.currentPlaylist.id !== undefined){
         this.timer = setTimeout(() => {
-          if (this.currentPlaylist.id !== undefined){
-            axios({
-              method: 'put',
-              url: `api/v1/bw/playlist/` + this.currentPlaylist.id,
-              headers: {
-                'Authorization': 'Bearer ' + getToken(),
-              },
-              data: this.currentPlaylist,
-            }).then((response) => {
-              // console.log(response);
-              // this.dialogFolderActionVisible = false;
-              // this.getList(this.currentId);
-              this.getList();
-              done();
-              setTimeout(() => {
-                console.log(this.currentPlaylist);
-                this.status = {
-                  type: 'success',
-                  label: 'Público',
-                };
-                this.loading = false;
-                this.saved = true;
-              }, 400);
-            }).catch(error => console.log(error));
-          } else {
-            axios({
-              method: 'post',
-              url: `api/v1/bw/playlist`,
-              headers: {
-                'Authorization': 'Bearer ' + getToken(),
-              },
-              data: this.currentPlaylist,
-            }).then((response) => {
-              // console.log(response);
-              // this.dialogFolderActionVisible = false;
-              // this.getList(this.currentId);
-              this.getList();
-              done();
-              setTimeout(() => {
-                console.log(this.currentPlaylist);
-                this.status = {
-                  type: 'success',
-                  label: 'Público',
-                };
-                this.loading = false;
-                this.saved = true;
-              }, 400);
-            }).catch(error => console.log(error));
-          }
+          axios({
+            method: 'put',
+            url: `api/v1/bw/playlist/` + this.currentPlaylist.id,
+            headers: {
+              'Authorization': 'Bearer ' + getToken(),
+            },
+            data: this.currentPlaylist,
+          }).then((response) => {
+            this.getList();
+            setTimeout(() => {
+              this.status = {
+                type: 'success',
+                label: 'Público',
+              };
+              this.saved = true;
+              this.cancelForm();
+            }, 400);
+          }).catch(error => console.log(error));
         }, 2000);
+      // CRIAR PLAYLIST
       } else {
-        this.cancelForm();
+        this.timer = setTimeout(() => {
+          axios({
+            method: 'post',
+            url: `api/v1/bw/playlist`,
+            headers: {
+              'Authorization': 'Bearer ' + getToken(),
+            },
+            data: this.currentPlaylist,
+          }).then((response) => {
+            this.getList();
+            setTimeout(() => {
+              console.log(this.currentPlaylist);
+              this.status = {
+                type: 'success',
+                label: 'Público',
+              };
+              this.saved = true;
+              this.cancelForm();
+            }, 400);
+          }).catch(error => console.log(error));
+        }, 2000);
       }
     },
     handleCoverSuccess(res, file) {
@@ -266,10 +249,16 @@ export default {
         this.playlists[this.playlists.length - 1].status = 'PUBLIC';
       }
     },
-
+    cancelForm() {
+      this.loading = false;
+      this.dialog = false;
+      clearTimeout(this.timer);
+      if (this.saved === false && this.currentPlaylist.id === undefined) {
+        this.playlists.pop();
+      }
+    },
     async getList(id = null) {
       this.loading = true;
-      // alert('list');
       var urlList = `api/v1/bw/playlist/lista`;
       if (id) {
         urlList = `api/v1/bw/playlist/lista/` + id;

@@ -59,10 +59,11 @@ class PlaylistController extends Controller
         // if ($validator->fails()) {
         //     return response()->json(['errors' => 'Ops! Ocorreu um erro ao salvar a PLAYLIST! Por favor, verifique os campos e tente novamente'], 403);
         // } else {
+            // dd($request->all());
             $playlist = Playlist::firstOrCreate([
                 'name' => $request->name,
                 'description' => $request->description,
-                'cover_image' => 'adfasd.jpg',
+                'cover_image' => $request->cover_image,
                 'status' => $request->status,
                 'type' => $request->type,
                 'author_id' => Auth::user()->id,

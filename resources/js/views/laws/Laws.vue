@@ -13,6 +13,13 @@
           </li>
         </ul>
       </div>
+      <el-alert
+        v-if="currentPath === '/leis'"
+        title="Atenção!"
+        type="warning"
+        description="Todas as pastas criadas neste diretório raiz serão consideradas leis"
+        show-icon
+      />
       <ul class="data">
         <li v-for="lei in leis" :key="lei.id" :class="leisClass(lei.type)">
           <!-- {{ lei.children.length }} -->
@@ -26,6 +33,19 @@
               <span v-if="lei.type === 'file'">{{ formatBytes(lei.size) }}</span>
             </span>
           </div>
+          <!-- <span class="btn-delete"><i class="el-icon-delete-solid" /> Excluir</span> -->
+          <el-popconfirm
+            :title="'Você tem certeza que deseja excluir este item?'"
+            class="btn-delete"
+            confirm-button-text="Sim"
+            cancel-button-text="Não, obrigado"
+            icon="el-icon-info"
+            icon-color="red"
+            @onConfirm="excluir(lei)"
+          >
+            <!-- <el-button slot="reference" type="danger" size="mini"><i class="el-icon-delete-solid" /> Excluir</el-button> -->
+            <el-button slot="reference" type="info" icon="el-icon-delete" circle />
+          </el-popconfirm>
         </li>
       </ul>
     </div>
@@ -52,18 +72,69 @@
         <dropzone id="myVueDropzone" url="api/v1/bw/controle-de-leis/leis" :path="currentPath" :parent="currentId" :max-filesize="20000" :max-files="10" accepted-files="audio/*" @dropzone-removedFile="dropzoneR" @dropzone-success="dropzoneS" @dropzone-successmultiple="dropzoneA" />
       </div>
     </el-dialog>
-    <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="dialogAudioActionVisible" :close-on-click-modal="false" :destroy-on-close="true" :before-close="handleCloseAudio">
+
+    <el-drawer
+      :title="audioDialogTitle"
+      :append-to-body="true"
+      :visible.sync="drawer"
+      :before-close="handleCloseAudio"
+      size="40%"
+      custom-class="teste"
+    >
+
+      <el-card class="box-card">
+        <p><i class="el-icon-user-solid" /> Leonardo - <i class="el-icon-date" /> {{ newMusicInfo.created_at | format_date }}</p>
+        <p v-show="showInfoUpdated"><i class="el-icon-user-solid" /> Leonardo - <i class="el-icon-date" /> {{ newMusicInfo.updated_at | format_date }}</p>
+        <div class="playerButtons">
+          <a class="button play" title="Play/Pause Song" @click="playAudio()">
+            <transition name="slide-fade" mode="out-in">
+              <i :key="1" class="zmdi" :class="[currentlyStopped ? 'zmdi-stop' : (currentlyPlaying ? 'zmdi-pause-circle' : 'zmdi-play-circle')]" />
+            </transition>
+          </a>
+          <div class="currentTimeContainer" style="text-align:center">
+            <span class="currentTime">{{ currentTime | fancyTimeFormat }}</span>
+            <span class="totalTime"> {{ trackDuration | fancyTimeFormat }}</span>
+          </div>
+
+          <div class="currentProgressBar">
+            <div class="currentProgress" :style="{ width: currentProgressBar + '%' }" />
+          </div>
+        </div>
+
+        <el-button type="danger" icon="el-icon-refresh"> Substituir áudio </el-button>
+
+        <div class="audioDetails">
+          <el-form ref="currentForm" label-position="left" :rules="rules" label-width="100px" :model="newMusicInfo">
+            <el-form-item label="Nome" prop="title">
+              <el-input v-model="newMusicInfo.title" />
+            </el-form-item>
+            <el-form-item label="Descrição" prop="description">
+              <el-input v-model="newMusicInfo.description" />
+            </el-form-item>
+            <el-form-item label="Narrador" prop="narrator">
+              <el-input v-model="newMusicInfo.narrator" />
+            </el-form-item>
+            <el-form-item label="Texto da lei" prop="text">
+              <el-input v-model="newMusicInfo.text" type="textarea" rows="10" />
+            </el-form-item>
+            <el-row>
+              <el-button type="primary" :loading="btnLoading" @click="handleSubmit('currentForm', newMusicInfo)">Atualizar</el-button>
+              <el-button type="warning">Cancelar</el-button>
+            </el-row>
+          </el-form>
+        </div>
+      </el-card>
+    </el-drawer>
+
+    <!-- <el-dialog :title="audioDialogTitle" width="25%" :visible.sync="drawer" :close-on-click-modal="false" :destroy-on-close="true" :before-close="handleCloseAudio">
       <div class="audioDetails">
         <transition name="slide-fade" mode="out-in">
           <p :key="currentSong" class="title">
-            <!-- <vue-inline-text-editor :value="empty.title" @blur="onBlur" @close="onClose" @change="onChange" @open="onOpen" @update="onUpdate" /> -->
-            <!-- <vue-inline-text-editor :value="empty.title" @update="onUpdate" /> -->
             <vue-inline-text-editor placeholder="Nome do áudio" :value.sync="newMusicInfo.title" @update="onUpdate('name', audioId)" />
           </p>
         </transition>
         <transition name="slide-fade" mode="out-in">
           <p :key="currentSong" class="description">
-            <!-- <vue-inline-text-editor :value="empty.description" @update="onUpdate" /> -->
             <vue-inline-text-editor placeholder="Descrição do áudio" :value.sync="newMusicInfo.description" @update="onUpdate('description', audioId)" />
           </p>
         </transition>
@@ -77,14 +148,14 @@
         <div class="currentTimeContainer" style="text-align:center">
           <span class="currentTime">{{ currentTime | fancyTimeFormat }}</span>
           <span class="totalTime"> {{ trackDuration | fancyTimeFormat }}</span>
-          <!--<span style="color:black">({{ currentSong+1 }}/{{ music.length }})</span>-->
         </div>
 
         <div class="currentProgressBar">
           <div class="currentProgress" :style="{ width: currentProgressBar + '%' }" />
         </div>
       </div>
-    </el-dialog>
+    </el-dialog> -->
+
   </div>
 </template>
 
@@ -93,6 +164,7 @@ import axios from 'axios';
 import { getToken } from '@/utils/auth';
 import Dropzone from '@/components/Dropzone';
 // var VueInlineTextEditor = require('vue-inline-text-editor');
+import moment from 'moment';
 import VueInlineTextEditor from 'vue-inline-text-editor';
 export default {
   name: 'Files',
@@ -101,9 +173,19 @@ export default {
     fancyTimeFormat: function(s) {
       return (s - (s %= 60)) / 60 + (s > 9 ? ':' : ':0') + s;
     },
+    format_date(value){
+      if (value) {
+        moment.locale('pt-br');
+        return moment(String(value)).format('lll:s');
+      }
+    },
   },
   data() {
     return {
+      btnLoading: false,
+      showInfoUpdated: false,
+      drawer: false,
+      innerDrawer: false,
       dialogFolderActionVisible: false,
       dialogFileActionVisible: false,
       dialogAudioActionVisible: false,
@@ -125,9 +207,21 @@ export default {
         name: 'leis',
       }],
       rules: {
-        nome: [
-          { required: true, message: 'Por favor, preencha o nome da pasta', trigger: 'change' },
+        title: [
+          { required: true, message: 'Por favor, preencha o título do áudio', trigger: 'change' },
           { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 50', trigger: 'change' },
+        ],
+        description: [
+          { required: true, message: 'Por favor, preencha uma descrição curta do áudio', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 191', trigger: 'change' },
+        ],
+        narrator: [
+          { required: true, message: 'Por favor, preencha o nome do narrador do áudio', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 3 caracteres e no máximo 191', trigger: 'change' },
+        ],
+        text: [
+          { required: true, message: 'Por favor, preencha o texto do áudio', trigger: 'change' },
+          { min: 3, max: 50, message: 'Preencha no mínimo 20 caracteres', trigger: 'change' },
         ],
       },
 
@@ -148,6 +242,12 @@ export default {
       newMusicInfo: {
         title: '',
         description: '',
+        text: '',
+        narrator: '',
+        created_at: '',
+        updated_at: '',
+        path: '',
+        audio: '',
       },
       audioFile: '',
     };
@@ -172,6 +272,21 @@ export default {
     clearTimeout(this.checkingCurrentPositionInTrack);
   },
   methods: {
+    excluir(lei){
+      // alert(lei.name);
+      axios({
+        method: 'delete',
+        url: `api/v1/bw/controle-de-leis/leis/` + lei.id,
+        headers: {
+          'Authorization': 'Bearer ' + getToken(),
+        },
+        data: {
+          lei: lei,
+        },
+      }).then((response) => {
+        this.getList(this.currentId);
+      }).catch(error => console.log(error));
+    },
     createFolder() {
       this.dialogFolderActionVisible = true;
       this.folderDialogTitle = 'Adicionar nova pasta';
@@ -252,7 +367,18 @@ export default {
           this.audioId = response.data.id;
           this.newMusicInfo.title = response.data.audio_name;
           this.newMusicInfo.description = response.data.audio_description;
-          this.dialogAudioActionVisible = true;
+          this.newMusicInfo.narrator = response.data.audio_narrator;
+          this.newMusicInfo.text = response.data.audio_text;
+          this.newMusicInfo.created_at = response.data.created_at;
+          this.newMusicInfo.updated_at = response.data.updated_at;
+          this.newMusicInfo.path = response.data.path;
+          this.newMusicInfo.audio = response.data.name;
+
+          if (response.data.updated_at > response.data.created_at){
+            this.showInfoUpdated = true;
+          }
+
+          this.drawer = true;
           this.music.url = '/storage' + response.data.path + '/' + response.data.name;
           this.listLoading = false;
 
@@ -291,7 +417,8 @@ export default {
         this.listLoading = false;
       }).catch(error => console.log(error));
     },
-    handleSubmit(formName) {
+    handleSubmit(formName, currentLaw) {
+      console.log(formName);
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.currentLaw.id !== undefined){
@@ -410,6 +537,7 @@ export default {
       clearTimeout(this.checkingCurrentPositionInTrack);
     },
     handleCloseAudio(done) {
+      this.showInfoUpdated = false;
       this.stopAudio();
       done();
     },
@@ -460,6 +588,12 @@ export default {
 };
 </script>
 <style scoped>
+
+.el-drawer.rtl.teste{
+  overflow: scroll !important;
+}
+
+
 .data {
 	margin-top: 60px;
 	z-index: -3;
@@ -835,8 +969,8 @@ export default {
 }
 .currentTimeContainer .currentTime,
 .currentTimeContainer .totalTime {
-  font-size: 0.5rem;
-  font-family: monospace;
+  font-size: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
   color: rgba(0, 0, 0, 0.75);
 }
 .currentProgressBar {
@@ -851,4 +985,5 @@ export default {
   -webkit-transition: 100ms;
   transition: 100ms;
 }
+
 </style>

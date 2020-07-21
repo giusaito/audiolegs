@@ -15,14 +15,29 @@ class CreateLawsTable extends Migration
     {
         Schema::create('laws', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
+            $table->string('name', 255);
             $table->enum('type', ['file', 'folder'])->default('folder');
-            $table->string('path',100);
+            $table->string('path',255);
             $table->bigInteger('size')->unsigned();
             $table->string('audio_name', 255)->nullable();
-            $table->text('audio_description')->nullable();
+            $table->string('audio_description', 255)->nullable();
+            $table->text('audio_text')->nullable();
+            $table->string('audio_narrator', 255)->nullable();
+            $table->bigInteger('user_id')->unsigned()->nullable();
+            $table->bigInteger('updated_user_id' )->unsigned()->nullable();
             $table->nestedSet();
+            $table->timestamp('text_updated', 0)->nullable();	
+            $table->timestamp('audio_updated', 0)->nullable();
             $table->timestamps();
+
+
+            $table->foreign('user_id')
+            ->references('id')
+            ->on('users');
+            
+            $table->foreign('updated_user_id')
+            ->references('id')
+            ->on('users');
         });
     }
 

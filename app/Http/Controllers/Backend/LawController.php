@@ -44,10 +44,17 @@ class LawController extends Controller
             // SE FOR ÁUDIO
             }else {
                 $audio = $request->file('file');
-                $audioName = $audio->getClientOriginalName();
-                $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
+                if(!empty($audio)){
+                    $audioName = $audio->getClientOriginalName();
+                    $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
+                } else {
+                    $parent = Law::where('id',$request->id)->first();
+                }
+                
+                dd($parent);
+               
                 $file = Law::create([
-                    'name' => $audioName,
+                    'name' => $audioName ? $audioName : $parent->name ,
                     'type' => $request->type,
                     'path' => $request->path,
                     'size' => $path->getSize()
@@ -57,6 +64,8 @@ class LawController extends Controller
             }
         // SE FOR FILHO DE ALGUÉM
         }else {
+            dd('audio f');
+
             $parent = Law::where('id',$request->id)->first();
             // SE FOR PASTA
             if($request->type == 'folder'){
@@ -70,6 +79,8 @@ class LawController extends Controller
                 Storage::makeDirectory('/public/'.$request->path.'/'.$request->name);
             // SE FOR ÁUDIO
             }else {
+                dd('audio 3');
+
                 $audio = $request->file('file');
                 $audioName = $audio->getClientOriginalName();
                 $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);

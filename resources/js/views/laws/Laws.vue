@@ -105,12 +105,12 @@
         <div class="audioDetails">
           <el-form ref="currentForm" label-position="left" :rules="rules" label-width="100px" :model="newMusicInfo">
             <el-form-item label="Nome" prop="title">
-              <el-input v-model="newMusicInfo.title" />
+              <el-input v-model="newMusicInfo.title" maxlength="250" show-word-limit/>
             </el-form-item>
             <el-form-item label="Descrição" prop="description">
-              <el-input v-model="newMusicInfo.description" />
+              <el-input v-model="newMusicInfo.description" maxlength="250" show-word-limit/>
             </el-form-item>
-            <el-form-item label="Narrador" prop="narrator">
+            <el-form-item label="Narrador" prop="narrator" maxlength="250" show-word-limit>
               <el-input v-model="newMusicInfo.narrator" />
             </el-form-item>
             <el-form-item label="Texto da lei" prop="text">
@@ -416,23 +416,25 @@ export default {
       }).catch(error => console.log(error));
     },
     handleSubmit(formName, currentLaw) {
-      console.log(formName);
+      console.log(this.currentLaw);git 
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.currentLaw.id !== undefined){
-            alert('edit');
           } else {
             axios({
-              method: 'post',
-              url: `api/v1/bw/controle-de-leis/leis`,
+              method: 'PUT',
+              url: `api/v1/bw/controle-de-leis/leis/` + this.audioId,
               headers: {
                 'Authorization': 'Bearer ' + getToken(),
               },
               data: {
-                name: this.currentLaw.nome,
-                path: this.currentLaw.path,
-                type: this.currentLaw.type,
-                parent_id: this.currentLaw.parent_id,
+                name: currentLaw.name,
+                description: currentLaw.description,
+                narrator: currentLaw.narrator,
+                text: currentLaw.text,
+                path: currentLaw.path,
+                type: currentLaw.type,
+                parent_id: currentLaw.parent_id,
               },
             }).then((response) => {
               console.log(response);

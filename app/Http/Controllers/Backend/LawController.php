@@ -29,7 +29,6 @@ class LawController extends Controller
         return response()->json($response);
     }
     public function store(Request $request){
-        dd($request->all());
         // SE FOR RAIZ (ROOT)
         $request->parent_id = intval($request->parent_id);
         if(!$request->parent_id){
@@ -44,6 +43,7 @@ class LawController extends Controller
                 Storage::makeDirectory('/public/'.$request->path.'/'.$request->name);
             // SE FOR ÁUDIO
             }else {
+                dd($request->all());
                 $audio = $request->file('file');
                 $audioName = $audio->getClientOriginalName();
                 $path = $audio->move(Storage::disk('local')->path('/public/'.$request->path),$audioName);
@@ -99,5 +99,9 @@ class LawController extends Controller
         // dd(Law::findOrFail($request->lei['id']));
         $lei = Law::findOrFail($request->lei['id'])->delete();
         return response()->json($lei);
+    }
+
+    public function update(Request $request){
+        dd($request->all());
     }
 }

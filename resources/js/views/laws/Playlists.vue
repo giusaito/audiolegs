@@ -99,7 +99,7 @@
         <!-- RODAPÉ SIDEBAR -->
         <div class="drawer__footer">
           <el-button @click="cancelForm">Cancelar</el-button>
-          <el-button type="primary" :loading="loading" @click="handleFormSubmit">{{ loading ? 'Salvando ...' : 'Enviar' }}</el-button>
+          <el-button type="primary" :loading="loading" @click="handleFormSubmit(currentPlaylist)">{{ loading ? 'Salvando ...' : 'Enviar' }}</el-button>
         </div>
         <!-- /fim RODAPÉ SIDEBAR -->
       </div>
@@ -164,11 +164,13 @@ export default {
       this.saved = false;
     },
     handleEditPlaylist(val) {
-      this.playlistDrawerTitle = 'Editar playlist';
-      this.btnInsertUpdate = 'Editar playlist';
-      this.currentPlaylist = val;
-      this.saved = false;
-      this.dialog = true;
+      if(val != null){
+        this.playlistDrawerTitle = 'Editar playlist';
+        this.btnInsertUpdate = 'Editar playlist';
+        this.currentPlaylist = val;
+        this.saved = false;
+        this.dialog = true;
+      }
     },
     handleFormSubmit(done){
       if (this.loading) {
@@ -187,7 +189,6 @@ export default {
             },
             data: this.currentPlaylist,
           }).then((response) => {
-            this.getList();
             setTimeout(() => {
               this.status = {
                 type: 'success',
@@ -195,6 +196,12 @@ export default {
               };
               this.saved = true;
               this.cancelForm();
+              this.$message({
+                type: 'success',
+                message: 'A playlist foi atualizada com sucesso',
+                duration: 5 * 1000,
+              });
+              this.getList();
             }, 400);
           }).catch(error => console.log(error));
         }, 2000);

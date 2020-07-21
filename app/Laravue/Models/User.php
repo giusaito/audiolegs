@@ -117,6 +117,9 @@ class User extends Authenticatable
     public function state(){
     	return $this->belongsTo('App\Laravue\Models\State');
     }
+    public function playlists(){
+        return $this->hasMany('App\Laravue\Models\Playlist','id','author_id');
+    }
 
     public function getDescriptionForEvent(string $eventName): string
     {

@@ -89,6 +89,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
     // Fim rota de controle-de-leis backend
 
     // Rota de playlists
+    Route::get('playlist/lista/{id?}', 'PlaylistController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('playlist', 'PlaylistController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });
 

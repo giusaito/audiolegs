@@ -979,4 +979,5 @@ export default {
   -webkit-transition: 100ms;
   transition: 100ms;
 }
+
 </style>

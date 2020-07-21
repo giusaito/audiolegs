@@ -15,9 +15,9 @@ class CreateLawsTable extends Migration
     {
         Schema::create('laws', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
+            $table->string('name', 255);
             $table->enum('type', ['file', 'folder'])->default('folder');
-            $table->string('path',100);
+            $table->string('path',255);
             $table->bigInteger('size')->unsigned();
             $table->string('audio_name', 255)->nullable();
             $table->string('audio_description', 255)->nullable();

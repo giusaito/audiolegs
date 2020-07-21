@@ -8,6 +8,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
+site.zip
 
 # Laravel 5 & Lumen specific
 public/storage

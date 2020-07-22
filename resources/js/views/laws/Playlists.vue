@@ -82,16 +82,15 @@
             <el-upload
               ref="cover"
               class="cover-uploader"
-              action=""
+              :action="upload_cover_url"
               :multiple="false"
               :limit="1"
               :show-file-list="false"
-              :on-success="handleCoverSuccess"
               :on-change="handleCoverPath"
               :before-upload="beforeCoverUpload"
               :auto-upload="false"
             >
-              <img v-if="currentPlaylist.cover_image" :src="currentPlaylist.cover_image" class="cover">
+              <img v-if="cover_image_preview" :src="cover_image_preview" class="cover">
               <i v-else class="el-icon-plus cover-uploader-icon" />
             </el-upload>
           </el-form-item>
@@ -139,6 +138,8 @@ export default {
         label: 'Público',
       },
       counter: 1,
+      cover_image_preview: null,
+      upload_cover_url: 'api/v1/bw/playlist/upload-cover/',
     };
   },
   mounted() {
@@ -217,29 +218,32 @@ export default {
             },
             data: this.currentPlaylist,
           }).then((response) => {
-            this.getList();
-            setTimeout(() => {
-              console.log(this.currentPlaylist);
-              this.status = {
-                type: 'success',
-                label: 'Público',
-              };
-              this.saved = true;
-              this.cancelForm();
-            }, 400);
+            if (response.data['success'] === true) {
+              this.getList();
+              setTimeout(() => {
+                // console.log(this.currentPlaylist);
+                this.status = {
+                  type: 'success',
+                  label: 'Público',
+                };
+                if (response.data['last_insert_id']) {
+                  this.upload_cover_url = 'api/v1/bw/playlist/upload-cover/' + response.data['last_insert_id'];
+                  this.$refs.cover.submit();
+                  // console.log(response.data['last_insert_id']);
+                  this.saved = true;
+                  this.cancelForm();
+                }
+              }, 400);
+            }
           }).catch(error => console.log(error));
         }, 2000);
       }
-    },
-    handleCoverSuccess(res, file) {
-      console.log(file);
-      // this.currentPlaylist.cover_image = URL.createObjectURL(file.raw);
     },
     handleCoverPath(file, fileList) {
       // Certificate upload component on-change event
       // this.cert_path = fileList;
       console.log(file);
-      this.currentPlaylist.cover_image = URL.createObjectURL(file.raw);
+      this.cover_image_preview = URL.createObjectURL(file.raw);
       // this.currentPlaylist.cover_image = file;
     },
     beforeCoverUpload(file) {

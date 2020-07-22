@@ -90,6 +90,7 @@ Route::group(['prefix' => 'v1/bw', 'middleware' => 'auth:api'], function () {
 
     // Rota de playlists
     Route::get('playlist/lista/{id?}', 'PlaylistController@getList')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::post('playlist/upload-cover/{id?}', 'PlaylistController@uploadCover')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::apiResource('playlist', 'PlaylistController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     });
 

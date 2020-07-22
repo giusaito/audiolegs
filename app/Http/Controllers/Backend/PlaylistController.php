@@ -6,6 +6,7 @@ use App\Laravue\Models\Playlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+use Response;
 
 class PlaylistController extends Controller
 {
@@ -68,6 +69,7 @@ class PlaylistController extends Controller
                 'type' => $request->type,
                 'author_id' => Auth::user()->id,
             ]);
+            return Response::json(array('success' => true, 'last_insert_id' => $playlist->id), 200);
         // }
     }
     /**
@@ -87,6 +89,8 @@ class PlaylistController extends Controller
         $playlist->status = $request->status;
         $playlist->type = $request->type;
         $playlist->update();
+
+        return Response::json(array('success' => true, 'last_insert_id' => $playlist->id), 200);
     }
 
     /**
@@ -120,5 +124,38 @@ class PlaylistController extends Controller
     public function destroy(Playlist $playlist)
     {
         //
+    }
+
+    public function uploadCover(Request $request, $id){
+        // Define o valor default para a variável que contém o nome da imagem 
+        $nameFile = null;
+    
+        // Verifica se informou o arquivo e se é válido
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            
+            // Define um aleatório para o arquivo baseado no timestamps atual
+            $name = uniqid(date('HisYmd'));
+    
+            // Recupera a extensão do arquivo
+            $extension = $request->image->extension();
+    
+            // Define finalmente o nome
+            $nameFile = "{$name}.{$extension}";
+    
+            // Faz o upload:
+            $upload = $request->image->storeAs('playlist/cover', $nameFile);
+            // Se tiver funcionado o arquivo foi armazenado em storage/app/public/playlist/cover/nomedinamicoarquivo.extensao
+    
+            // Verifica se NÃO deu certo o upload (Redireciona de volta)
+            if ( !$upload ){
+                Playlist::findOrFail($id)->delete();
+                return Response::json(array('success' => false, 'message' => 'Não foi possível efetuar o envio da capa da playlist. Por favor, tente novamente.'), 200);
+            }else {
+                $playlist               = Playlist::findOrFail($id);
+                $playlist->cover_image  = $nameFile;
+                $playlist->update();
+            }
+    
+        }
     }
 }
